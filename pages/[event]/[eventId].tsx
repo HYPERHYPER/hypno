@@ -244,7 +244,7 @@ const SubGallery = (props: ResponseData) => {
                       {...register(v.id, { 
                         required: true, 
                         ...(v.id == 'email' && { pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ }),
-                        ...(v.id == 'age' && { pattern: /\d+/ })
+                        ...(v.id == 'age' && { pattern: /^[0-9]*$/ })
                       })} 
                     />
                   ))}
