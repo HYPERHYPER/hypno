@@ -223,9 +223,9 @@ const SubGallery = (props: ResponseData) => {
 
         <div className={`sm:mx-auto block h-full ${_.isEmpty(event) && 'mt-8'}`}>
           {!photos.length ? (
-            <div className='mx-auto max-w-[24rem] sm:max-w-2xl flex flex-col gap-4 items-center justify-center bg-white/10 backdrop-blur-[50px] p-10'>
+            <div className='mx-auto max-w-[24rem] sm:max-w-2xl flex flex-row gap-4 items-center justify-center bg-white/10 backdrop-blur-[50px] p-8'>
               <Spinner />
-              <p className='text-center text-2xl text-white/20'>Your photos are processing, <br />come back later...</p>
+              <p className='text-white/20'>Your photos are processing, come back later...</p>
             </div>
           ) : (
             dataCapture ? (
@@ -288,7 +288,6 @@ const SubGallery = (props: ResponseData) => {
                       {_.range(0, uploadingCount).map((v, i) => (
                         <div key={i} className='bg-white/10 backdrop-blur-[50px] px-3 py-6 flex flex-col gap-3 justify-center items-center aspect-[9/16]'>
                           <Spinner size='30px' />
-                          <p className='text-white/20'>Still processing... <br/>come back later</p>
                         </div>
                       ))}
                     </Masonry>
