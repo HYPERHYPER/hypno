@@ -5,6 +5,10 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    fontFamily: {
+      nbAkademieStd: "NB Akademie Std, sans-serif",
+      sans: ["NB Akademie Std","Helvetica Neue","Arial","ui-sans-serif"]
+    },
     extend: {},
   },
   plugins: [require("daisyui")],

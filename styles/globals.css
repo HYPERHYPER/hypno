@@ -1,6 +1,100 @@
+@font-face {
+  font-family: 'NB Akademie Std';
+  src: url('../assets/fonts/NBAkademieStd/NBAkademieStd-Regular.woff2') format('woff2'),
+      url('../assets/fonts/NBAkademieStd/NBAkademieStd-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'NB Akademie Std';
+  src: url('../assets/fonts/NBAkademieStd/NBAkademieStdLight.woff2') format('woff2'),
+      url('../assets/fonts/NBAkademieStd/NBAkademieStdLight.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'NB Akademie Std';
+  src: url('../assets/fonts/NBAkademieStd/NB_Akademie_Std_Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'NB Akademie Std';
+  src: url('../assets/fonts/NBAkademieStd/NB_Akademie_Std_Bold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'NB Akademie Std';
+  src: url('../assets/fonts/NBAkademieStd/NBAkademieStd-Regular.woff2') format('woff2'),
+      url('../assets/fonts/NBAkademieStd/NBAkademieStd-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'NB Akademie Std';
+  src: url('../assets/fonts/NBAkademieStd/NBAkademieStdLight.woff2') format('woff2'),
+      url('../assets/fonts/NBAkademieStd/NBAkademieStdLight.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'NB Akademie Std';
+  src: url('../assets/fonts/NBAkademieStd/NB_Akademie_Std_Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'NB Akademie Std';
+  src: url('../assets/fonts/NBAkademieStd/NB_Akademie_Std_Bold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'NB Akademie Std';
+  src: url('../assets/fonts/NBAkademieStd/NB_Akademie_Std_Black.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .checkbox {
+    @apply rounded-none border-none bg-white checked:bg-white
+  }
+
+  .btn {
+    @apply rounded-none font-normal
+  }
+
+  .input {
+    @apply rounded-none text-sm text-black placeholder:text-black
+  }
+
+  .input.error {
+    @apply placeholder:text-red-600
+  }
+}
 
 :root {
   --max-width: 1100px;
@@ -97,6 +191,8 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+  letter-spacing: -0.03rem;
+  line-height: 1rem;
 }
 
 a {

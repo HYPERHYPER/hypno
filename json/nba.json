@@ -1,0 +1,11 @@
+{
+    "name": "NBA All Star Weekend 2023",
+    "fields": ["Name", "Email", "Age", "NBA ID"],
+    "title": "Share and tag to win...",
+    "subtitle": "#allstarweekend23 #nbaid \n@nba @nbaontnt",
+    "terms": "",
+    "privacy": "",
+    "logo": "/nbaLogo.svg",
+    "background": "/nbaBg.png",
+    "color": "#FFF21F"
+}
