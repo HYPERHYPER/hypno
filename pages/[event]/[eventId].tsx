@@ -82,7 +82,7 @@ const SubGallery = (props: ResponseData) => {
     })
   let photos: ImageData[] = data?.photos || [];
 
-  const expectedPhotoUploads = _.first(photos)?.category_count || photos.length;
+  const expectedPhotoUploads = _.first(photos)?.category_count || 15;
   const uploadingCount = expectedPhotoUploads - photos.length;
   useEffect(() => {
     setPhotoUploadCompleted(expectedPhotoUploads == photos.length)
@@ -215,14 +215,14 @@ const SubGallery = (props: ResponseData) => {
       </label> */}
 
       <section
-        className='text-white bg-black min-h-screen p-10'
+        className='text-white bg-black min-h-screen p-10 pt-0'
         style={event.background ? { background: `url(${event.background}) no-repeat center center fixed`, backgroundSize: 'cover' } : {}}>
 
         <div className='flex justify-center'>
-          <img src={event.logo ? event.logo : 'https://hypno-web-assets.s3.amazonaws.com/hypno-logo-white-drop.png'} alt={event.name + " logo"} width={125} height={150} />
+          <img src={event.logo ? event.logo : 'https://hypno-web-assets.s3.amazonaws.com/hypno-logo-white-drop.png'} alt={event.name + " logo"} width={150} height={150} />
         </div>
 
-        <div className='mt-8 sm:mx-auto block h-full'>
+        <div className='sm:mx-auto block h-full'>
           {!photos.length ? (
             <div className='mx-auto max-w-[24rem] sm:max-w-2xl flex flex-col gap-4 items-center justify-center bg-white/10 backdrop-blur-[50px] p-10'>
               <Spinner />
@@ -248,10 +248,10 @@ const SubGallery = (props: ResponseData) => {
                       })} 
                     />
                   ))}
-                  <div className='flex flex-row items-start gap-3 p-3 bg-white/10 backdrop-blur-[50px]'>
+                  <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
                     <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} />
                     <p className='text-xs text-gray-400'>
-                      By pressing "continue" to access and save your content, you accept the <a className='text-white' href={event.terms} rel="noreferrer" target='_blank'>Terms of Use</a> and <a className='text-white' href={event.privacy} rel="noreferrer" target='_blank'>Privacy Policy</a> provided by Hypno and its related partners and services
+                      By pressing "continue" to access and save your content, you accept the <a className='text-white' href={event.terms} rel="noreferrer" target='_blank'>Terms of Use</a> and <a className='text-white' href={event.privacy} rel="noreferrer" target='_blank'>Privacy Policy</a> provided by the NBA and its related partners and services
                     </p>
                   </div>
                   <input className='btn btn-primary' type='submit' value='GO' style={event.color ? { backgroundColor: event.color, borderColor: event.color, color: toTextColor(event.color) } : {}} />
