@@ -237,7 +237,16 @@ const SubGallery = (props: ResponseData) => {
                 </div>
                 <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
                   {fields?.map((v, i) => (
-                    <input className={`input ${errors[v.id] && 'error'}`} placeholder={`${v.name}${errors[v.id] ? ' is required' : ''}`} key={i} {...register(v.id, { required: true })} />
+                    <input 
+                      className={`input ${errors[v.id] && 'error text-red-600'}`} 
+                      placeholder={`${v.name}${errors[v.id] ? (errors[v.id]?.type === 'pattern' ? ' is not valid' : ' is required') : ''}`} 
+                      key={i} 
+                      {...register(v.id, { 
+                        required: true, 
+                        ...(v.id == 'email' && { pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ }),
+                        ...(v.id == 'age' && { pattern: /\d+/ })
+                      })} 
+                    />
                   ))}
                   <div className='flex flex-row items-start gap-3 p-3 bg-white/10 backdrop-blur-[50px]'>
                     <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} />
