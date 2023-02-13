@@ -222,40 +222,46 @@ const SubGallery = (props: ResponseData) => {
           <Image className='h-auto' src={event.logo ? event.logo : 'https://hypno-web-assets.s3.amazonaws.com/hypno-logo-white-drop.png'} alt={event.name + " logo"} width={150} height={150} priority />
         </div>
 
-        <div className={`sm:mx-auto block h-full ${_.isEmpty(event) && 'mt-8'}`}>
+        <div className={`sm:mx-auto h-full ${_.isEmpty(event) ? 'mt-8' : ''}`}>
           {!photos.length ? (
-            <div className='mx-auto max-w-[24rem] sm:max-w-2xl flex flex-row gap-4 items-center justify-center bg-white/10 backdrop-blur-[50px] p-8'>
-              <Spinner />
-              <p className='text-white/20'>Your photos are processing, come back later...</p>
+            <div className='fixed hero top-0 left-0 h-screen p-10'>
+              <div className='hero-content max-w-[24rem] sm:max-w-2xl flex flex-row gap-4 items-center justify-center bg-white/10 backdrop-blur-[50px] p-8'>
+                <Spinner />
+                <p className='text-white/20'>Your photos are processing, come back later...</p>
+              </div>
             </div>
           ) : (
             dataCapture ? (
-              <div className='max-w-[24rem] sm:max-w-2xl block mx-auto'>
-                <div className='mb-4'>
-                  <h2>Want your photos?</h2>
-                  {!_.isEmpty(fields) && <h2 className='text-gray-400'>Add your info to continue...</h2>}
-                </div>
-                <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
-                  {fields?.map((v, i) => (
-                    <input 
-                      className={`input ${errors[v.id] && 'error text-red-600'}`} 
-                      placeholder={`${v.name}${errors[v.id] ? (errors[v.id]?.type === 'pattern' ? ' is not valid' : ' is required') : ''}`} 
-                      key={i} 
-                      {...register(v.id, { 
-                        required: true, 
-                        ...(v.id == 'email' && { pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ }),
-                        ...(v.id == 'age' && { pattern: /^[0-9]*$/ })
-                      })} 
-                    />
-                  ))}
-                  <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
-                    <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} />
-                    <p className='text-xs text-gray-400'>
-                      By pressing &quot;continue&quot; to access and save your content, you accept the <a className='text-white' href={event.terms} rel="noreferrer" target='_blank'>Terms of Use</a> and <a className='text-white' href={event.privacy} rel="noreferrer" target='_blank'>Privacy Policy</a> provided by {_.isEmpty(event) ? 'Hypno' : 'the NBA'} and its related partners and services
-                    </p>
+              <div className='fixed hero top-0 left-0 h-screen'>
+                <div className='hero-content max-w-[24rem] sm:max-w-2xl p-10'>
+                  <div className='flex flex-col'>
+                    <div className='mb-4'>
+                      <h2>Want your photos?</h2>
+                      {!_.isEmpty(fields) && <h2 className='text-gray-400'>Add your info to continue...</h2>}
+                    </div>
+                    <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
+                      {fields?.map((v, i) => (
+                        <input
+                          className={`input ${errors[v.id] && 'error text-red-600'}`}
+                          placeholder={`${v.name}${errors[v.id] ? (errors[v.id]?.type === 'pattern' ? ' is not valid' : ' is required') : ''}`}
+                          key={i}
+                          {...register(v.id, {
+                            required: true,
+                            ...(v.id == 'email' && { pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ }),
+                            ...(v.id == 'age' && { pattern: /^[0-9]*$/ })
+                          })}
+                        />
+                      ))}
+                      <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
+                        <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} />
+                        <p className='text-xs text-gray-400'>
+                          By pressing &quot;continue&quot; to access and save your content, you accept the <a className='text-white' href={event.terms} rel="noreferrer" target='_blank'>Terms of Use</a> and <a className='text-white' href={event.privacy} rel="noreferrer" target='_blank'>Privacy Policy</a> provided by {_.isEmpty(event) ? 'Hypno' : 'the NBA'} and its related partners and services
+                        </p>
+                      </div>
+                      <input className='btn btn-primary' type='submit' value='GO' style={event.color ? { backgroundColor: event.color, borderColor: event.color, color: toTextColor(event.color) } : {}} />
+                    </form>
                   </div>
-                  <input className='btn btn-primary' type='submit' value='GO' style={event.color ? { backgroundColor: event.color, borderColor: event.color, color: toTextColor(event.color) } : {}} />
-                </form>
+                </div>
               </div>
             ) : (
               <div className='max-w-[24rem] sm:max-w-2xl md:max-w-6xl block mx-auto h-full'>
@@ -295,15 +301,15 @@ const SubGallery = (props: ResponseData) => {
                 </FadeIn>
               </div>
             ))}
+        </div>
 
-          {/* <label
+        {/* <label
                 className='btn btn-lg btn-circle rounded-full fixed z-90 bottom-10 right-8 w-50 h-50 justify-center items-center hover:bg-green-700 hover:drop-shadow-2xl hover:animate-pulse duration-300'
                 htmlFor={queue.length ? 'send-modal' : 'info-modal'}
               >
                 {queue.length ? queue.length : null}
                 <ArrowRight />
               </label> */}
-        </div>
       </section>
     </>
   );
