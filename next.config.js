@@ -8,7 +8,13 @@ const nextConfig = {
         hostname: 'images.hypno.com',
         port: '',
         pathname: '**'
-      }
+      },
+      {
+        protocol: 'https',
+        hostname: 'hypno-web-assets.s3.amazonaws.com',
+        port: '',
+        pathname: '**'
+      },
     ]
   },
   webpack: (config) => {

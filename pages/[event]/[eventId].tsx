@@ -6,15 +6,16 @@ import { useState, useRef, useEffect } from 'react';
 import ArrowRight from '../../public/pop/arrow-right.svg';
 import ArrowLeft from '../../public/pop/arrow-left.svg';
 import Head from 'next/head';
-import { rgbDataURL } from '@/helpers/image';
 import _ from 'lodash';
 import { getEventData } from '../api/pro/[eventId]';
 import { useForm } from 'react-hook-form';
 import { toTextColor } from '@/helpers/color';
 import Spinner from '@/components/Spinner';
-import useSWR, { preload } from 'swr';
+import useSWR from 'swr';
 import { fetchWithToken } from '@/lib/fetchWithToken';
 import { FadeIn } from 'react-slide-fade-in';
+import Image from 'next/image';
+import AutosizeImage from '@/components/AutosizeImage';
 
 type ImageData = {
   id: number;
@@ -85,7 +86,7 @@ const SubGallery = (props: ResponseData) => {
   const uploadingCount = expectedPhotoUploads - photos.length;
   useEffect(() => {
     setPhotoUploadCompleted(expectedPhotoUploads == photos.length)
-  }, [photos])
+  }, [photos, expectedPhotoUploads])
 
   /* Setting up the data capture form for the gallery. */
   const [dataCapture, setDataCapture] = useState<boolean>(!!event.fields);
@@ -218,7 +219,7 @@ const SubGallery = (props: ResponseData) => {
         style={event.background ? { background: `url(${event.background}) no-repeat center center fixed`, backgroundSize: 'cover' } : {}}>
 
         <div className='flex justify-center'>
-          <img src={event.logo ? event.logo : 'https://hypno-web-assets.s3.amazonaws.com/hypno-logo-white-drop.png'} alt={event.name + " logo"} width={150} height={150} />
+          <Image src={event.logo ? event.logo : 'https://hypno-web-assets.s3.amazonaws.com/hypno-logo-white-drop.png'} alt={event.name + " logo"} width={150} height={150} priority />
         </div>
 
         <div className={`sm:mx-auto block h-full ${_.isEmpty(event) && 'mt-8'}`}>
@@ -250,7 +251,7 @@ const SubGallery = (props: ResponseData) => {
                   <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
                     <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} />
                     <p className='text-xs text-gray-400'>
-                      By pressing "continue" to access and save your content, you accept the <a className='text-white' href={event.terms} rel="noreferrer" target='_blank'>Terms of Use</a> and <a className='text-white' href={event.privacy} rel="noreferrer" target='_blank'>Privacy Policy</a> provided by {_.isEmpty(event) ? 'Hypno' : 'the NBA'} and its related partners and services
+                      By pressing &quot;continue&quot; to access and save your content, you accept the <a className='text-white' href={event.terms} rel="noreferrer" target='_blank'>Terms of Use</a> and <a className='text-white' href={event.privacy} rel="noreferrer" target='_blank'>Privacy Policy</a> provided by {_.isEmpty(event) ? 'Hypno' : 'the NBA'} and its related partners and services
                     </p>
                   </div>
                   <input className='btn btn-primary' type='submit' value='GO' style={event.color ? { backgroundColor: event.color, borderColor: event.color, color: toTextColor(event.color) } : {}} />
@@ -278,10 +279,9 @@ const SubGallery = (props: ResponseData) => {
                           <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
                             <Spinner size='30px' />
                           </div>
-                          <img
+                          <AutosizeImage
                             src={p.jpeg_url}
                             alt={p.event_name + p.id}
-                            placeholder="blur"
                           />
                         </div>
                       ))}
