@@ -277,7 +277,7 @@ const SubGallery = (props: ResponseData) => {
                             <span className='indicator-item badge badge-primary' />
                           ) : null} */}
                           <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
-                            <Spinner size='30px' />
+                            <Spinner />
                           </div>
                           <AutosizeImage
                             src={p.jpeg_url}
@@ -287,7 +287,7 @@ const SubGallery = (props: ResponseData) => {
                       ))}
                       {_.range(0, uploadingCount).map((v, i) => (
                         <div key={i} className='bg-white/10 backdrop-blur-[50px] px-3 py-6 flex flex-col gap-3 justify-center items-center aspect-[9/16]'>
-                          <Spinner size='30px' />
+                          <Spinner />
                         </div>
                       ))}
                     </Masonry>
