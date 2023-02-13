@@ -89,7 +89,7 @@ const SubGallery = (props: ResponseData) => {
   }, [photos, expectedPhotoUploads])
 
   /* Setting up the data capture form for the gallery. */
-  const [dataCapture, setDataCapture] = useState<boolean>(!!event.fields);
+  const [dataCapture, setDataCapture] = useState<boolean>(!!(event.fields || event.terms));
   const fields = _.map(event.fields, (f) => ({ id: f.toLowerCase().replaceAll(" ", "_"), name: f }));
   const {
     register,
@@ -219,7 +219,7 @@ const SubGallery = (props: ResponseData) => {
         style={event.background ? { background: `url(${event.background}) no-repeat center center fixed`, backgroundSize: 'cover' } : {}}>
 
         <div className='flex justify-center'>
-          <Image src={event.logo ? event.logo : 'https://hypno-web-assets.s3.amazonaws.com/hypno-logo-white-drop.png'} alt={event.name + " logo"} width={150} height={150} priority />
+          <Image className='h-auto' src={event.logo ? event.logo : 'https://hypno-web-assets.s3.amazonaws.com/hypno-logo-white-drop.png'} alt={event.name + " logo"} width={150} height={150} priority />
         </div>
 
         <div className={`sm:mx-auto block h-full ${_.isEmpty(event) && 'mt-8'}`}>
@@ -233,7 +233,7 @@ const SubGallery = (props: ResponseData) => {
               <div className='max-w-[24rem] sm:max-w-2xl block mx-auto'>
                 <div className='mb-4'>
                   <h2>Want your photos?</h2>
-                  <h2 className='text-gray-400'>Add your info to continue...</h2>
+                  {!_.isEmpty(fields) && <h2 className='text-gray-400'>Add your info to continue...</h2>}
                 </div>
                 <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
                   {fields?.map((v, i) => (
