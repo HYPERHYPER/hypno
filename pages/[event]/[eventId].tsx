@@ -69,7 +69,7 @@ interface ResponseData {
 }
 
 const SubGallery = (props: ResponseData) => {
-  const { event, photos: initialPhotos } = props;
+  const { event, photos: initialPhotos, count } = props;
   const { query: { category, eventId } } = useRouter()
 
   const [photoUploadCompleted, setPhotoUploadCompleted] = useState<boolean>(false);
@@ -82,7 +82,7 @@ const SubGallery = (props: ResponseData) => {
     })
   let photos: ImageData[] = data?.photos || [];
 
-  const expectedPhotoUploads = _.get(_.first(photos)?.metadata, 'category_count') || photos.length;
+  const expectedPhotoUploads = _.get(_.first(photos)?.metadata, 'category_count') || count;
   const uploadingCount = expectedPhotoUploads - photos.length;
   useEffect(() => {
     setPhotoUploadCompleted(expectedPhotoUploads == photos.length)
@@ -276,7 +276,7 @@ const SubGallery = (props: ResponseData) => {
                       {photos.map((p) => (
                         <div
                           key={p.id}
-                          className='w-full block relative bg-white/10 backdrop-blur-[50px] min-h-[200px]'
+                          className='w-full block relative bg-white/10 backdrop-blur-[50px] min-h-[180px]'
                         // onClick={() => queueHandler(p.id)}
                         >
                           {/* {queue.includes(p.id) ? (
@@ -292,7 +292,7 @@ const SubGallery = (props: ResponseData) => {
                         </div>
                       ))}
                       {_.range(0, uploadingCount).map((v, i) => (
-                        <div key={i} className='bg-white/10 backdrop-blur-[50px] px-3 py-6 flex flex-col gap-3 justify-center items-center aspect-[9/16]'>
+                        <div key={i} className='bg-white/10 backdrop-blur-[50px] px-3 py-6 flex flex-col gap-3 justify-center items-center aspect-[4/3]'>
                           <Spinner />
                         </div>
                       ))}
