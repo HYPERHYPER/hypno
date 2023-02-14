@@ -82,7 +82,7 @@ const SubGallery = (props: ResponseData) => {
     })
   let photos: ImageData[] = data?.photos || [];
 
-  const expectedPhotoUploads = _.first(photos)?.category_count || photos.length;
+  const expectedPhotoUploads = _.get(_.first(photos)?.metadata, 'category_count') || photos.length;
   const uploadingCount = expectedPhotoUploads - photos.length;
   useEffect(() => {
     setPhotoUploadCompleted(expectedPhotoUploads == photos.length)
