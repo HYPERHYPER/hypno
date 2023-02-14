@@ -218,7 +218,14 @@ const SubGallery = (props: ResponseData) => {
 
       <section
         className={`text-white bg-black min-h-screen p-10 ${!_.isEmpty(event) && 'pt-0'}`}
-        style={event.background ? { background: `url(${event.background}) no-repeat center center fixed`, backgroundSize: 'cover' } : {}}>
+        style={event.background ? { 
+          background: `url(${event.background}) no-repeat center center fixed`, 
+          backgroundSize: 'cover',
+          //@ts-ignore
+          '-webkit-background-size': 'cover',
+          '-moz-background-size': 'cover',
+          '-o-background-size': 'cover'
+          } : {}}>
 
         <div className='flex justify-center'>
           <Image className='h-auto' src={event.logo ? event.logo : 'https://hypno-web-assets.s3.amazonaws.com/hypno-logo-white-drop.png'} alt={event.name + " logo"} width={150} height={150} priority />
