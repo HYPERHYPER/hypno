@@ -16,7 +16,7 @@ export default function AutosizeImage({
     const [paddingTop, setPaddingTop] = useState<string>("0");
 
     return (
-        <div className="relative min-h-[100px]" style={{ paddingTop }}>
+        <div className="relative min-h-[100px] border-0" style={{ paddingTop }}>
             <Image
                 src={src}
                 fill
