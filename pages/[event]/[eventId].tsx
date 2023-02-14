@@ -72,20 +72,22 @@ const SubGallery = (props: ResponseData) => {
   const { event, photos: initialPhotos, count } = props;
   const { query: { category, eventId } } = useRouter()
 
+  const [photoUploadPending, setPhotoUploadPending] = useState<boolean>(true); // waiting for first photo to arrive
   const [photoUploadCompleted, setPhotoUploadCompleted] = useState<boolean>(false);
   const photoUrl = `https://pro.hypno.com/api/v1/events/${eventId}/${category}/photos.json`;
   const { data, error } = useSWR([photoUrl, process.env.NEXT_PUBLIC_AUTH_TOKEN],
     ([url, token]) => fetchWithToken(url, token),
     {
       fallbackData: { photos: initialPhotos },
-      refreshInterval: photoUploadCompleted ? 0 : 1000
+      refreshInterval: (photoUploadCompleted && !photoUploadPending) ? 0 : 1000
     })
   let photos: ImageData[] = data?.photos || [];
 
   const expectedPhotoUploads = _.get(_.first(photos)?.metadata, 'category_count') || count;
   const uploadingCount = expectedPhotoUploads - photos.length;
   useEffect(() => {
-    setPhotoUploadCompleted(expectedPhotoUploads == photos.length)
+    setPhotoUploadPending(_.isEmpty(photos));
+    setPhotoUploadCompleted(expectedPhotoUploads == photos.length);
   }, [photos, expectedPhotoUploads])
 
   /* Setting up the data capture form for the gallery. */

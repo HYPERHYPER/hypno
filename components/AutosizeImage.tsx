@@ -21,9 +21,6 @@ export default function AutosizeImage({
                 src={src}
                 fill
                 style={{ objectFit: 'cover' }}
-                sizes="(max-width: 768px) 100vw,
-                        (max-width: 1200px) 50vw,
-                        33vw"
                 quality={100}
                 alt={alt}
                 onLoadingComplete={({ naturalWidth, naturalHeight }) => {
