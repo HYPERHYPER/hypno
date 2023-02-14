@@ -217,14 +217,14 @@ const SubGallery = (props: ResponseData) => {
       </label> */}
 
       <section
-        className={`text-white bg-black min-h-screen p-10 ${!_.isEmpty(event) && 'pt-0'}`}
+        className={`text-white bg-black min-h-screen p-10 ${!_.isEmpty(event) && 'pt-0'} relative`}
         style={event.background ? { 
           background: `url(${event.background}) no-repeat center center fixed`, 
-          backgroundSize: 'cover',
+          backgroundSize: '100% 100vh',
           //@ts-ignore
-          '-webkit-background-size': 'cover',
-          '-moz-background-size': 'cover',
-          '-o-background-size': 'cover'
+          '-webkit-background-size': '100% 100vh',
+          '-moz-background-size': '100% 100vh',
+          '-o-background-size': '100% 100vh'
           } : {}}>
 
         <div className='flex justify-center'>
