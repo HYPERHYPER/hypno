@@ -265,7 +265,7 @@ const SubGallery = (props: ResponseData) => {
                       <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
                         <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} />
                         <p className='text-xs text-gray-400'>
-                          By pressing &quot;continue&quot; to access and save your content, you accept the <a className='text-white' href={event.terms} rel="noreferrer" target='_blank'>Terms of Use</a> and <a className='text-white' href={event.privacy} rel="noreferrer" target='_blank'>Privacy Policy</a> provided by {_.isEmpty(event) ? 'Hypno' : 'the NBA'} and its related partners and services
+                          By pressing &quot;continue&quot; to access and save your content, you accept the <a className='text-white' href={event.terms} rel="noreferrer" target='_blank'>Terms of Use</a> and <a className='text-white' href={event.privacy} rel="noreferrer" target='_blank'>Privacy Policy</a> provided by {_.isEmpty(event) ? 'Hypno' : 'the NBA'} and related partners
                         </p>
                       </div>
                       <input className='btn btn-primary' type='submit' value='GO' style={event.color ? { backgroundColor: event.color, borderColor: event.color, color: toTextColor(event.color) } : {}} />
