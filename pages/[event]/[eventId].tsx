@@ -72,21 +72,21 @@ const SubGallery = (props: ResponseData) => {
   const { event, photos: initialPhotos, count } = props;
   const { query: { category, eventId } } = useRouter()
 
-  const [photoUploadProcessing, setPhotoUploadProcessing] = useState<boolean>(true); // waiting for first photo to arrive
+  const [photoUploadPending, setPhotoUploadPending] = useState<boolean>(true); // waiting for first photo to arrive
   const [photoUploadCompleted, setPhotoUploadCompleted] = useState<boolean>(false);
   const photoUrl = `https://pro.hypno.com/api/v1/events/${eventId}/${category}/photos.json`;
   const { data, error } = useSWR([photoUrl, process.env.NEXT_PUBLIC_AUTH_TOKEN],
     ([url, token]) => fetchWithToken(url, token),
     {
       fallbackData: { photos: initialPhotos },
-      refreshInterval: (photoUploadCompleted && !photoUploadProcessing) ? 0 : 1000
+      refreshInterval: (photoUploadCompleted && !photoUploadPending) ? 0 : 1000
     })
   let photos: ImageData[] = data?.photos || [];
 
   const expectedPhotoUploads = _.get(_.first(photos)?.metadata, 'category_count') || count;
   const uploadingCount = expectedPhotoUploads - photos.length;
   useEffect(() => {
-    setPhotoUploadProcessing(_.isEmpty(photos));
+    setPhotoUploadPending(_.isEmpty(photos));
     setPhotoUploadCompleted(expectedPhotoUploads == photos.length);
   }, [photos, expectedPhotoUploads])
 
@@ -215,117 +215,111 @@ const SubGallery = (props: ResponseData) => {
           </div>
         </label>
       </label> */}
-      <div className='relative'>
-        <section
-          className='bg-black fixed top-0 left-0 h-screen w-screen -z-10'
-          style={event.background ? {
-            background: `url(${event.background}) no-repeat center center fixed`,
-            backgroundSize: 'cover',
-            //@ts-ignore
-            '-webkit-background-size': 'cover',
-            '-moz-background-size': 'cover',
-            '-o-background-size': 'cover'
-          } : {}}
-        />
 
-        <section
-          className={`text-white min-h-screen h-min p-10 ${!_.isEmpty(event) && 'pt-0'}`}
-        >
+      <section
+        className={`text-white bg-black min-h-screen p-10 ${!_.isEmpty(event) && 'pt-0'}`}
+        style={event.background ? { 
+          background: `url(${event.background}) no-repeat center center fixed`, 
+          backgroundSize: 'cover',
+          //@ts-ignore
+          '-webkit-background-size': 'cover',
+          '-moz-background-size': 'cover',
+          '-o-background-size': 'cover'
+          } : {}}>
 
-          <div className='flex justify-center z-10'>
-            <Image className='h-auto' src={event.logo ? event.logo : 'https://hypno-web-assets.s3.amazonaws.com/hypno-logo-white-drop.png'} alt={event.name + " logo"} width={150} height={150} priority />
-          </div>
+        <div className='flex justify-center'>
+          <Image className='h-auto' src={event.logo ? event.logo : 'https://hypno-web-assets.s3.amazonaws.com/hypno-logo-white-drop.png'} alt={event.name + " logo"} width={150} height={150} priority />
+        </div>
 
-          <div className={`sm:mx-auto h-full ${_.isEmpty(event) ? 'mt-8' : ''}`}>
-            {!photos.length ? (
-              <div className='fixed hero top-0 left-0 h-screen p-10'>
-                <div className='hero-content max-w-[24rem] sm:max-w-2xl flex flex-row gap-4 items-center justify-center bg-white/10 backdrop-blur-[50px] p-8'>
-                  <Spinner />
-                  <p className='text-white/20'>Your photos are processing, come back later...</p>
+        <div className={`sm:mx-auto h-full ${_.isEmpty(event) ? 'mt-8' : ''}`}>
+          {!photos.length ? (
+            <div className='fixed hero top-0 left-0 h-screen p-10'>
+              <div className='hero-content max-w-[24rem] sm:max-w-2xl flex flex-row gap-4 items-center justify-center bg-white/10 backdrop-blur-[50px] p-8'>
+                <Spinner />
+                <p className='text-white/20'>Your photos are processing, come back later...</p>
+              </div>
+            </div>
+          ) : (
+            dataCapture ? (
+              <div className='fixed hero top-0 left-0 h-screen'>
+                <div className='hero-content max-w-[24rem] sm:max-w-2xl p-10'>
+                  <div className='flex flex-col'>
+                    <div className='mb-4'>
+                      <h2>Want your photos?</h2>
+                      {!_.isEmpty(fields) && <h2 className='text-gray-400'>Add your info to continue...</h2>}
+                    </div>
+                    <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
+                      {fields?.map((v, i) => (
+                        <input
+                          className={`input ${errors[v.id] && 'error text-red-600'}`}
+                          placeholder={`${v.name}${errors[v.id] ? (errors[v.id]?.type === 'pattern' ? ' is not valid' : ' is required') : ''}`}
+                          key={i}
+                          {...register(v.id, {
+                            required: true,
+                            ...(v.id == 'email' && { pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ }),
+                            ...(v.id == 'age' && { pattern: /^[0-9]*$/ })
+                          })}
+                        />
+                      ))}
+                      <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
+                        <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} />
+                        <p className='text-xs text-gray-400'>
+                          By pressing &quot;continue&quot; to access and save your content, you accept the <a className='text-white' href={event.terms} rel="noreferrer" target='_blank'>Terms of Use</a> and <a className='text-white' href={event.privacy} rel="noreferrer" target='_blank'>Privacy Policy</a> provided by {_.isEmpty(event) ? 'Hypno' : 'the NBA'} and its related partners and services
+                        </p>
+                      </div>
+                      <input className='btn btn-primary' type='submit' value='GO' style={event.color ? { backgroundColor: event.color, borderColor: event.color, color: toTextColor(event.color) } : {}} />
+                    </form>
+                  </div>
                 </div>
               </div>
             ) : (
-              dataCapture ? (
-                <div className='fixed hero top-0 left-0 h-screen'>
-                  <div className='hero-content max-w-[24rem] sm:max-w-2xl p-10'>
-                    <div className='flex flex-col'>
-                      <div className='mb-4'>
-                        <h2>Want your photos?</h2>
-                        {!_.isEmpty(fields) && <h2 className='text-gray-400'>Add your info to continue...</h2>}
-                      </div>
-                      <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
-                        {fields?.map((v, i) => (
-                          <input
-                            className={`input ${errors[v.id] && 'error text-red-600'}`}
-                            placeholder={`${v.name}${errors[v.id] ? (errors[v.id]?.type === 'pattern' ? ' is not valid' : ' is required') : ''}`}
-                            key={i}
-                            {...register(v.id, {
-                              required: true,
-                              ...(v.id == 'email' && { pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ }),
-                              ...(v.id == 'age' && { pattern: /^[0-9]*$/ })
-                            })}
-                          />
-                        ))}
-                        <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
-                          <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} />
-                          <p className='text-xs text-gray-400'>
-                            By pressing &quot;continue&quot; to access and save your content, you accept the <a className='text-white' href={event.terms} rel="noreferrer" target='_blank'>Terms of Use</a> and <a className='text-white' href={event.privacy} rel="noreferrer" target='_blank'>Privacy Policy</a> provided by {_.isEmpty(event) ? 'Hypno' : 'the NBA'} and its related partners and services
-                          </p>
-                        </div>
-                        <input className='btn btn-primary' type='submit' value='GO' style={event.color ? { backgroundColor: event.color, borderColor: event.color, color: toTextColor(event.color) } : {}} />
-                      </form>
-                    </div>
-                  </div>
+              <div className='max-w-[24rem] sm:max-w-2xl md:max-w-6xl block mx-auto h-full'>
+                <div className='mb-4'>
+                  <h2>{event?.title || 'Share and tag all over social.'}</h2>
+                  <h2 className='text-gray-400 whitespace-pre-line'>{event?.subtitle || '#hypno #pro #iphone'}</h2>
                 </div>
-              ) : (
-                <div className='max-w-[24rem] sm:max-w-2xl md:max-w-6xl block mx-auto h-full'>
-                  <div className='mb-4'>
-                    <h2>{event?.title || 'Share and tag all over social.'}</h2>
-                    <h2 className='text-gray-400 whitespace-pre-line'>{event?.subtitle || '#hypno #pro #iphone'}</h2>
-                  </div>
-                  <FadeIn
-                    from="bottom" positionOffset={300} triggerOffset={0}>
-                    <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
-                      <Masonry gutter='15px'>
-                        {photos.map((p) => (
-                          <div
-                            key={p.id}
-                            className='w-full block relative bg-white/10 backdrop-blur-[50px] min-h-[180px]'
-                          // onClick={() => queueHandler(p.id)}
-                          >
-                            {/* {queue.includes(p.id) ? (
+                <FadeIn
+                  from="bottom" positionOffset={300} triggerOffset={0}>
+                  <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
+                    <Masonry gutter='15px'>
+                      {photos.map((p) => (
+                        <div
+                          key={p.id}
+                          className='w-full block relative bg-white/10 backdrop-blur-[50px] min-h-[180px]'
+                        // onClick={() => queueHandler(p.id)}
+                        >
+                          {/* {queue.includes(p.id) ? (
                             <span className='indicator-item badge badge-primary' />
                           ) : null} */}
-                            <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
-                              <Spinner />
-                            </div>
-                            <AutosizeImage
-                              src={p.jpeg_url}
-                              alt={p.event_name + p.id}
-                            />
-                          </div>
-                        ))}
-                        {_.range(0, uploadingCount).map((v, i) => (
-                          <div key={i} className='bg-white/10 backdrop-blur-[50px] px-3 py-6 flex flex-col gap-3 justify-center items-center aspect-[4/3]'>
+                          <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
                             <Spinner />
                           </div>
-                        ))}
-                      </Masonry>
-                    </ResponsiveMasonry>
-                  </FadeIn>
-                </div>
-              ))}
-          </div>
+                          <AutosizeImage
+                            src={p.jpeg_url}
+                            alt={p.event_name + p.id}
+                          />
+                        </div>
+                      ))}
+                      {_.range(0, uploadingCount).map((v, i) => (
+                        <div key={i} className='bg-white/10 backdrop-blur-[50px] px-3 py-6 flex flex-col gap-3 justify-center items-center aspect-[4/3]'>
+                          <Spinner />
+                        </div>
+                      ))}
+                    </Masonry>
+                  </ResponsiveMasonry>
+                </FadeIn>
+              </div>
+            ))}
+        </div>
 
-          {/* <label
+        {/* <label
                 className='btn btn-lg btn-circle rounded-full fixed z-90 bottom-10 right-8 w-50 h-50 justify-center items-center hover:bg-green-700 hover:drop-shadow-2xl hover:animate-pulse duration-300'
                 htmlFor={queue.length ? 'send-modal' : 'info-modal'}
               >
                 {queue.length ? queue.length : null}
                 <ArrowRight />
               </label> */}
-        </section>
-      </div>
+      </section>
     </>
   );
 };
