@@ -25,6 +25,17 @@ const nextConfig = {
 
     return config
   },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: '/',
+          destination: process.env.NEXT_PUBLIC_HOME_URL,
+          basePath: false,
+        }
+      ]
+    }
+  }
 }
 
 module.exports = nextConfig
