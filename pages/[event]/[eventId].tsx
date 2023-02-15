@@ -43,7 +43,6 @@ type ImageData = {
   metadata: Object; // need to type?
   export: boolean;
   export_settings: Object; //need to type
-  category_count: number; // TODO
 };
 
 type EventData = {
