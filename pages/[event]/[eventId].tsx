@@ -51,6 +51,7 @@ type EventData = {
   fields: string[];
   title: string;
   subtitle: string;
+  dataCaptureTitle: string;
   terms: string;
   privacy: string;
   logo: string;
@@ -245,7 +246,7 @@ const SubGallery = (props: ResponseData) => {
                 <div className='hero-content max-w-[24rem] sm:max-w-2xl p-10'>
                   <div className='flex flex-col'>
                     <div className='mb-4'>
-                      <h2>Want your photos?</h2>
+                      <h2>{event.dataCaptureTitle || 'Want your photos?'}</h2>
                       {!_.isEmpty(fields) && <h2 className='text-gray-400'>Add your info to continue...</h2>}
                     </div>
                     <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
