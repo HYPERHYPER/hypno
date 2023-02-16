@@ -75,7 +75,7 @@ const SubGallery = (props: ResponseData) => {
 
   const [photoUploadPending, setPhotoUploadPending] = useState<boolean>(true); // waiting for first photo to arrive
   const [photoUploadCompleted, setPhotoUploadCompleted] = useState<boolean>(false);
-  const photoUrl = `https://pro.hypno.com/api/v1/events/${eventId}/${category}/photos.json`;
+  const photoUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${eventId}/${category}/photos.json`;
   const { data, error } = useSWR([photoUrl, process.env.NEXT_PUBLIC_AUTH_TOKEN],
     ([url, token]) => fetchWithToken(url, token),
     {
@@ -153,7 +153,7 @@ const SubGallery = (props: ResponseData) => {
       ...metadata,
       ...data,
     }
-    const url = `https://pro.hypno.com/api/v1/photos/${photoSlug}.json`;
+    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/${photoSlug}.json`;
     const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
     let resp = await axios.put(url, { metadata }, {
       headers: {
@@ -222,8 +222,8 @@ const SubGallery = (props: ResponseData) => {
         style={event.background ? { 
           background: `url(${event.background}) no-repeat center center fixed`, 
           backgroundSize: 'cover',
+          WebkitBackgroundSize: 'cover',
           //@ts-ignore
-          '-webkit-background-size': 'cover',
           '-moz-background-size': 'cover',
           '-o-background-size': 'cover'
           } : {}}>
@@ -333,7 +333,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const eventData = await getEventData(String(event));
 
   // Fetch subset of photos to be displayed in subgallery
-  const url = `https://pro.hypno.com/api/v1/events/${eventId}/${category}/photos.json`;
+  const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${eventId}/${category}/photos.json`;
   // const url = `http://localhost:4000/api/v1/events/${eventId}/${category}/photos.json`;
   const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
   let resp = await axios.get(url, {
