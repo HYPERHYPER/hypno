@@ -88,7 +88,15 @@
   }
 
   .input {
-    @apply rounded-none text-sm text-black placeholder:text-black
+    @apply input-ghost focus:bg-white/10 focus:text-white placeholder:text-white/20 disabled:bg-white/10 disabled:border-none disabled:placeholder:text-white/10
+  }
+
+  .form-control .label-text {
+    @apply text-white/40
+  }
+
+  .input.data-capture {
+    @apply rounded-none bg-white text-sm text-black placeholder:text-black
   }
 
   .input.error {
