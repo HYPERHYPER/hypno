@@ -1,24 +1,24 @@
 import axios from 'axios';
-import { useState, useRef } from 'react';
+import { useState, useRef, SyntheticEvent } from 'react';
 
 interface UploaderProps {
   eventName: string;
 }
 
 export default function S3Uploader(props: UploaderProps) {
-  const fileRef = useRef();
-  const [file, setFile] = useState('');
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  const [file, setFile] = useState<ArrayBuffer | string>('');
   const [contentType, setContentType] = useState('');
   const [newFilename, setNewFilename] = useState('');
   const [assetLocation, setAssetLocation] = useState('');
 
-  const onFileChange = (e) => {
-    let files = e.target.files || e.dataTransfer.files;
-    if (!files.length) return;
+  const onFileChange = (e: SyntheticEvent) => {
+    let files = (e.target as HTMLInputElement).files
+    if (!files?.length) return;
     createImage(files[0]);
   };
 
-  const createImage = (file) => {
+  const createImage = (file: File) => {
     let reader = new FileReader();
     reader.onload = (e) => {
       // console.log("length: ", e.target.result.includes("data:image/jpeg"));
@@ -28,19 +28,21 @@ export default function S3Uploader(props: UploaderProps) {
       // if (e.target.result.length > MAX_IMAGE_SIZE) {
       //   return alert("Image is loo large.");
       // }
-      setFile(e.target.result);
-      setContentType(e.target.result.split(':')[1].split(';')[0]);
+	  if (e.target?.result) {
+      	setFile(e.target.result);
+      	setContentType((e.target.result as string).split(':')[1].split(';')[0]);
+	  }
     };
     reader.readAsDataURL(file);
   };
 
-  const uploadToS3 = async (e) => {
+  const uploadToS3 = async () => {
     const url = process.env.NEXT_PUBLIC_AWS_ENDPOINT as string;
     const resp = await axios.get(url, {
       params: { fileName: props.eventName + '/' + newFilename, contentType },
     });
 
-    let binary = Buffer.from(file.split(',')[1], 'base64');
+    let binary = Buffer.from((file as string).split(',')[1], 'base64');
     let blob = new Blob([binary as BlobPart], {
       type: contentType,
     });
@@ -56,7 +58,9 @@ export default function S3Uploader(props: UploaderProps) {
 
     if (result.status == 200) {
       setAssetLocation(result.url.split('?')[0]);
-      fileRef.current.value = result.url.split('?')[0];
+      if (fileRef.current) {
+		fileRef.current.value = result.url.split('?')[0];
+	  } 
     }
   };
 
