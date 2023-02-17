@@ -87,8 +87,8 @@
     @apply rounded-none font-normal
   }
 
-  .input {
-    @apply input-ghost focus:bg-white/10 focus:text-white placeholder:text-white/20 disabled:bg-white/10 disabled:border-none disabled:placeholder:text-white/10
+  .input, .select, .textarea {
+    @apply input-ghost bg-white/[.08] text-white focus:bg-white/10 focus:text-white placeholder:text-white/20 disabled:bg-white/10 disabled:border-none disabled:placeholder:text-white/10
   }
 
   .form-control .label-text {
@@ -193,12 +193,7 @@ body {
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background: black;
   letter-spacing: -0.03rem;
   line-height: 1rem;
 }
