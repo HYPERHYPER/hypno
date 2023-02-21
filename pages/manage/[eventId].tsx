@@ -103,20 +103,20 @@ const ManageEventGallery = (props: ResponseData) => {
 
             <section className={`text-white bg-white/10 min-h-screen relative`}>
                 <div className='sticky top-0 bg-black'>
-                    <div className='mx-auto px-[30px] py-[35px] flex sm:flex-row justify-between items-center'>
+                    <div className='mx-auto px-[30px] py-[35px] flex flex-col-reverse sm:flex-row justify-between items-start gap-3 sm:items-center'>
                         <h1 className='text-2xl'>Edit Gallery <span className='ml-1 text-gray-400'>{name}</span></h1>
                         <Image className='w-auto' src={'https://hypno-web-assets.s3.amazonaws.com/hypno-logo-white-drop.png'} alt={"Hypno logo"} width={100} height={100} priority />
                     </div>
                 </div>
 
-                <div className={`sm:mx-auto h-full mx-7 pb-[30px] flex flex-row w-full`}>
-                    <div className='mt-8 w-1/3 p-4'>
-                        <div className="tabs gap-2 font-medium bg-transparent flex flex-col">
+                <div className={`sm:mx-auto h-full mx-7 pb-[30px] flex flex-col sm:flex-row w-full`}>
+                    <div className='mt-3 sm:mt-8 w-full sm:w-1/3 sm:p-4'>
+                        <div className="tabs gap-2 font-medium bg-transparent flex flex-row sm:flex-col">
                             <a className={`tab tab-lg text-white ${view == 'basic' ? 'tab-active' : ''}`} onClick={() => setView('basic')}>Basic</a>
                             <a className={`tab tab-lg text-white ${view == 'data' ? 'tab-active' : ''}`} onClick={() => setView('data')}>Data Capture</a>
                         </div>
                     </div>
-                    <form onSubmit={handleSubmit(submitForm)} className='mt-8 space-y-3 flex-1 flex flex-col p-4 pb-5 max-w-lg'>
+                    <form onSubmit={handleSubmit(submitForm)} className='sm:mt-8 space-y-3 flex-1 flex flex-col p-4 pb-5 max-w-xs sm:max-w-lg'>
                         {view == 'basic' && (
                             <>
                                 <div className='form-control '>
