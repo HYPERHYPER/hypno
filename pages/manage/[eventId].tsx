@@ -1,18 +1,14 @@
-import { useRouter } from 'next/router';
 import axios from 'axios';
 import type { GetServerSideProps } from 'next';
-import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import _ from 'lodash';
 import { useForm } from 'react-hook-form';
-import Spinner from '@/components/Spinner';
-import useSWR from 'swr';
-import { fetchWithToken } from '@/lib/fetchWithToken';
 import Image from 'next/image';
-import Link from 'next/link';
 import S3Uploader from '@/components/S3Uploader';
 import { ThreeDots } from 'react-loader-spinner';
+import nookies, { parseCookies } from 'nookies'
+
 
 interface ResponseData {
     status: number;
@@ -86,7 +82,7 @@ const ManageEventGallery = (props: ResponseData) => {
         }
 
         const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${id}.json`;
-        const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+        const token = parseCookies().hypno_token;
         let resp = await axios.put(url, { metadata: { ...eventMetadata }, terms_and_conditions }, {
             headers: {
                 'Content-Type': 'application/json',
@@ -258,19 +254,43 @@ const ManageEventGallery = (props: ResponseData) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    const { eventId } = context.query;
+    const { eventId, accessToken : accessTokenParam } = context.query;
+    const cookieToken = nookies.get(context).hypno_token;
+    let accessToken = accessTokenParam || cookieToken;
+    if (!accessToken) {
+        return {
+            notFound: true,
+        }
+    }
+
+    // Store access token in case of refresh
+    if (cookieToken !== accessToken) {
+        nookies.set(context, 'hypno_token', String(accessToken));
+    }
 
     // Fetch event config
     const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${eventId}.json`;
-    const token = process.env.NEXT_PUBLIC_AUTH_TOKEN; // TODO: use token stored as cookie from prev
-    let resp = await axios.get(url, {
+    const token = accessToken;
+    let data = {};
+    await axios.get(url, {
         headers: {
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + token,
         },
-    });
-    let data = await resp.data;
-    console.log(data)
+    }).then(async (res) => {
+        if (res.status === 200) {
+            data = await res.data;
+        }
+    }).catch((e) => {
+        console.log(e);
+    })
+
+    if (_.isEmpty(data)) {
+        return {
+            notFound: true,
+        }
+    }
+
     return {
         props: {
             ...data,

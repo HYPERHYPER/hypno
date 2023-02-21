@@ -333,19 +333,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   // Load theme interface based on event
   const isDefault = String(event) === 'pro';
   const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${eventId}.json`;
-  const token2 = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
   let eventRes = await axios.get(eventUrl, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + token2,
+      Authorization: 'Bearer ' + token,
     },
   });
   let eventData = await eventRes.data?.event;
-  // const eventData = await getEventData(String(event));
 
   // Fetch subset of photos to be displayed in subgallery
   const photoUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${eventId}/${category}/photos.json`;
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
   let resp = await axios.get(photoUrl, {
     headers: {
       'Content-Type': 'application/json',
