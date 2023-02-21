@@ -53,6 +53,7 @@ type EventData = {
   gallery_subtitle: string;
   data_capture_title: string;
   data_capture_subtitle: string;
+  data_capture_screen: boolean;
   terms: string;
   privacy: string;
   logo: string;
@@ -94,7 +95,7 @@ const SubGallery = (props: ResponseData) => {
   }, [photos, expectedPhotoUploads])
 
   /* Setting up the data capture form for the gallery. */
-  const [dataCapture, setDataCapture] = useState<boolean>(!!(event.fields || event.terms));
+  const [dataCapture, setDataCapture] = useState<boolean>(event.data_capture_screen);
   const fields = _.map(event.fields, (f) => ({ id: f.toLowerCase().replaceAll(" ", "_"), name: f }));
   const {
     register,

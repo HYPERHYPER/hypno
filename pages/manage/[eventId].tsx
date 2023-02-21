@@ -38,7 +38,7 @@ const ManageEventGallery = (props: ResponseData) => {
         defaultValues: {
             gallery_title: metadata.gallery_title || '',
             gallery_subtitle: metadata.gallery_subtitle || '',
-            data_capture: !_.isEmpty(metadata.fields) || false,
+            data_capture_screen: metadata.data_capture_screen || false,
             data_capture_title: metadata.data_capture_title || '',
             data_capture_subtitle: metadata.data_capture_subtitle || '',
             fields: metadata.fields || [],
@@ -70,7 +70,6 @@ const ManageEventGallery = (props: ResponseData) => {
 
         console.log("submitForm", { data });
         const terms_and_conditions = data.terms_and_conditions;
-        delete data['data_capture']
         delete data['terms_and_conditions']
 
         /* Update metadata field of event */
@@ -78,7 +77,7 @@ const ManageEventGallery = (props: ResponseData) => {
         eventMetadata = {
             ...props.event.metadata,
             ...data,
-            fields: data.fields ? _.map(_.split(data.fields, ','), (f) => f.trim()) : [],
+            fields: (!_.isEmpty(data.fields) && _.first(data.fields) != '') ? _.map(_.split(data.fields, ','), (f) => f.trim()) : [],
         }
 
         const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${id}.json`;
@@ -180,8 +179,8 @@ const ManageEventGallery = (props: ResponseData) => {
                                         <span className='label-text text-white'>Data Capture Screen</span>
                                     </label>
                                     <div className='flex flex-row gap-2 items-center'>
-                                        <input type="checkbox" className="toggle toggle-lg" {...register('data_capture')} />
-                                        <span className='text-sm text-white/40'>{config.data_capture ? 'Enabled' : 'Disabled'}</span>
+                                        <input type="checkbox" className="toggle toggle-lg" {...register('data_capture_screen')} />
+                                        <span className='text-sm text-white/40'>{config.data_capture_screen ? 'Enabled' : 'Disabled'}</span>
                                     </div>
                                 </div>
 
@@ -192,7 +191,7 @@ const ManageEventGallery = (props: ResponseData) => {
                                     <input
                                         className='input'
                                         placeholder='Name, Email'
-                                        disabled={!config.data_capture}
+                                        disabled={!config.data_capture_screen}
                                         {...register('fields')} />
                                 </div>
 
@@ -203,7 +202,7 @@ const ManageEventGallery = (props: ResponseData) => {
                                     <input
                                         className='input'
                                         placeholder='Want your photos?'
-                                        disabled={!config.data_capture}
+                                        disabled={!config.data_capture_screen}
                                         {...register('data_capture_title')} />
                                 </div>
 
@@ -214,7 +213,7 @@ const ManageEventGallery = (props: ResponseData) => {
                                     <input
                                         className='input'
                                         placeholder='Add your info to continue'
-                                        disabled={!config.data_capture}
+                                        disabled={!config.data_capture_screen}
                                         {...register('data_capture_subtitle')} />
                                 </div>
 
@@ -223,7 +222,7 @@ const ManageEventGallery = (props: ResponseData) => {
                                         <span className='label-text text-white'>Terms and Conditions</span>
                                         <span className='label-text-alt cursor-pointer text-white/40 hover:text-white transition' onClick={() => setValue('terms_and_conditions', DEFAULT_TERMS)}>Reset</span>
                                     </label>
-                                    <textarea className='textarea w-full leading-[1.1rem]' rows={3} disabled={!config.data_capture} {...register('terms_and_conditions')} />
+                                    <textarea className='textarea w-full leading-[1.1rem]' rows={3} disabled={!config.data_capture_screen} {...register('terms_and_conditions')} />
                                 </div>
                             </>
                         )}
