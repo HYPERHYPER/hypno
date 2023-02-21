@@ -352,8 +352,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   });
   let data = await resp.data;
 
-  console.log(eventData)
-
   return {
     props: {
       ...data,

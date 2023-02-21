@@ -78,7 +78,7 @@ const ManageEventGallery = (props: ResponseData) => {
         eventMetadata = {
             ...props.event.metadata,
             ...data,
-            fields: _.map(_.split(data.fields, ','), (f) => f.trim()),
+            fields: data.fields ? _.map(_.split(data.fields, ','), (f) => f.trim()) : [],
         }
 
         const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${id}.json`;
