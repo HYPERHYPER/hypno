@@ -9,7 +9,11 @@ module.exports = {
       nbAkademieStd: "NB Akademie Std, sans-serif",
       sans: ["NB Akademie Std","Helvetica Neue","Arial","ui-sans-serif"]
     },
-    extend: {},
+    extend: {
+      colors: {
+        grey: '#808080',
+      }
+    },
   },
   plugins: [require("daisyui")],
 }

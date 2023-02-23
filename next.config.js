@@ -15,6 +15,12 @@ const nextConfig = {
         port: '',
         pathname: '**'
       },
+      {
+        protocol: 'https',
+        hostname: 'media.hypno.com',
+        port: '',
+        pathname: '**'
+      },
     ]
   },
   webpack: (config) => {
