@@ -17,7 +17,7 @@ import { FadeIn } from 'react-slide-fade-in';
 import Image from 'next/image';
 import AutosizeImage from '@/components/AutosizeImage';
 import { parseLink } from '@/helpers/text';
-import GalleryNavBar from '@/components/GalleryNavBar';
+import GalleryNavBar from '@/components/Gallery/GalleryNavBar';
 import Link from 'next/link';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { getAspectRatio } from '@/helpers/image';
@@ -109,7 +109,12 @@ const PublicGallery = (props: ResponseData) => {
                 <meta name="description" content="Taken with HYPNO: The animated, social photo booth" />
             </Head>
 
-            <GalleryNavBar name={galleryTitle} />
+            <GalleryNavBar name={galleryTitle}>
+                <div className='flex flex-row gap-3 items-center text-lg'>
+                    <span>Newest</span>
+                    <span>Oldest</span>
+                </div>
+            </GalleryNavBar>
             <section className={`text-white bg-black min-h-screen border-t-white/20 border-solid border-t-[1px]`}>
                 <InfiniteScroll
                     next={() => setSize(size + 1)}
@@ -137,6 +142,12 @@ const PublicGallery = (props: ResponseData) => {
                                                         width={p.width}
                                                         height={p.height}
                                                     />
+                                                    {p.gif && (
+                                                        <div
+                                                            className='absolute top-0 left-0 w-full h-full animate-jpeg-strip'
+                                                            style={{ backgroundImage: `url(${p.jpeg_url})`, backgroundSize: '100% 500%' }}
+                                                        />
+                                                    )}
                                                 </div>
                                             </div>
                                         </Link>
@@ -153,7 +164,7 @@ const PublicGallery = (props: ResponseData) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    const { gallerySlug } = context.query;
+    const { gallerySlug, order_by } = context.query;
 
     // Request to get photos for gallery
     const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${gallerySlug}/photos.json`;

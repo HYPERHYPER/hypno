@@ -4,7 +4,7 @@ import Head from 'next/head';
 import _ from 'lodash';
 import Spinner from '@/components/Spinner';
 import AutosizeImage from '@/components/AutosizeImage';
-import GalleryNavBar from '@/components/GalleryNavBar';
+import GalleryNavBar from '@/components/Gallery/GalleryNavBar';
 import Image from 'next/image';
 
 import * as Generation from "@/lib/generation/generation_pb";
@@ -16,6 +16,7 @@ import {
 
 import { client, metadata } from '@/lib/stabilityClient';
 import { useEffect, useState } from 'react';
+import { parseLink } from '@/helpers/text';
 
 type ImageData = {
     id: number;
@@ -46,6 +47,7 @@ type ImageData = {
     export_settings: Object; //need to type
     width: number;
     height: number;
+    mp4_url: string;
 };
 
 interface ResponseData {
@@ -181,16 +183,19 @@ const DetailGallery = (props: ResponseData) => {
 
             <div className='min-h-screen bg-black'>
                 <GalleryNavBar name={galleryTitle} gallerySlug={String(photo?.event_id)} />
-                <section className={`text-white bg-black border-t-white/20 border-solid border-t-[1px]`}>
-                    <div className={`sm:mx-auto h-full mb-[35px] px-[90px] w-full flex flex-col justify-center items-center gap-5`}>
-                        <div className='relative bg-white/10 backdrop-blur-[50px] w-[500px] max-w-[30vw]'>
+                <section className={`text-white bg-black`}>
+                    <div className={`sm:mx-auto h-full mb-[35px] px-[90px] w-full flex justify-center flex-col items-center`}>
+                        <div className='relative bg-white/10 backdrop-blur-[50px] h-[75vh]'>
                             <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
                                 <Spinner />
                             </div>
-                            <AutosizeImage
+                            {/* <AutosizeImage
                                 src={photo.posterframe}
                                 alt={photo.event_name + photo.id}
-                            />
+                            /> */}
+                            <div className='block '>
+                            <video className='max-w-full max-h-[75vh]' src={photo.mp4_url} autoPlay loop playsInline poster={photo.posterframe} />
+                            </div>
                         </div>
                         <div>
                             <a className='btn btn-accent' href={photo.download_url}>DOWNLOAD</a>
