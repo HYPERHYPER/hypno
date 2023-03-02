@@ -1,23 +1,21 @@
-import { useRouter } from 'next/router';
 import axios from 'axios';
 import type { GetServerSideProps } from 'next';
-import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
-import { useState, useRef, useEffect } from 'react';
-import ArrowRight from '../../public/pop/arrow-right.svg';
-import ArrowLeft from '../../public/pop/arrow-left.svg';
 import Head from 'next/head';
 import _ from 'lodash';
-import { getEventData } from '../api/pro/[eventId]';
-import { useForm } from 'react-hook-form';
-import { toTextColor } from '@/helpers/color';
 import Spinner from '@/components/Spinner';
-import useSWRInfinite from 'swr/infinite';
-import { fetchWithToken } from '@/lib/fetchWithToken';
-import { FadeIn } from 'react-slide-fade-in';
-import Image from 'next/image';
 import AutosizeImage from '@/components/AutosizeImage';
-import { parseLink } from '@/helpers/text';
 import GalleryNavBar from '@/components/GalleryNavBar';
+import Image from 'next/image';
+
+import * as Generation from "@/lib/generation/generation_pb";
+import {
+    buildGenerationRequest,
+    executeGenerationRequest,
+    onGenerationComplete,
+} from "../../helpers/stableDiffusion";
+
+import { client, metadata } from '@/lib/stabilityClient';
+import { useEffect, useState } from 'react';
 
 type ImageData = {
     id: number;
@@ -50,32 +48,129 @@ type ImageData = {
     height: number;
 };
 
-type EventData = {
-    name: string;
-    fields: string[];
-    gallery_title: string;
-    gallery_subtitle: string;
-    data_capture_title: string;
-    data_capture_subtitle: string;
-    data_capture_screen: boolean;
-    terms: string;
-    privacy: string;
-    logo: string;
-    background: string;
-    color: string;
-    terms_and_conditions: string;
-}
-
 interface ResponseData {
     status: number;
     message: string;
     photo: ImageData;
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 const DetailGallery = (props: ResponseData) => {
     const { photo } = props;
 
     const galleryTitle = photo?.event_name;
+
+    const [data, setData] = useState<string>();
+    const [prediction, setPrediction] = useState<any>(null);
+    const [error, setError] = useState(null);
+
+    const handleGenerateImage = async () => {
+        const buffer = await fetch(`/api/file?url=${photo.url}`)
+            .then((res) => res.json())
+            .then((data) => {
+                console.log('imgdata', data)
+                return data.data
+            })
+        // DreamStudio uses an Image Strength slider to control the influence of the initial image on the final result.
+        // This "Image Strength" is a value from 0-1, where values close to 1 yield images very similar to the init_image
+        // and values close to 0 yield imges wildly different than the init_image. This is just another way to calculate
+        // stepScheduleStart, which is done via the following formula: stepScheduleStart = 1 - imageStrength.  This means
+        // an image strength of 35% would result in a stepScheduleStart of 0.65.
+        const imageStrength = 0.5;
+        const request = buildGenerationRequest("stable-diffusion-512-v2-1", {
+            type: "image-to-image",
+            prompts: [
+                {
+                    text: "a person wearing halo armor standing in a field, a poster by Miyamoto, trending on polycount, sots art, official art, reimagined by industrial light and magic, hi-res, hyper realistic, unreal engine 5, centered, facing the camera, smoke and fog in background, no helmet on head",
+                },
+            ],
+            stepScheduleStart: 1 - imageStrength,
+            initImage: buffer,
+            // seed,
+            width: 256,
+            height: 256,
+            samples: 1,
+            cfgScale: 8,
+            steps: 25,
+            sampler: Generation.DiffusionSampler.SAMPLER_K_DPMPP_2M,
+        });
+
+        executeGenerationRequest(client, request, metadata)
+            .then((res) => {
+                const imageDataUrls = onGenerationComplete(res);
+                setData(_.first(imageDataUrls) || '');
+            })
+            .catch((error) => {
+                console.error("Failed to make text-to-image request:", error);
+            });
+    }
+
+    const handleReplicate = async () => {
+        console.log('predicting')
+        const buffer = await fetch(`/api/file?url=${photo.url}`)
+            .then((res) => res.json())
+            .then((data) => {
+                console.log('imgdata', data)
+                return data.data
+            })
+        const response = await fetch("/api/predictions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                prompt: 'add glowing blur around person',
+                image: photo.url,
+            }),
+        });
+        let prediction = await response.json();
+        console.log(prediction);
+        if (response.status !== 201) {
+            setError(prediction.detail);
+            return;
+        }
+        setPrediction(prediction);
+
+        while (
+            prediction.status !== "succeeded" &&
+            prediction.status !== "failed"
+        ) {
+            await sleep(1000);
+            const response = await fetch("/api/predictions/" + prediction.id);
+            prediction = await response.json();
+            if (response.status !== 200) {
+                setError(prediction.detail);
+                return;
+            }
+            console.log({ prediction })
+            setPrediction(prediction);
+        }
+    }
+
+    const handleHuggingFace = async () => {
+        const buffer = await fetch(`/api/file?url=${photo.url}`)
+            .then((res) => res.json())
+            .then((data) => {
+                console.log('imgdata', data)
+                return data.data
+            })
+
+        const token = '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';
+        const res = await fetch("https://nielsr-clipseg.hf.space/run/predict", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                // Authorization: 'Bearer ' + token,
+            },
+            body: JSON.stringify({data: [
+                buffer.toString('base64'),
+                'person'
+            ]}),
+        });
+
+        console.log('done!', res);
+    }
 
     return (
         <>
@@ -87,7 +182,7 @@ const DetailGallery = (props: ResponseData) => {
             <div className='min-h-screen bg-black'>
                 <GalleryNavBar name={galleryTitle} gallerySlug={String(photo?.event_id)} />
                 <section className={`text-white bg-black border-t-white/20 border-solid border-t-[1px]`}>
-                    <div className={`sm:mx-auto h-full mb-[35px] px-[90px] w-full flex justify-center`}>
+                    <div className={`sm:mx-auto h-full mb-[35px] px-[90px] w-full flex flex-col justify-center items-center gap-5`}>
                         <div className='relative bg-white/10 backdrop-blur-[50px] w-[500px] max-w-[30vw]'>
                             <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
                                 <Spinner />
@@ -97,7 +192,30 @@ const DetailGallery = (props: ResponseData) => {
                                 alt={photo.event_name + photo.id}
                             />
                         </div>
+                        <div>
+                            <a className='btn btn-accent' href={photo.download_url}>DOWNLOAD</a>
+                            <button className='ml-3 btn btn-info' onClick={handleGenerateImage}>TESTING</button>
+                            <button className='ml-3 btn btn-info' onClick={handleReplicate}>REPLICATE</button>
+                            <button className='ml-3 btn btn-info' onClick={handleHuggingFace}>HUGGING FACE</button>
+                        </div>
+                        {data && <img src={`data:image/jpeg;base64,${data}`} />}
+                        {prediction && (
+                            <div>
+                                {prediction.output && (
+                                    <div>
+                                        <Image
+                                            fill
+                                            src={prediction.output}
+                                            alt="output"
+                                            sizes='100vw'
+                                        />
+                                    </div>
+                                )}
+                                <p>status: {prediction.status}</p>
+                            </div>
+                        )}
                     </div>
+
                 </section>
             </div>
         </>
@@ -118,6 +236,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     });
     let data = await resp.data;
     console.log(data)
+
     return {
         props: {
             ...data,

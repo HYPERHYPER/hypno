@@ -289,7 +289,7 @@ const SubGallery = (props: ResponseData) => {
                       {photos.map((p) => (
                         <div
                           key={p.id}
-                          className='w-full block relative bg-white/10 backdrop-blur-[50px] min-h-[180px]'
+                          className='w-full block relative bg-white/10 backdrop-blur-[50px]'
                         // onClick={() => queueHandler(p.id)}
                         >
                           {/* {queue.includes(p.id) ? (

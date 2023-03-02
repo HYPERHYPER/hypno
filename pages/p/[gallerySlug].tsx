@@ -20,6 +20,7 @@ import { parseLink } from '@/helpers/text';
 import GalleryNavBar from '@/components/GalleryNavBar';
 import Link from 'next/link';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { getAspectRatio } from '@/helpers/image';
 
 type ImageData = {
     id: number;
@@ -120,14 +121,12 @@ const PublicGallery = (props: ResponseData) => {
                     <div className={`sm:mx-auto block h-full my-[35px] px-[90px] mb-[35px]`}>
                         <FadeIn
                             from="bottom" positionOffset={300} triggerOffset={0}>
-
                             <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3, 1200: 4 }}>
                                 <Masonry gutter='20px' >
                                     {paginatedPhotos.map((p) => (
                                         <Link key={p.id} href={`/i/${p.slug}`}>
-                                            <div
-                                                className='w-full block relative bg-white/10 backdrop-blur-[50px] min-h-[180px] overflow-hidden'
-                                            >
+                                            <div className='w-full block relative bg-white/10 backdrop-blur-[50px] overflow-hidden' style={{ aspectRatio: getAspectRatio(p.width, p.height)}} >
+                                                {/* <div className='absolute top-0 left-0' /> */}
                                                 <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
                                                     <Spinner />
                                                 </div>
@@ -135,6 +134,8 @@ const PublicGallery = (props: ResponseData) => {
                                                     <AutosizeImage
                                                         src={p.posterframe}
                                                         alt={p.event_name + p.id}
+                                                        width={p.width}
+                                                        height={p.height}
                                                     />
                                                 </div>
                                             </div>
@@ -164,7 +165,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
     });
     let data = await resp.data;
-
+    console.log(data)
     return {
         props: {
             ...data,
