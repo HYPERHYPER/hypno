@@ -16,6 +16,7 @@ import { fetchWithToken } from '@/lib/fetchWithToken';
 import { FadeIn } from 'react-slide-fade-in';
 import Image from 'next/image';
 import AutosizeImage from '@/components/AutosizeImage';
+import { parseLink } from '@/helpers/text';
 
 type ImageData = {
   id: number;
@@ -43,20 +44,22 @@ type ImageData = {
   metadata: Object; // need to type?
   export: boolean;
   export_settings: Object; //need to type
-  category_count: number; // TODO
 };
 
 type EventData = {
   name: string;
   fields: string[];
-  title: string;
-  subtitle: string;
-  dataCaptureTitle: string;
+  gallery_title: string;
+  gallery_subtitle: string;
+  data_capture_title: string;
+  data_capture_subtitle: string;
+  data_capture_screen: boolean;
   terms: string;
   privacy: string;
   logo: string;
   background: string;
   color: string;
+  terms_and_conditions: string;
 }
 
 interface ResponseData {
@@ -92,7 +95,7 @@ const SubGallery = (props: ResponseData) => {
   }, [photos, expectedPhotoUploads])
 
   /* Setting up the data capture form for the gallery. */
-  const [dataCapture, setDataCapture] = useState<boolean>(!!(event.fields || event.terms));
+  const [dataCapture, setDataCapture] = useState<boolean>(event.data_capture_screen);
   const fields = _.map(event.fields, (f) => ({ id: f.toLowerCase().replaceAll(" ", "_"), name: f }));
   const {
     register,
@@ -218,21 +221,21 @@ const SubGallery = (props: ResponseData) => {
       </label> */}
 
       <section
-        className={`text-white bg-black min-h-screen p-10 ${!_.isEmpty(event) && 'pt-0'}`}
-        style={event.background ? { 
-          background: `url(${event.background}) no-repeat center center fixed`, 
+        className={`text-white bg-black min-h-screen p-10 ${!_.isEmpty(event.logo) && 'pt-0'}`}
+        style={event.background ? {
+          background: `url(${event.background}) no-repeat center center fixed`,
           backgroundSize: 'cover',
           WebkitBackgroundSize: 'cover',
           //@ts-ignore
           '-moz-background-size': 'cover',
           '-o-background-size': 'cover'
-          } : {}}>
+        } : {}}>
 
         <div className='flex justify-center'>
           <Image className='h-auto' src={event.logo ? event.logo : 'https://hypno-web-assets.s3.amazonaws.com/hypno-logo-white-drop.png'} alt={event.name + " logo"} width={150} height={150} priority />
         </div>
 
-        <div className={`sm:mx-auto h-full ${_.isEmpty(event) ? 'mt-8' : ''}`}>
+        <div className={`sm:mx-auto h-full ${_.isEmpty(event.logo) ? 'mt-8' : ''}`}>
           {!photos.length ? (
             <div className='fixed hero top-0 left-0 h-screen p-10'>
               <div className='hero-content max-w-[24rem] sm:max-w-2xl flex flex-row gap-4 items-center justify-center bg-white/10 backdrop-blur-[50px] p-8'>
@@ -246,13 +249,13 @@ const SubGallery = (props: ResponseData) => {
                 <div className='hero-content max-w-[24rem] sm:max-w-2xl p-10'>
                   <div className='flex flex-col'>
                     <div className='mb-4'>
-                      <h2>{event.dataCaptureTitle || 'Want your photos?'}</h2>
-                      {!_.isEmpty(fields) && <h2 className='text-gray-400'>Add your info to continue...</h2>}
+                      <h2>{event.data_capture_title || 'Want your photos?'}</h2>
+                      <h2 className='text-gray-400'>{event.data_capture_subtitle || 'Add your info to continue...'}</h2>
                     </div>
                     <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
                       {fields?.map((v, i) => (
                         <input
-                          className={`input ${errors[v.id] && 'error text-red-600'}`}
+                          className={`input data-capture ${errors[v.id] && 'error text-red-600'}`}
                           placeholder={`${v.name}${errors[v.id] ? (errors[v.id]?.type === 'pattern' ? ' is not valid' : ' is required') : ''}`}
                           key={i}
                           {...register(v.id, {
@@ -265,7 +268,7 @@ const SubGallery = (props: ResponseData) => {
                       <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
                         <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} />
                         <p className='text-xs text-gray-400'>
-                          By pressing &quot;continue&quot; to access and save your content, you accept the <a className='text-white' href={event.terms} rel="noreferrer" target='_blank'>Terms of Use</a> and <a className='text-white' href={event.privacy} rel="noreferrer" target='_blank'>Privacy Policy</a> provided by {_.isEmpty(event) ? 'Hypno' : 'the NBA'} and related partners
+                          {parseLink(event.terms_and_conditions, [{text: 'Terms of Use', url: 'https://hypno.com/app/terms'}, {text: 'Privacy Policy', url: 'https://hypno.com/privacy'}])}
                         </p>
                       </div>
                       <input className='btn btn-primary' type='submit' value='GO' style={event.color ? { backgroundColor: event.color, borderColor: event.color, color: toTextColor(event.color) } : {}} />
@@ -276,8 +279,8 @@ const SubGallery = (props: ResponseData) => {
             ) : (
               <div className='max-w-[24rem] sm:max-w-2xl md:max-w-6xl block mx-auto h-full'>
                 <div className='mb-4'>
-                  <h2>{event?.title || 'Share and tag all over social.'}</h2>
-                  <h2 className='text-gray-400 whitespace-pre-line'>{event?.subtitle || '#hypno #pro #iphone'}</h2>
+                  <h2>{event.gallery_title || 'Share and tag all over social.'}</h2>
+                  <h2 className='text-gray-400 whitespace-pre-line'>{event.gallery_subtitle || '#hypno #pro #iphone'}</h2>
                 </div>
                 <FadeIn
                   from="bottom" positionOffset={300} triggerOffset={0}>
@@ -330,13 +333,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   // Load theme interface based on event
   const isDefault = String(event) === 'pro';
-  const eventData = await getEventData(String(event));
+  const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${eventId}.json`;
+  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+  let eventRes = await axios.get(eventUrl, {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + token,
+    },
+  });
+  let eventData = await eventRes.data?.event;
 
   // Fetch subset of photos to be displayed in subgallery
-  const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${eventId}/${category}/photos.json`;
-  // const url = `http://localhost:4000/api/v1/events/${eventId}/${category}/photos.json`;
-  const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-  let resp = await axios.get(url, {
+  const photoUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${eventId}/${category}/photos.json`;
+  let resp = await axios.get(photoUrl, {
     headers: {
       'Content-Type': 'application/json',
       Authorization: 'Bearer ' + token,
@@ -348,10 +357,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       ...data,
       event: isDefault ? {} : {
-        ...eventData,
+        name: eventData.name,
+        id: eventData.id,
+        ...eventData.metadata,
+        terms_and_conditions: eventData.terms_and_conditions,
       }
     }
-  };
+  }
 };
 
 export default SubGallery;

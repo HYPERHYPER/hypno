@@ -88,7 +88,7 @@
   }
 
   .input, .select, .textarea {
-    @apply input-ghost bg-white/[.08] text-white focus:bg-white/10 focus:text-white placeholder:text-white/20 disabled:bg-white/10 disabled:border-none disabled:placeholder:text-white/10
+    @apply input-ghost bg-white/[.08] text-white focus:bg-white/10 focus:text-white placeholder:text-white/20 disabled:bg-white/[0.03] disabled:border-white/[0.03] disabled:placeholder:text-white/10
   }
 
   .form-control .label-text {
@@ -102,6 +102,15 @@
   .input.error {
     @apply placeholder:text-red-600
   }
+
+  .tab {
+    @apply opacity-30 hover:opacity-100 transition-opacity
+  }
+
+  .tab-active {
+    @apply opacity-100 
+  }
+
 }
 
 :root {
