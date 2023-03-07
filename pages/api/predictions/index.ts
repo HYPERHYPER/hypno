@@ -13,16 +13,16 @@ export default async function handler(
       body: JSON.stringify({
         // Pinned to a specific version of Stable Diffusion
         // See https://replicate.com/stability-ai/stable-diffussion/versions
-        version: "7af9a66f36f97fee2fece7dcc927551a951f0022cbdd23747b9212f23fc17021",
+        version: req.body.version,
   
         // This is the text prompt that will be submitted by a form on the frontend
         input: { 
-            // prompt: req.body.prompt,
-            input: req.body.image,
+            prompt: req.body.prompt,
+            image: req.body.image,
             neutral: 'a person',
-            target: 'a person wearing a top hat',
-            manipulation_strength: 4.1,
-            disentanglement_threshold: 0.15,
+            target: 'a person with red hair',
+            // manipulation_strength: 4.1,
+            // disentanglement_threshold: 0.15,
         },
       }),
     });

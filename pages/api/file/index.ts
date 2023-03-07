@@ -9,12 +9,11 @@ export async function loadImageFromURL(url: string) {
     const data = await response.arrayBuffer();
     const buffer = Buffer.from(data);    
     const compressedBuffer = await sharp(buffer)
-      .resize(768, 768, { fit: 'contain' })
+      .resize(512, 512, { fit: 'contain' })
       .jpeg({ quality: 80 })
       .toBuffer();
-    return compressedBuffer;
+      return compressedBuffer;
 }
-
 
 export default async function handler(
     req: NextApiRequest,

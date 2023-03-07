@@ -110,16 +110,16 @@ const PublicGallery = (props: ResponseData) => {
             </Head>
 
             <GalleryNavBar name={galleryTitle}>
-                <div className='flex flex-row gap-3 items-center text-lg'>
-                    <span>Newest</span>
-                    <span>Oldest</span>
+                <div className='flex flex-row gap-3 items-center text-lg invisible'>
+                    <Link href={'/'}>Newest</Link>
+                    <Link href={'/'}>Oldest</Link>
                 </div>
             </GalleryNavBar>
             <section className={`text-white bg-black min-h-screen border-t-white/20 border-solid border-t-[1px]`}>
                 <InfiniteScroll
                     next={() => setSize(size + 1)}
                     hasMore={!hasReachedEnd}
-                    loader={<Spinner />}
+                    loader={<div className='w-full flex justify-center h-[100px] mb-8'><Spinner /></div>}
                     endMessage={<p>Reached the end</p>}
                     dataLength={paginatedPhotos?.length}
                 >
@@ -131,7 +131,6 @@ const PublicGallery = (props: ResponseData) => {
                                     {paginatedPhotos.map((p) => (
                                         <Link key={p.id} href={`/i/${p.slug}`}>
                                             <div className='w-full block relative bg-white/10 backdrop-blur-[50px] overflow-hidden' style={{ aspectRatio: getAspectRatio(p.width, p.height)}} >
-                                                {/* <div className='absolute top-0 left-0' /> */}
                                                 <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
                                                     <Spinner />
                                                 </div>
@@ -166,9 +165,30 @@ const PublicGallery = (props: ResponseData) => {
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const { gallerySlug, order_by } = context.query;
 
+    const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+
+    // handles case where event_id is passed as gallerySlug
+    let reg = new RegExp(/^\d+$/);
+    if (reg.test(String(gallerySlug))) {
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${gallerySlug}.json`;
+        let resp = await axios.get(url, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
+            },
+        });
+        let data = await resp.data;
+        if (!data) return { notFound: true }
+        return { 
+            redirect: {
+                destination: '/p/'+data.event.party_slug,
+                permanent: false,
+            }
+        }
+    }
+
     // Request to get photos for gallery
     const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${gallerySlug}/photos.json`;
-    const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
     let resp = await axios.get(url, {
         headers: {
             'Content-Type': 'application/json',
@@ -176,7 +196,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
     });
     let data = await resp.data;
-    console.log(data)
+    if (!data) return { notFound: true }
     return {
         props: {
             ...data,
