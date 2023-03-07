@@ -15,13 +15,39 @@ const nextConfig = {
         port: '',
         pathname: '**'
       },
+      {
+        protocol: 'https',
+        hostname: 'media.hypno.com',
+        port: '',
+        pathname: '**'
+      },
+      {
+        protocol: 'https',
+        hostname: 'replicate.delivery',
+        port: '',
+        pathname: '**'
+      },
     ]
   },
   webpack: (config) => {
     config.module.rules.push({
       test: /\.svg$/,
-      use: ["@svgr/webpack"]
+      use: ["@svgr/webpack"],
     })
+
+    config.externals.push({
+      'sharp': 'commonjs sharp'
+    })
+
+    config.resolve = {
+      ...config.resolve,
+      fallback: {
+        "fs": false,
+        "path": false,
+        "os": false,
+        "child_process": false,
+      }
+    }
 
     return config
   },
