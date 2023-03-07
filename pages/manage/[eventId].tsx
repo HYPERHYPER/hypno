@@ -8,7 +8,7 @@ import Image from 'next/image';
 import S3Uploader from '@/components/S3Uploader';
 import { ThreeDots } from 'react-loader-spinner';
 import nookies, { parseCookies } from 'nookies'
-
+import AiPlayground from '@/components/AiPlayground/AiPlayground';
 
 interface ResponseData {
     status: number;
@@ -18,16 +18,16 @@ interface ResponseData {
 
 const DEFAULT_TERMS = `By pressing "continue" to access and save your content, you accept the Terms of Use and Privacy Policy provided by Hypno and related partners`
 
-
 const ManageEventGallery = (props: ResponseData) => {
     const { event: {
         id,
         name,
         metadata,
         terms_and_conditions,
+        party_slug,
     } } = props;
 
-    const [view, setView] = useState<'basic' | 'data'>('basic');
+    const [view, setView] = useState<'basic' | 'data' | 'ai'>('basic');
     const {
         register,
         handleSubmit,
@@ -114,8 +114,10 @@ const ManageEventGallery = (props: ResponseData) => {
                         <div className="tabs gap-2 font-medium bg-transparent flex flex-row sm:flex-col">
                             <a className={`tab tab-lg text-white ${view == 'basic' ? 'tab-active' : ''}`} onClick={() => setView('basic')}>Basic</a>
                             <a className={`tab tab-lg text-white ${view == 'data' ? 'tab-active' : ''}`} onClick={() => setView('data')}>Data Capture</a>
+                            <a className={`tab tab-lg text-white ${view == 'ai' ? 'tab-active' : ''}`} onClick={() => setView('ai')}>AI Playground</a>
                         </div>
                     </div>
+                    { view !== 'ai' && (
                     <form onSubmit={handleSubmit(submitForm)} className='sm:mt-8 space-y-3 flex-1 flex flex-col p-4 pb-5 max-w-xs sm:max-w-lg'>
                         {view == 'basic' && (
                             <>
@@ -240,12 +242,18 @@ const ManageEventGallery = (props: ResponseData) => {
                                     :
                                     'CHANGES SAVED!'
                                 }</button>
-                            ) : 
+                            ) :
                                 <input className='btn btn-primary btn-wide rounded-full shadow-lg' type='submit' value='SAVE' />
                             }
                         </div>
-
                     </form>
+                    )}
+
+                    {view == 'ai' && (
+                        <div className='sm:mt-8 flex-1 p-4 pb-5'>
+                            <AiPlayground gallerySlug={party_slug} />
+                        </div>
+                    )}
                 </div>
             </section>
         </>
@@ -253,7 +261,7 @@ const ManageEventGallery = (props: ResponseData) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    const { eventId, accessToken : accessTokenParam } = context.query;
+    const { eventId, accessToken: accessTokenParam } = context.query;
     const cookieToken = nookies.get(context).hypno_token;
     let accessToken = accessTokenParam || cookieToken;
     if (!accessToken) {

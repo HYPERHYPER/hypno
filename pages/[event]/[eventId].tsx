@@ -12,7 +12,7 @@ import { useForm } from 'react-hook-form';
 import { toTextColor } from '@/helpers/color';
 import Spinner from '@/components/Spinner';
 import useSWR from 'swr';
-import { fetchWithToken } from '@/lib/fetchWithToken';
+import { axiosGetWithToken } from '@/lib/fetchWithToken';
 import { FadeIn } from 'react-slide-fade-in';
 import Image from 'next/image';
 import AutosizeImage from '@/components/AutosizeImage';
@@ -80,7 +80,7 @@ const SubGallery = (props: ResponseData) => {
   const [photoUploadCompleted, setPhotoUploadCompleted] = useState<boolean>(false);
   const photoUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${eventId}/${category}/photos.json`;
   const { data, error } = useSWR([photoUrl, process.env.NEXT_PUBLIC_AUTH_TOKEN],
-    ([url, token]) => fetchWithToken(url, token),
+    ([url, token]) => axiosGetWithToken(url, token),
     {
       fallbackData: { photos: initialPhotos },
       refreshInterval: (photoUploadCompleted && !photoUploadPending) ? 0 : 1000
@@ -289,7 +289,7 @@ const SubGallery = (props: ResponseData) => {
                       {photos.map((p) => (
                         <div
                           key={p.id}
-                          className='w-full block relative bg-white/10 backdrop-blur-[50px] min-h-[180px]'
+                          className='w-full block relative bg-white/10 backdrop-blur-[50px]'
                         // onClick={() => queueHandler(p.id)}
                         >
                           {/* {queue.includes(p.id) ? (
