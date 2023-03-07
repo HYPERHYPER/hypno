@@ -132,7 +132,7 @@ export default function AiPlayground(props: AiPlaygroundProps) {
                     <div className='flex flex-row gap-8'>
                         <div>
                             <div className='bg-black w-[200px] h-[200px] relative'>
-                                {/* <span className='place-content-center w-full h-full'>Select an image from the gallery to preview</span> */}
+                                <span className='absolute top-1/2 left-1/2 text-sm text-center -translate-x-1/2 -translate-y-1/2 opacity-50'>Select an image from the gallery to preview</span>
                                 {previewImageUrl && <Image fill className='object-contain' src={previewImageUrl} alt={previewImageUrl} />}
                             </div>
                         </div>
@@ -143,7 +143,6 @@ export default function AiPlayground(props: AiPlaygroundProps) {
                                     <div className='form-control'>
                                         <label className='label'>
                                             <span className='label-text text-white'>Prompt</span>
-                                            {/* <span className='label-text-alt cursor-pointer text-white/40 hover:text-white transition' onClick={() => setValue('terms_and_conditions', DEFAULT_TERMS)}>Reset</span> */}
                                         </label>
                                         <textarea className='textarea w-full leading-[1.1rem]' rows={3} onChange={(e) => { e.preventDefault(); setPrompt(e.target.value) }} />
                                     </div>

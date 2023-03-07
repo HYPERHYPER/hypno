@@ -2,21 +2,13 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 import type { GetServerSideProps } from 'next';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
-import { useState, useRef, useEffect } from 'react';
-import ArrowRight from '../../public/pop/arrow-right.svg';
-import ArrowLeft from '../../public/pop/arrow-left.svg';
 import Head from 'next/head';
 import _ from 'lodash';
-import { getEventData } from '../api/pro/[eventId]';
-import { useForm } from 'react-hook-form';
-import { toTextColor } from '@/helpers/color';
 import Spinner from '@/components/Spinner';
 import useSWRInfinite from 'swr/infinite';
 import { fetchWithToken } from '@/lib/fetchWithToken';
 import { FadeIn } from 'react-slide-fade-in';
-import Image from 'next/image';
 import AutosizeImage from '@/components/AutosizeImage';
-import { parseLink } from '@/helpers/text';
 import GalleryNavBar from '@/components/Gallery/GalleryNavBar';
 import Link from 'next/link';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -123,11 +115,11 @@ const PublicGallery = (props: ResponseData) => {
                     endMessage={<p>Reached the end</p>}
                     dataLength={paginatedPhotos?.length}
                 >
-                    <div className={`sm:mx-auto block h-full my-[35px] px-[90px] mb-[35px]`}>
+                    <div className={`sm:mx-auto block h-full my-[35px] xl:px-[90px] mb-[35px]`}>
                         <FadeIn
                             from="bottom" positionOffset={300} triggerOffset={0}>
                             <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3, 1200: 4 }}>
-                                <Masonry gutter='20px' >
+                                <Masonry gutter={'20px'} >
                                     {paginatedPhotos.map((p) => (
                                         <Link key={p.id} href={`/i/${p.slug}`}>
                                             <div className='w-full block relative bg-white/10 backdrop-blur-[50px] overflow-hidden' style={{ aspectRatio: getAspectRatio(p.width, p.height)}} >

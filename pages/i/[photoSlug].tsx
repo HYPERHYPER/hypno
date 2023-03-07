@@ -3,21 +3,8 @@ import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import _ from 'lodash';
 import Spinner from '@/components/Spinner';
-import AutosizeImage from '@/components/AutosizeImage';
 import GalleryNavBar from '@/components/Gallery/GalleryNavBar';
-import Image from 'next/image';
-
-import * as Generation from "@/lib/generation/generation_pb";
-import {
-    buildGenerationRequest,
-    executeGenerationRequest,
-    onGenerationComplete,
-} from "../../helpers/stableDiffusion";
-
-import { client, metadata } from '@/lib/stabilityClient';
-import { useEffect, useState } from 'react';
-import { parseLink } from '@/helpers/text';
-import { arrayBufferToBase64, base64ToArrayBuffer } from '@/helpers/image';
+import { Footer } from '@/components/Footer';
 
 type ImageData = {
     id: number;
@@ -117,7 +104,7 @@ const DetailGallery = (props: ResponseData) => {
             <div className='min-h-screen bg-black'>
                 <GalleryNavBar name={galleryTitle} gallerySlug={String(photo?.event_id)} />
                 <section className={`text-white bg-black`}>
-                    <div className={`sm:mx-auto h-full mb-[35px] px-[90px] w-full flex justify-center flex-col items-center`}>
+                    <div className={`sm:mx-auto h-full mb-[35px] md:px-[90px] w-full flex justify-center flex-col items-center`}>
                         <div className='relative bg-white/10 backdrop-blur-[50px] max-h-[75vh]'>
                             <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
                                 <Spinner />
@@ -140,27 +127,9 @@ const DetailGallery = (props: ResponseData) => {
                         <div className='mt-3'>
                             <a className='btn btn-primary' href={photo.download_url}>DOWNLOAD</a>
                         </div>
-                        {/* {data && <img src={`data:image/png;base64,${data}`} />}
-                        {mask && <img src={`${mask}`} />}
-                        {hfData && <img src={`${hfData}`} />}
-                        {prediction && (
-                            <div>
-                                {prediction.output && (
-                                    <div>
-                                        <Image
-                                            fill
-                                            src={prediction.output}
-                                            alt="output"
-                                            sizes='100vw'
-                                        />
-                                    </div>
-                                )}
-                                <p>status: {prediction.status}</p>
-                            </div>
-                        )} */}
                     </div>
-
                 </section>
+                <Footer />
             </div>
         </>
     );
