@@ -46,10 +46,17 @@ const ManageEventGallery = (props: ResponseData) => {
             background: metadata.background || '',
             color: metadata.color || '',
             terms_and_conditions: terms_and_conditions || DEFAULT_TERMS,
+            email_delivery: metadata.email_delivery || false,
         }
     });
 
     const config = watch();
+    useEffect(() => {
+        if (config.email_delivery) {
+            setValue('data_capture_screen', true);
+            setValue('fields', ['Email'])
+        }
+    }, [config.email_delivery])
 
     const [savedChangesStatus, setSavedChangesStatus] = useState<'saving' | 'completed'>()
 
@@ -113,7 +120,7 @@ const ManageEventGallery = (props: ResponseData) => {
                     <div className='mt-3 sm:mt-8 w-full sm:w-1/3 sm:p-4'>
                         <div className="tabs gap-2 font-medium bg-transparent flex flex-row sm:flex-col">
                             <a className={`tab tab-lg text-white ${view == 'basic' ? 'tab-active' : ''}`} onClick={() => setView('basic')}>Basic</a>
-                            <a className={`tab tab-lg text-white ${view == 'data' ? 'tab-active' : ''}`} onClick={() => setView('data')}>Data Capture</a>
+                            <a className={`tab tab-lg text-white ${view == 'data' ? 'tab-active' : ''}`} onClick={() => setView('data')}>Data Capture + Delivery</a>
                             <a className={`tab tab-lg text-white ${view == 'ai' ? 'tab-active' : ''}`} onClick={() => setView('ai')}>AI Playground</a>
                         </div>
                     </div>
@@ -225,6 +232,19 @@ const ManageEventGallery = (props: ResponseData) => {
                                         <span className='label-text-alt cursor-pointer text-white/40 hover:text-white transition' onClick={() => setValue('terms_and_conditions', DEFAULT_TERMS)}>Reset</span>
                                     </label>
                                     <textarea className='textarea w-full leading-[1.1rem]' rows={3} disabled={!config.data_capture_screen} {...register('terms_and_conditions')} />
+                                </div>
+
+                                <div className='form-control'>
+                                    <label className='label'>
+                                        <span className='label-text text-white'>Single Asset Email Delivery</span>
+                                    </label>
+                                    <div className='flex flex-row gap-2 items-center'>
+                                        <input type="checkbox" className="toggle toggle-lg" {...register('email_delivery')} />
+                                        <span className='text-sm text-white/40'>{config.email_delivery ? 'Enabled' : 'Disabled'}</span>
+                                    </div>
+                                    <label className='label'>
+                                        <span className='label-text text-white'>Note: enabling email delivery will automatically enable data capture screen with email field</span>
+                                    </label>
                                 </div>
                             </>
                         )}
