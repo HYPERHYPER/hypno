@@ -17,6 +17,12 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'admin-web-assets.s3.amazonaws.com',
+        port: '',
+        pathname: '**'
+      },
+      {
+        protocol: 'https',
         hostname: 'media.hypno.com',
         port: '',
         pathname: '**'
