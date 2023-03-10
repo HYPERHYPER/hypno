@@ -124,7 +124,7 @@ export default function S3Uploader(props: UploaderProps) {
           />
 
           <div className='modal-action'>
-            <button className={`btn btn-block rounded-full ${uploadStatus == 'completed' ? 'btn-success' : ''}`} disabled={uploadStatus == 'uploading'} onClick={uploadToS3}>
+            <button className={`btn btn-block rounded-full ${uploadStatus == 'completed' ? 'btn-success' : ''}`} disabled={uploadStatus == 'uploading' || !file} onClick={uploadToS3}>
               {uploadStatus == 'uploading' ? (
                 <ThreeDots
                   height="20"

@@ -153,7 +153,9 @@ const ManageEventGallery = (props: ResponseData) => {
                                         eventName={id}
                                         label={'Logo'}
                                         inputId='logo'
-                                        onInputChange={(value: string) => setValue('logo', value)} />
+                                        onInputChange={(value: string) => setValue('logo', value)} 
+                                        value={config.logo}
+                                    />
                                 </div>
 
                                 <div>
