@@ -124,7 +124,7 @@ const DetailGallery = (props: ResponseData) => {
             <div className='min-h-screen bg-black'>
                 <GalleryNavBar name={galleryTitle} gallerySlug={String(photo?.event_id)} />
                 <section className={`text-white bg-black`}>
-                    <DetailView asset={photo} />
+                    <DetailView asset={photo} config={{ aiGeneration: props.event?.metadata?.ai_generation }}/>
                 </section>
                 <Footer />
             </div>
@@ -134,30 +134,32 @@ const DetailGallery = (props: ResponseData) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const { photoSlug } = context.query;
-
     // Request to get photo for detail view
     const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/${photoSlug}.json`;
     const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+    let eventData = {};
+    let photoData = {};
     let resp = await axios.get(url, {
         headers: {
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + token,
         },
+    }).then(async (res) => {
+        photoData = res.data;
+        const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${res.data.photo.event_id}.json`;
+        let eventRes = await axios.get(eventUrl, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
+            },
+        });
+        eventData = await eventRes.data?.event;
+        console.log(eventData)
     });
-    let data = await resp.data;
-
-    const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${data.event_id}.json`;
-    let eventRes = await axios.get(eventUrl, {
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + token,
-        },
-    });
-    let eventData = await eventRes.data?.event;
 
     return {
         props: {
-            ...data,
+            ...photoData,
             event: eventData,
         }
     }
