@@ -121,7 +121,7 @@ const DetailGallery = (props: ResponseData) => {
                 <meta name="description" content="Taken with HYPNO: The animated, social photo booth" />
             </Head>
 
-            <div className='min-h-screen bg-black'>
+            <div className='min-h-screen bg-black pb-8'>
                 <GalleryNavBar name={galleryTitle} gallerySlug={String(photo?.event_id)} />
                 <section className={`text-white bg-black`}>
                     <DetailView asset={photo} config={{ aiGeneration: props.event?.metadata?.ai_generation }}/>
