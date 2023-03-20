@@ -154,7 +154,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             },
         });
         eventData = await eventRes.data?.event;
-        console.log(eventData)
     });
 
     return {
