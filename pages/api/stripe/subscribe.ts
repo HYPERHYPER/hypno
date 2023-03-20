@@ -7,7 +7,7 @@ const createSubscription = async (
   res: NextApiResponse
 ) => {
   try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+    const stripe = new Stripe(`${process.env.STRIPE_SECRET_KEY}` as string, {
       apiVersion: '2022-11-15',
     });
     const { customerId, priceId } = req.body;
@@ -56,7 +56,7 @@ const cancelSubscription = async (
   res: NextApiResponse
 ) => {
   try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+    const stripe = new Stripe(`${process.env.STRIPE_SECRET_KEY}` as string, {
       apiVersion: '2022-11-15',
     });
     const { subscriptionId } = req.body;

@@ -4,7 +4,11 @@ import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import * as z from 'zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { StripeCardElement, StripeCardElementChangeEvent, StripeError } from '@stripe/stripe-js';
+import {
+  StripeCardElement,
+  StripeCardElementChangeEvent,
+  StripeError,
+} from '@stripe/stripe-js';
 
 const PricingPage = (): JSX.Element => {
   const [stripeError, setStripeError] = useState<string | undefined>(undefined);
@@ -13,6 +17,7 @@ const PricingPage = (): JSX.Element => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [success, setSuccess] = useState(false);
+  const [processing, setProcessing] = useState(false);
   const stripe = useStripe();
   const elements = useElements();
 
@@ -42,9 +47,11 @@ const PricingPage = (): JSX.Element => {
   }
 
   async function handleCheckoutFormSubmit(event: any) {
+    setProcessing(true)
     event.preventDefault();
     if (!stripe || !elements) {
       // Stripe.js has not loaded yet.
+      setProcessing(false)
       return;
     }
     const inputValues = getValues();
@@ -53,6 +60,7 @@ const PricingPage = (): JSX.Element => {
       formSchema.parse(inputValues);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        setProcessing(false)
         return;
       }
     }
@@ -65,6 +73,7 @@ const PricingPage = (): JSX.Element => {
 
     const resp = await createCustomer.json();
     if (resp.code != 'customer_created') {
+      setProcessing(false)
       return;
     }
     setCustomerId(resp.customer.id);
@@ -76,11 +85,11 @@ const PricingPage = (): JSX.Element => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         customerId: resp.customer.id,
-        priceId: 'price_1MmMbgA3gTSa41CeVKxjGTEx', //prod code
+        priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID, //prod code
       }),
     });
     const subscription = await subscriptionResponse.json();
-    
+
     const stripePayload = await stripe.confirmCardPayment(
       subscription.clientSecret, // returned by subscribe endpoint
       {
@@ -92,7 +101,9 @@ const PricingPage = (): JSX.Element => {
 
     if (stripePayload.error) {
       setStripeError(stripePayload.error.message);
+      setProcessing(false)
     } else {
+      setProcessing(false)
       setSuccess(true);
     }
   }
@@ -120,9 +131,9 @@ const PricingPage = (): JSX.Element => {
     <>
       {success ? (
         <div className='flex flex-col w-full h-screen justify-center items-center'>
-          <span className="w-1/3 h-min text-center text-2xl">
-          Thank you for signing up for Hypno Pro. Credentials to log in to our
-          platform should arrive in your inbox shortly.
+          <span className='w-1/3 h-min text-center text-2xl'>
+            Thank you for signing up for Hypno Pro. Credentials to log in to our
+            platform should arrive in your inbox shortly.
           </span>
         </div>
       ) : (
@@ -166,16 +177,17 @@ const PricingPage = (): JSX.Element => {
               <CardElement
                 options={cardStyle}
                 onChange={handleCardInputChange}
+                className='max-w-lg'
               />
               {stripeError && (
                 <span className='text-red-800 block mt-2'>{stripeError}</span>
               )}
               <button
-                className='btn btn-neutral rounded-md'
+                className='btn btn-neutral rounded-md max-w-lg'
                 disabled={!stripe && disabled}
                 type='submit'
               >
-                subscribe
+                {processing ? <Spinner /> : 'subscribe'}
               </button>
             </form>
           </div>
