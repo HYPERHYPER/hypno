@@ -5,6 +5,7 @@ import _ from 'lodash';
 import Spinner from '@/components/Spinner';
 import GalleryNavBar from '@/components/Gallery/GalleryNavBar';
 import { Footer } from '@/components/Footer';
+import DetailView from '@/components/Gallery/DetailView';
 
 type ImageData = {
     id: number;
@@ -38,10 +39,29 @@ type ImageData = {
     mp4_url: string;
 };
 
+type EventData = {
+    name: string;
+    fields: string[];
+    gallery_title: string;
+    gallery_subtitle: string;
+    data_capture_title: string;
+    data_capture_subtitle: string;
+    data_capture_screen: boolean;
+    terms: string;
+    privacy: string;
+    logo: string;
+    background: string;
+    color: string;
+    terms_and_conditions: string;
+    email_delivery: boolean;
+    ai_generation: any;
+}
+
 interface ResponseData {
     status: number;
     message: string;
     photo: ImageData;
+    event: EventData;
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -104,30 +124,7 @@ const DetailGallery = (props: ResponseData) => {
             <div className='min-h-screen bg-black'>
                 <GalleryNavBar name={galleryTitle} gallerySlug={String(photo?.event_id)} />
                 <section className={`text-white bg-black`}>
-                    <div className={`sm:mx-auto h-full mb-[35px] md:px-[90px] w-full flex justify-center flex-col items-center`}>
-                        <div className='relative bg-white/10 backdrop-blur-[50px] max-h-[75vh]'>
-                            <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
-                                <Spinner />
-                            </div>
-
-                            {photo.gif ? (
-                                <div className='block'>
-                                    <video className='max-w-full max-h-[75vh]' src={photo.mp4_url} autoPlay loop playsInline poster={photo.posterframe} />
-                                </div>
-                            ) : (
-                                <div className='block'>
-                                    <img src={photo.url} alt={photo.event_name + photo.id} className='max-h-[75vh]' />
-                                    {/* <AutosizeImage
-                                        src={photo.url}
-                                        alt={photo.event_name + photo.id}
-                                    /> */}
-                                </div>
-                            )}
-                        </div>
-                        <div className='mt-3'>
-                            <a className='btn btn-primary' href={photo.download_url}>DOWNLOAD</a>
-                        </div>
-                    </div>
+                    <DetailView asset={photo} />
                 </section>
                 <Footer />
             </div>
@@ -149,9 +146,19 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     });
     let data = await resp.data;
 
+    const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${data.event_id}.json`;
+    let eventRes = await axios.get(eventUrl, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + token,
+        },
+    });
+    let eventData = await eventRes.data?.event;
+
     return {
         props: {
             ...data,
+            event: eventData,
         }
     }
 };

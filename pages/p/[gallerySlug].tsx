@@ -101,7 +101,7 @@ const PublicGallery = (props: ResponseData) => {
                 <meta name="description" content="Taken with HYPNO: The animated, social photo booth" />
             </Head>
 
-            <GalleryNavBar name={galleryTitle}>
+            <GalleryNavBar name={galleryTitle} gallerySlug={String(gallerySlug)}>
                 <div className='flex flex-row gap-3 items-center text-lg invisible'>
                     <Link href={'/'}>Newest</Link>
                     <Link href={'/'}>Oldest</Link>

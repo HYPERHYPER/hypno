@@ -11,6 +11,7 @@ import { useStableDiffusion } from '@/hooks/useStableDiffusion';
 
 interface AiPlaygroundProps {
     gallerySlug: string;
+    onSaveCurrent: any;
 }
 
 type ImageData = {
@@ -43,7 +44,7 @@ type ImageData = {
 
 export default function AiPlayground(props: AiPlaygroundProps) {
     const photoUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${props.gallerySlug}/photos.json`;
-    const { data : initialData, error : initialError } = useSWR([photoUrl, process.env.NEXT_PUBLIC_AUTH_TOKEN],
+    const { data: initialData, error: initialError } = useSWR([photoUrl, process.env.NEXT_PUBLIC_AUTH_TOKEN],
         ([url, token]) => axiosGetWithToken(url, token))
     let photos: ImageData[] = initialData?.photos || [];
 
@@ -78,7 +79,8 @@ export default function AiPlayground(props: AiPlaygroundProps) {
     const [replaceWith, setReplaceWith] = useState<string>('');
 
     const { output, generateImgToImg, generateTextInpainting, isLoading: isLoadingGeneration } = useStableDiffusion();
-    const handleGenerate = async () => {
+    const handleGenerate = async (e: any) => {
+        e.preventDefault();
         const buffer = await fetch(`/api/file?url=${previewImageUrl}`)
             .then((res) => res.json())
             .then((data) => {
@@ -96,6 +98,11 @@ export default function AiPlayground(props: AiPlaygroundProps) {
                 return;
             }
         }
+    }
+
+    const handleSaveCurrent = (e: any) => {
+        e.preventDefault();
+        props.onSaveCurrent && props.onSaveCurrent({ type: diffusionType, prompt, image_strength: imageStrength / 100, seed })
     }
 
     return (
@@ -193,7 +200,10 @@ export default function AiPlayground(props: AiPlaygroundProps) {
                             )}
                         </div>
                     </div>
-                    <button className='btn btn-primary mt-8 btn-block' onClick={handleGenerate}>GENERATE</button>
+                    <div className='flex flex-row gap-2 w-full mt-8'>
+                        <button className='btn btn-primary w-1/2' onClick={handleSaveCurrent}>UPDATE CURRENT SETTINGS</button> 
+                        <button className='btn btn-primary w-1/2' onClick={handleGenerate}>GENERATE</button> 
+                    </div>
 
                 </div>
             </div>
@@ -201,7 +211,7 @@ export default function AiPlayground(props: AiPlaygroundProps) {
             <div className='flex-1 max-w-[512px]'>
                 <h2 className='text-xl text-white/20 mb-3'>Generated Output</h2>
                 <div className='bg-black w-full aspect-square relative overflow-hidden'>
-                    {output && <img src={output} alt='output-img'className={`w-full h-full top-0 left-0 transition ${isLoadingGeneration ? 'blur-sm' : ''}`} />}
+                    {output && <img src={output} alt='output-img' className={`w-full h-full top-0 left-0 transition ${isLoadingGeneration ? 'blur-sm' : ''}`} />}
                     {isLoadingGeneration && <span className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'><Spinner /></span>}
                 </div>
             </div>

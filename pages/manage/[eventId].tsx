@@ -47,6 +47,7 @@ const ManageEventGallery = (props: ResponseData) => {
             color: metadata.color || '',
             terms_and_conditions: terms_and_conditions || DEFAULT_TERMS,
             email_delivery: metadata.email_delivery || false,
+            ai_generation: metadata.ai_generation || {},
         }
     });
 
@@ -124,8 +125,7 @@ const ManageEventGallery = (props: ResponseData) => {
                             <a className={`tab tab-lg text-white ${view == 'ai' ? 'tab-active' : ''}`} onClick={() => setView('ai')}>AI Playground</a>
                         </div>
                     </div>
-                    { view !== 'ai' && (
-                    <form onSubmit={handleSubmit(submitForm)} className='sm:mt-8 space-y-3 flex-1 flex flex-col p-4 pb-5 max-w-xs sm:max-w-lg'>
+                    <form onSubmit={handleSubmit(submitForm)} className={`sm:mt-8 space-y-3 flex-1 flex flex-col p-4 pb-5 ${view !== 'ai' ? 'max-w-xs sm:max-w-lg' : ''}`}>
                         {view == 'basic' && (
                             <>
                                 <div className='form-control '>
@@ -250,32 +250,74 @@ const ManageEventGallery = (props: ResponseData) => {
                                 </div>
                             </>
                         )}
-                        <div className='fixed bottom-[30px] right-1/2 translate-x-1/2'>
-                            {savedChangesStatus ? (
-                                <button className='btn btn-wide rounded-full shadow-lg'>{savedChangesStatus == 'saving' ?
-                                    <ThreeDots
-                                        height="20"
-                                        width="50"
-                                        radius="4"
-                                        color="#FFFFFF"
-                                        ariaLabel="three-dots-loading"
-                                        visible={true}
-                                    />
-                                    :
-                                    'CHANGES SAVED!'
-                                }</button>
-                            ) :
-                                <input className='btn btn-primary btn-wide rounded-full shadow-lg' type='submit' value='SAVE' />
-                            }
-                        </div>
-                    </form>
-                    )}
+                        {view !== 'ai' && (
+                            <div className='fixed bottom-[30px] right-1/2 translate-x-1/2'>
+                                {savedChangesStatus ? (
+                                    <button className='btn btn-wide rounded-full shadow-lg'>{savedChangesStatus == 'saving' ?
+                                        <ThreeDots
+                                            height="20"
+                                            width="50"
+                                            radius="4"
+                                            color="#FFFFFF"
+                                            ariaLabel="three-dots-loading"
+                                            visible={true}
+                                        />
+                                        :
+                                        'CHANGES SAVED!'
+                                    }</button>
+                                ) :
+                                    <input className='btn btn-primary btn-wide rounded-full shadow-lg' type='submit' value='SAVE' />
+                                }
+                            </div>
+                        )}
 
-                    {view == 'ai' && (
-                        <div className='sm:mt-8 flex-1 p-4 pb-5'>
-                            <AiPlayground gallerySlug={party_slug} />
-                        </div>
-                    )}
+                        {view == 'ai' && (
+                            <div className='flex-1 pb-5'>
+                                <div className='space-y-5 w-1/2 mr-[30px]'>
+                                    <div className='form-control'>
+                                        <label className='label'>
+                                            <span className='label-text text-white'>AI Remix Button</span>
+                                        </label>
+                                        <div className='flex flex-row gap-2 items-center'>
+                                            <input type="checkbox" className="toggle toggle-lg" checked={config.ai_generation?.enabled} onChange={(e) => setValue('ai_generation.enabled', e.target.checked)} />
+                                            <span className='text-sm text-white/40'>{!config.ai_generation?.enabled ? 'Disabled' : 'Enabled'}</span>
+                                        </div>
+                                    </div>
+                                    <div className="collapse collapse-arrow w-full mt-3 bg-white/10 rounded-box">
+                                        <input type="checkbox" />
+                                        <div className="collapse-title text-lg font-medium">
+                                            Current Settings
+                                        </div>
+                                        <div className="collapse-content">
+                                            <p>Type: {config.ai_generation?.type}</p>
+                                            <p>Prompt: {config.ai_generation?.prompt}</p>
+                                            <p>Image Strength: {config.ai_generation?.image_strength}</p>
+                                        </div>
+                                    </div>
+                                    {savedChangesStatus ? (
+                                        <button className='btn btn-wide'>{savedChangesStatus == 'saving' ?
+                                            <ThreeDots
+                                                height="20"
+                                                width="50"
+                                                radius="4"
+                                                color="#FFFFFF"
+                                                ariaLabel="three-dots-loading"
+                                                visible={true}
+                                            />
+                                            :
+                                            'CHANGES SAVED!'
+                                        }</button>
+                                    ) :
+                                        <input className='btn btn-primary btn-wide' type='submit' value='SAVE' />
+                                    }
+                                </div>
+
+
+                                <div className='divider before:bg-white/[.03] after:bg-white/[.03] mr-[30px] my-[30px]' />
+                                <AiPlayground gallerySlug={party_slug} onSaveCurrent={(val: any) => setValue('ai_generation', { ...val, enabled: config.ai_generation.enabled })} />
+                            </div>
+                        )}
+                    </form>
                 </div>
             </section>
         </>

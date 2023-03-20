@@ -10,7 +10,7 @@ import _ from 'lodash';
 import { arrayBufferToBase64 } from "@/helpers/image";
 
 export const useStableDiffusion = () => {
-    const [output, setOutput] = useState<string>();
+    const [output, setOutput] = useState<string | string[]>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const generateImgToImg = ({ imageBuffer, prompt, seed, imageStrength = 0.5 }: { imageBuffer: Buffer, prompt: string, seed?: number, imageStrength?: number }) => {
@@ -34,7 +34,7 @@ export const useStableDiffusion = () => {
             height: 256,
             samples: 1,
             cfgScale: 8,
-            steps: 25,
+            steps: 30,
             sampler: Generation.DiffusionSampler.SAMPLER_K_DPMPP_2M,
         });
 
@@ -55,6 +55,7 @@ export const useStableDiffusion = () => {
         const b64 = arrayBufferToBase64(imageBuffer);
         const prefix = 'data:image/png;base64,'
         const b64Url = prefix+b64;
+
         const res = await fetch("/api/hugging", {
             method: "POST",
             headers: {
@@ -76,10 +77,38 @@ export const useStableDiffusion = () => {
         });
     }
 
+    const generateSegmentationMask = async ({ imageBuffer, toIdentify, toIgnore, threshold }: { imageBuffer: number[], toIdentify: string, toIgnore: string, threshold: number }) => {
+        setIsLoading(true);
+        const b64 = arrayBufferToBase64(imageBuffer);
+        const prefix = 'data:image/png;base64,'
+        const b64Url = prefix+b64;
+        const res = await fetch("/api/hugging", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                url: "https://sessex-clipseg2.hf.space/run/mask",
+                data: [
+                    b64Url,
+                    toIdentify,
+                    toIgnore,
+                    threshold
+                ]
+            }),
+        });
+
+        await res.json().then((val) => {
+            setOutput(val.data);
+            setIsLoading(false);
+        });
+    }
+
     return {
         output,
         generateImgToImg,
         generateTextInpainting,
+        generateSegmentationMask,
         isLoading,
     }
 }
