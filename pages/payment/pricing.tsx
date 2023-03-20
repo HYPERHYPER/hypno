@@ -166,12 +166,13 @@ const PricingPage = (): JSX.Element => {
               <CardElement
                 options={cardStyle}
                 onChange={handleCardInputChange}
+                className="max-w-lg"
               />
               {stripeError && (
                 <span className='text-red-800 block mt-2'>{stripeError}</span>
               )}
               <button
-                className='btn btn-neutral rounded-md'
+                className='btn btn-neutral rounded-md max-w-lg'
                 disabled={!stripe && disabled}
                 type='submit'
               >
