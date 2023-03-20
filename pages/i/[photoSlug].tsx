@@ -5,6 +5,7 @@ import _ from 'lodash';
 import Spinner from '@/components/Spinner';
 import GalleryNavBar from '@/components/Gallery/GalleryNavBar';
 import { Footer } from '@/components/Footer';
+import DetailView from '@/components/Gallery/DetailView';
 
 type ImageData = {
     id: number;
@@ -38,10 +39,30 @@ type ImageData = {
     mp4_url: string;
 };
 
+type EventData = {
+    name: string;
+    fields: string[];
+    gallery_title: string;
+    gallery_subtitle: string;
+    data_capture_title: string;
+    data_capture_subtitle: string;
+    data_capture_screen: boolean;
+    terms: string;
+    privacy: string;
+    logo: string;
+    background: string;
+    color: string;
+    terms_and_conditions: string;
+    email_delivery: boolean;
+    ai_generation: any;
+    metadata: any;
+}
+
 interface ResponseData {
     status: number;
     message: string;
     photo: ImageData;
+    event: EventData;
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -50,6 +71,7 @@ const DetailGallery = (props: ResponseData) => {
     const { photo } = props;
 
     const galleryTitle = photo?.event_name;
+    const aiGeneration = props.event.metadata.ai_generation || null;
 
     // const handleReplicate = async () => {
     //     console.log('predicting')
@@ -101,33 +123,10 @@ const DetailGallery = (props: ResponseData) => {
                 <meta name="description" content="Taken with HYPNO: The animated, social photo booth" />
             </Head>
 
-            <div className='min-h-screen bg-black'>
+            <div className='min-h-screen bg-black pb-8'>
                 <GalleryNavBar name={galleryTitle} gallerySlug={String(photo?.event_id)} />
                 <section className={`text-white bg-black`}>
-                    <div className={`sm:mx-auto h-full mb-[35px] md:px-[90px] w-full flex justify-center flex-col items-center`}>
-                        <div className='relative bg-white/10 backdrop-blur-[50px] max-h-[75vh]'>
-                            <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
-                                <Spinner />
-                            </div>
-
-                            {photo.gif ? (
-                                <div className='block'>
-                                    <video className='max-w-full max-h-[75vh]' src={photo.mp4_url} autoPlay loop playsInline poster={photo.posterframe} />
-                                </div>
-                            ) : (
-                                <div className='block'>
-                                    <img src={photo.url} alt={photo.event_name + photo.id} className='max-h-[75vh]' />
-                                    {/* <AutosizeImage
-                                        src={photo.url}
-                                        alt={photo.event_name + photo.id}
-                                    /> */}
-                                </div>
-                            )}
-                        </div>
-                        <div className='mt-3'>
-                            <a className='btn btn-primary' href={photo.download_url}>DOWNLOAD</a>
-                        </div>
-                    </div>
+                    <DetailView asset={photo} config={{ aiGeneration }}/>
                 </section>
                 <Footer />
             </div>
@@ -137,21 +136,32 @@ const DetailGallery = (props: ResponseData) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const { photoSlug } = context.query;
-
     // Request to get photo for detail view
     const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/${photoSlug}.json`;
     const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+    let eventData = {};
+    let photoData = {};
     let resp = await axios.get(url, {
         headers: {
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + token,
         },
+    }).then(async (res) => {
+        photoData = res.data;
+        const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${res.data.photo.event_id}.json`;
+        let eventRes = await axios.get(eventUrl, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
+            },
+        });
+        eventData = await eventRes.data?.event;
     });
-    let data = await resp.data;
 
     return {
         props: {
-            ...data,
+            ...photoData,
+            event: eventData,
         }
     }
 };
