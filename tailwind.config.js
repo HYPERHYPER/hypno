@@ -1,13 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
+    './pages/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     fontFamily: {
-      nbAkademieStd: "NB Akademie Std, sans-serif",
-      sans: ["NB Akademie Std","Helvetica Neue","Arial","ui-sans-serif"]
+      nbAkademieStd: 'NB Akademie Std, sans-serif',
+      sans: ['NB Akademie Std', 'Helvetica Neue', 'Arial', 'ui-sans-serif'],
     },
     extend: {
       colors: {
@@ -26,9 +26,26 @@ module.exports = {
           '71.4285714286%': { backgroundPosition: '0 75%' },
           '85.7142857143%': { backgroundPosition: '0 50%' },
           '100%': { backgroundPosition: '0 25%' },
-        }
-      }
+        },
+      },
     },
   },
-  plugins: [require("daisyui")],
-}
+  daisyui: {
+    themes: [
+      {
+        mytheme: {
+          primary: '#87D58A',
+          secondary: '#D926AA',
+          accent: '#1FB2A5',
+          neutral: '#FFFFFF',
+          info: '#3ABFF8',
+          success: '#36D399',
+          warning: '#FBBD23',
+          error: '#F87272',
+        },
+      },
+    ],
+  },
+
+  plugins: [require('daisyui')],
+};
