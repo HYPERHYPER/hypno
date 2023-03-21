@@ -131,23 +131,23 @@ const PricingPage = (): JSX.Element => {
     <>
       {success ? (
         <div className='flex flex-col w-full h-screen justify-center items-center'>
-          <span className='w-1/3 h-min text-center text-2xl'>
+          <span className='md:w-1/3 h-min text-center text-2xl'>
             Thank you for signing up for Hypno Pro. Credentials to log in to our
             platform should arrive in your inbox shortly.
           </span>
         </div>
       ) : (
-        <div className='flex w-full h-screen gap-3 flex-row justify-center align-middle'>
-          <div className='flex flex-col align-middle justify-center text-right w-1/3'>
+        <div className='flex w-full h-screen gap-3 flex-col md:flex-row justify-center align-middle'>
+          <div className='flex flex-col align-middle justify-center text-center md:text-right md:w-1/3'>
             <span className='text-5xl'>Hypno Pro</span>
             <span className='text-2xl'>$99/mo</span>
           </div>
-          <div className='form-control justify-center w-1/2 p-10 gap-5'>
+          <div className='form-control justify-center md:w-1/2 p-10 gap-5'>
             <input
               type='text'
               id='fullName'
               placeholder='Full Name'
-              className='input w-full max-w-lg'
+              className='input w-full md:max-w-lg'
               {...register('fullName')}
               onChange={(e) => setName(e.target.value)}
             />
@@ -160,7 +160,7 @@ const PricingPage = (): JSX.Element => {
               type='text'
               id='email'
               placeholder='Email'
-              className='input w-full max-w-lg'
+              className='input w-full md:max-w-lg'
               {...register('email')}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -177,13 +177,13 @@ const PricingPage = (): JSX.Element => {
               <CardElement
                 options={cardStyle}
                 onChange={handleCardInputChange}
-                className='max-w-lg'
+                className='md:max-w-lg'
               />
               {stripeError && (
                 <span className='text-red-800 block mt-2'>{stripeError}</span>
               )}
               <button
-                className='btn btn-neutral rounded-md max-w-lg'
+                className='btn btn-neutral rounded-md md:max-w-lg'
                 disabled={!stripe && disabled}
                 type='submit'
               >
