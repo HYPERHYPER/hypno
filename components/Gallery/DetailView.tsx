@@ -1,10 +1,10 @@
 import { useStableDiffusion } from "@/hooks/useStableDiffusion";
 import Spinner from "../Spinner";
 import { ThreeDots } from "react-loader-spinner";
+import Image from 'next/image';
 
-export default function DetailView({ asset, config }: any) {
+export default function DetailView({ asset, config, imageProps }: any) {
     const { output, generateImgToImg, generateTextInpainting, isLoading: isLoadingGeneration } = useStableDiffusion();
-
     const handleRemix = async (e: any) => {
         e.preventDefault();
         if (config.aiGeneration) {
@@ -28,7 +28,7 @@ export default function DetailView({ asset, config }: any) {
         <div className={`sm:mx-auto h-full mb-[35px] md:px-[90px] w-full flex justify-center flex-col items-center`}>
             <div className='relative bg-white/10 backdrop-blur-[50px] max-h-[75vh]'>
                 <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
-                    <Spinner />
+                    {/* <Spinner /> */}
                 </div>
 
                 {asset.mp4_url ? (
@@ -36,12 +36,12 @@ export default function DetailView({ asset, config }: any) {
                         <video className='max-w-full max-h-[75vh]' src={asset.mp4_url} autoPlay loop playsInline poster={asset.posterframe} />
                     </div>
                 ) : (
-                    <div className='block'>
-                        <img src={asset.url} alt={asset.event_name + asset.id} className='max-h-[75vh]' />
-                        {/* <AutosizeImage
-                                        src={photo.url}
-                                        alt={photo.event_name + photo.id}
-                                    /> */}
+                    <div className='block overflow-hidden relative'>
+                        <Image 
+                            {...imageProps} 
+                            alt={asset.event_name + asset.id}
+                            placeholder='blur' 
+                            className="max-h-[75vh] w-auto" />
                     </div>
                 )}
             </div>

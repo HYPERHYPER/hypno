@@ -116,36 +116,34 @@ const PublicGallery = (props: ResponseData) => {
                     dataLength={paginatedPhotos?.length}
                 >
                     <div className={`sm:mx-auto block h-full my-[35px] xl:px-[90px] mb-[35px]`}>
-                        <FadeIn
-                            from="bottom" positionOffset={300} triggerOffset={0}>
-                            <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3, 1200: 4 }}>
-                                <Masonry gutter={'20px'} >
-                                    {paginatedPhotos.map((p) => (
-                                        <Link key={p.id} href={`/i/${p.slug}`}>
-                                            <div className='w-full block relative bg-white/10 backdrop-blur-[50px] overflow-hidden' style={{ aspectRatio: getAspectRatio(p.width, p.height)}} >
-                                                <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
-                                                    <Spinner />
-                                                </div>
-                                                <div className='hover:scale-110 transition'>
-                                                    <AutosizeImage
-                                                        src={p.posterframe}
-                                                        alt={p.event_name + p.id}
-                                                        width={p.width}
-                                                        height={p.height}
-                                                    />
-                                                    {p.gif && (
-                                                        <div
-                                                            className='absolute top-0 left-0 w-full h-full animate-jpeg-strip'
-                                                            style={{ backgroundImage: `url(${p.jpeg_url})`, backgroundSize: '100% 500%' }}
-                                                        />
-                                                    )}
-                                                </div>
+                        <ResponsiveMasonry columnsCountBreakPoints={{ 375: 3, 750: 2, 900: 3, 1200: 4 }}>
+                            <Masonry gutter={'10px'} >
+                                {paginatedPhotos.map((p, i) => (
+                                    <Link key={p.id} href={`/i/${p.slug}`}>
+                                        <div className='w-full block relative bg-white/10 backdrop-blur-[50px] overflow-hidden' style={{ aspectRatio: getAspectRatio(p.width, p.height) }} >
+                                            <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
+                                                <Spinner />
                                             </div>
-                                        </Link>
-                                    ))}
-                                </Masonry>
-                            </ResponsiveMasonry>
-                        </FadeIn>
+                                            <div className='hover:scale-110 transition'>
+                                                <AutosizeImage
+                                                    src={p.gif ? p.posterframe : p.jpeg_thumb_url}
+                                                    alt={p.event_name + p.id}
+                                                    width={p.width}
+                                                    height={p.height}
+                                                    priority={i < 11}
+                                                />
+                                                {p.gif && 
+                                                    <div
+                                                        className='absolute top-0 left-0 w-full h-full animate-jpeg-strip'
+                                                        style={{ backgroundImage: `url(${p.jpeg_url})`, backgroundSize: '100% 500%' }}
+                                                    />
+                                                }
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </Masonry>
+                        </ResponsiveMasonry>
                     </div>
                 </InfiniteScroll>
 
@@ -171,9 +169,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         });
         let data = await resp.data;
         if (!data) return { notFound: true }
-        return { 
+        return {
             redirect: {
-                destination: '/p/'+data.event.party_slug,
+                destination: '/p/' + data.event.party_slug,
                 permanent: false,
             }
         }

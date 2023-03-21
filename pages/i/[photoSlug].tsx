@@ -6,6 +6,7 @@ import Spinner from '@/components/Spinner';
 import GalleryNavBar from '@/components/Gallery/GalleryNavBar';
 import { Footer } from '@/components/Footer';
 import DetailView from '@/components/Gallery/DetailView';
+import { getPlaiceholder } from 'plaiceholder';
 
 type ImageData = {
     id: number;
@@ -63,6 +64,7 @@ interface ResponseData {
     message: string;
     photo: ImageData;
     event: EventData;
+    placeholder: any;
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -72,6 +74,11 @@ const DetailGallery = (props: ResponseData) => {
 
     const galleryTitle = photo?.event_name;
     const aiGeneration = props.event.metadata.ai_generation || null;
+    const { base64, img } = props.placeholder;
+    const imageProps = {
+        ...img,
+        blurDataURL: base64,
+    }
 
     // const handleReplicate = async () => {
     //     console.log('predicting')
@@ -126,7 +133,7 @@ const DetailGallery = (props: ResponseData) => {
             <div className='min-h-screen bg-black pb-8'>
                 <GalleryNavBar name={galleryTitle} gallerySlug={String(photo?.event_id)} />
                 <section className={`text-white bg-black`}>
-                    <DetailView asset={photo} config={{ aiGeneration }}/>
+                    <DetailView asset={photo} config={{ aiGeneration }} imageProps={imageProps} />
                 </section>
                 <Footer />
             </div>
@@ -141,6 +148,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
     let eventData = {};
     let photoData = {};
+    let placeholder = {};
     let resp = await axios.get(url, {
         headers: {
             'Content-Type': 'application/json',
@@ -156,12 +164,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             },
         });
         eventData = await eventRes.data?.event;
+
+        placeholder = await getPlaiceholder(res.data.photo.jpeg_url);
     });
 
     return {
         props: {
             ...photoData,
             event: eventData,
+            placeholder: placeholder,
         }
     }
 };

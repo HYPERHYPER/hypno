@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Image from "next/image";
-import { getAspectRatio } from "@/helpers/image";
 
 /**
  * Image component fills container width and maintains aspect ratio height to display full image
@@ -11,12 +10,14 @@ export default function AutosizeImage({
     onLoadingComplete,
     width,
     height,
+    ...rest
 }: {
     src?: any;
     alt?: string;
     onLoadingComplete?: () => void;
     width?: number;
     height?: number;
+    priority?: boolean;
 }) {
     const [paddingTop, setPaddingTop] = useState<string>("0");
 
@@ -32,6 +33,7 @@ export default function AutosizeImage({
                     setPaddingTop(`calc(100% / (${naturalWidth} / ${naturalHeight})`);
                     onLoadingComplete && onLoadingComplete();
                 }}
+                {...rest}
             />
         </div>
     )
