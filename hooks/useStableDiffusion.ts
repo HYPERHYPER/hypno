@@ -9,11 +9,31 @@ import { useState } from "react";
 import _ from 'lodash';
 import { arrayBufferToBase64 } from "@/helpers/image";
 
+
 export const useStableDiffusion = () => {
     const [output, setOutput] = useState<string | string[]>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const generateImgToImg = ({ imageBuffer, prompt, seed, imageStrength = 0.5 }: { imageBuffer: Buffer, prompt: string, seed?: number, imageStrength?: number }) => {
+    const upscaleImage = ({ imageBuffer } : { imageBuffer: Buffer }) => {
+        setIsLoading(true);
+        const request = buildGenerationRequest("esrgan-v1-x2plus", {
+            type: "upscaling",
+            upscaler: Generation.Upscaler.UPSCALER_ESRGAN,
+            initImage: imageBuffer,
+          });
+          
+          executeGenerationRequest(client, request, metadata)
+            .then((res) => {
+                const imageDataUrls = onGenerationComplete(res);
+                setOutput(`data:image/png;base64,${_.first(imageDataUrls)}` || '');
+                setIsLoading(false);
+            })
+            .catch((error) => {
+              console.error("Failed to upscale image:", error);
+            });
+    }
+
+    const generateImgToImg = ({ imageBuffer, prompt, seed, imageStrength = 0.5, upscale = true }: { imageBuffer: Buffer, prompt: string, seed?: number, imageStrength?: number, upscale?: boolean }) => {
         setIsLoading(true);
         // DreamStudio uses an Image Strength slider to control the influence of the initial image on the final result.
         // This "Image Strength" is a value from 0-1, where values close to 1 yield images very similar to the init_image
@@ -30,8 +50,8 @@ export const useStableDiffusion = () => {
             stepScheduleStart: 1 - imageStrength,
             initImage: imageBuffer,
             seed,
-            width: 256,
-            height: 256,
+            width: 512,
+            height: 512,
             samples: 1,
             cfgScale: 8,
             steps: 30,
@@ -42,6 +62,10 @@ export const useStableDiffusion = () => {
             .then((res) => {
                 const imageDataUrls = onGenerationComplete(res);
                 setOutput(`data:image/png;base64,${_.first(imageDataUrls)}` || '');
+                if (_.first(imageDataUrls) && upscale) {
+                    const buffer = Buffer.from(_.first(imageDataUrls) || '', "base64")
+                    upscaleImage({imageBuffer: buffer})
+                }
                 setIsLoading(false);
             })
             .catch((error) => {

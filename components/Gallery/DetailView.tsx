@@ -5,7 +5,8 @@ import { ThreeDots } from "react-loader-spinner";
 export default function DetailView({ asset, config }: any) {
     const { output, generateImgToImg, generateTextInpainting, isLoading: isLoadingGeneration } = useStableDiffusion();
 
-    const handleRemix = async () => {
+    const handleRemix = async (e: any) => {
+        e.preventDefault();
         if (config.aiGeneration) {
             const buffer = await fetch(`/api/file?url=${asset.url}`)
                 .then((res) => res.json())
@@ -51,7 +52,7 @@ export default function DetailView({ asset, config }: any) {
                     </div>
 
                     <div className='block'>
-                        <img src={String(output)} alt={asset.event_name + asset.id} className='max-h-[75vh] sm:h-[75vh]' />
+                        <img src={String(output)} alt={asset.event_name + asset.id} className='min-w-[512px] max-h-[75vh] sm:h-[75vh]' />
                         {/* <AutosizeImage
                                         src={photo.url}
                                         alt={photo.event_name + photo.id}

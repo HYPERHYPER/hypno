@@ -22,21 +22,41 @@ export type CommonGenerationParams = {
   seed?: number;
 };
 
-export type GenerationRequestParams = CommonGenerationParams &
-  (
-    | { type: "text-to-image" }
-    | {
-        type: "image-to-image";
-        initImage: Buffer;
-        stepScheduleStart: number;
-        stepScheduleEnd?: number;
-      }
-    | {
-        type: "image-to-image-masking";
-        initImage: Buffer;
-        maskImage: Buffer;
-      }
-  );
+export type TextToImageParams = CommonGenerationParams & {
+  type: "text-to-image";
+  height?: number;
+  width?: number;
+};
+
+export type ImageToImageParams = CommonGenerationParams & {
+  type: "image-to-image";
+  initImage: Buffer;
+  stepScheduleStart: number;
+  stepScheduleEnd?: number;
+};
+
+export type ImageToImageMaskingParams = CommonGenerationParams & {
+  type: "image-to-image-masking";
+  initImage: Buffer;
+  maskImage: Buffer;
+};
+
+export type UpscalingParams = HeightOrWidth & {
+  type: "upscaling";
+  initImage: Buffer;
+  upscaler: Generation.UpscalerMap[keyof Generation.UpscalerMap];
+};
+
+type HeightOrWidth =
+  | { height: number; width?: never }
+  | { height?: never; width: number }
+  | { height?: never; width?: never };
+
+export type GenerationRequestParams =
+  | TextToImageParams
+  | ImageToImageParams
+  | ImageToImageMaskingParams
+  | UpscalingParams;
 
 export type GenerationRequest = Generation.Request;
 
@@ -52,6 +72,24 @@ export function buildGenerationRequest(
   engineID: string,
   params: GenerationRequestParams
 ): GenerationRequest {
+  if (params.type === "upscaling") {
+    const request = new Generation.Request();
+    request.setEngineId(engineID);
+    request.setRequestedType(Generation.ArtifactType.ARTIFACT_IMAGE);
+    request.setClassifier(new Generation.ClassifierParameters());
+
+    const imageParams = new Generation.ImageParameters();
+    if ("width" in params && !!params.width) {
+      imageParams.setWidth(params.width);
+    } else if ("height" in params && !!params.height) {
+      imageParams.setHeight(params.height);
+    }
+    request.setImage(imageParams);
+    request.addPrompt(createInitImagePrompt(params.initImage));
+
+    return request;
+  }
+
   const imageParams = new Generation.ImageParameters();
   params.width && imageParams.setWidth(params.width);
   params.height && imageParams.setHeight(params.height);
@@ -239,8 +277,7 @@ export function onGenerationComplete(response: GenerationResponse) {
   }
 
   console.log(
-    `${
-      response.imageArtifacts.length + response.filteredArtifacts.length
+    `${response.imageArtifacts.length + response.filteredArtifacts.length
     } artifacts were generated.`
   );
 
@@ -248,23 +285,23 @@ export function onGenerationComplete(response: GenerationResponse) {
   if (response.filteredArtifacts.length > 0) {
     console.log(
       `${response.filteredArtifacts.length} artifact` +
-        `${response.filteredArtifacts.length === 1 ? "s" : ""}` +
-        ` were filtered by the NSFW classifier`
+      `${response.filteredArtifacts.length === 1 ? "s" : ""}` +
+      ` were filtered by the NSFW classifier`
     );
   }
 
-  let encodedImages : string[] = [];
+  let encodedImages: string[] = [];
   // Do something with the successful image artifacts
   response.imageArtifacts.forEach((artifact: Generation.Artifact) => {
     try {
-        console.log(artifact)
-        const base64 = artifact.getBinary_asB64();
-        encodedImages.push(base64);
-    //   fs.writeFile(
-    //     `image-${artifact.getSeed()}.png`,
-    //     Buffer.from(artifact.getBinary_asU8()),
-    //     () => { console.log('seed', artifact.getSeed())}
-    //   );
+      console.log(artifact)
+      const base64 = artifact.getBinary_asB64();
+      encodedImages.push(base64);
+      //   fs.writeFile(
+      //     `image-${artifact.getSeed()}.png`,
+      //     Buffer.from(artifact.getBinary_asU8()),
+      //     () => { console.log('seed', artifact.getSeed())}
+      //   );
     } catch (error) {
       console.error("Failed to write resulting image to disk", error);
     }
