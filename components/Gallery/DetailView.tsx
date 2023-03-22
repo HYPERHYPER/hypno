@@ -39,8 +39,10 @@ export default function DetailView({ asset, config, imageProps }: any) {
                     <div className='block overflow-hidden relative'>
                         <Image 
                             {...imageProps} 
+                            fill={!imageProps.width}
+                            src={asset.url}
                             alt={asset.event_name + asset.id}
-                            placeholder='blur' 
+                            placeholder={imageProps ? 'blur' : 'empty'}
                             className="max-h-[75vh] w-auto" />
                     </div>
                 )}

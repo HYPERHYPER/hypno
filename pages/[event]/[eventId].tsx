@@ -16,6 +16,7 @@ import DetailView from '@/components/Gallery/DetailView';
 import Link from 'next/link';
 import Head from 'next/head';
 import _ from 'lodash';
+import { getPlaiceholder } from 'plaiceholder';
 
 type ImageData = {
     id: number;
@@ -74,11 +75,12 @@ interface ResponseData {
     photos: ImageData[];
     event: EventData;
     photo: ImageData;
+    placeholder: any;
 }
 
 
 const SubGallery = (props: ResponseData) => {
-    const { event, photos: initialPhotos, count, photo } = props;
+    const { event, photos: initialPhotos, count, photo, placeholder } = props;
     const { query: { category, eventId, event: gallerySlug } } = useRouter()
 
     const [photoUploadPending, setPhotoUploadPending] = useState<boolean>(true); // waiting for first photo to arrive
@@ -172,7 +174,7 @@ const SubGallery = (props: ResponseData) => {
 
                 {isDetailView ? (
                     <div className='text-white mt-8'>
-                        <DetailView asset={photo} config={{ aiGeneration: event.ai_generation }} />
+                        <DetailView asset={photo} config={{ aiGeneration: event.ai_generation }} imageProps={{...placeholder?.img, blurDataURL: placeholder?.base64}} />
                     </div>
                 ) : (
                     <div className={`sm:mx-auto h-full ${_.isEmpty(event.logo) ? 'mt-8' : ''}`}>
@@ -249,7 +251,7 @@ const SubGallery = (props: ResponseData) => {
                                             </ResponsiveMasonry>
                                         </FadeIn>
                                     ) : (
-                                        <DetailView asset={singleAsset} />
+                                        <DetailView asset={singleAsset} config={{ aiGeneration: event.ai_generation }} imageProps={{ img: placeholder.img,  blurDataURL: placeholder.base64 }} />
                                     )}
                                 </div>
                             ))}
@@ -297,8 +299,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 'Content-Type': 'application/json',
                 Authorization: 'Bearer ' + token,
             },
+        }).then(async (res) => {
+            singleAssetData = res.data;
+            const placeholder = await getPlaiceholder(res.data.photo.jpeg_url);
+            singleAssetData = {
+                ...singleAssetData,
+                placeholder
+            }
         });
-        singleAssetData = await resp.data;
     }
 
     return {
