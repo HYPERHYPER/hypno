@@ -97,7 +97,7 @@ const PublicGallery = (props: ResponseData) => {
     return (
         <>
             <Head>
-                <title>{'HYPNO® Presents: ' + galleryTitle || 'Hypno'}</title>
+                <title>{galleryTitle + ' | hypno™'  || 'hypno™'}</title>
                 <meta name="description" content="Taken with HYPNO: The animated, social photo booth" />
             </Head>
 

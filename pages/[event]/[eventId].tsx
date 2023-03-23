@@ -151,7 +151,7 @@ const SubGallery = (props: ResponseData) => {
     return (
         <>
             <Head>
-                <title>{event.name || 'HYPNO'}</title>
+                <title>{event.gallery_title + ' | hypno™' || 'hypno™'}</title>
                 <meta name="description" content="" />
             </Head>
 
@@ -174,7 +174,7 @@ const SubGallery = (props: ResponseData) => {
 
                 {isDetailView ? (
                     <div className='text-white mt-8'>
-                        <DetailView asset={photo} config={{ aiGeneration: event.ai_generation }} imageProps={{...placeholder?.img, blurDataURL: placeholder?.base64}} />
+                        <DetailView asset={photo} config={{ aiGeneration: event.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
                     </div>
                 ) : (
                     <div className={`sm:mx-auto h-full ${_.isEmpty(event.logo) ? 'mt-8' : ''}`}>
@@ -251,7 +251,7 @@ const SubGallery = (props: ResponseData) => {
                                             </ResponsiveMasonry>
                                         </FadeIn>
                                     ) : (
-                                        <DetailView asset={singleAsset} config={{ aiGeneration: event.ai_generation }} imageProps={{ img: placeholder.img,  blurDataURL: placeholder.base64 }} />
+                                        <DetailView asset={singleAsset} config={{ aiGeneration: event.ai_generation }} imageProps={{ img: placeholder.img, blurDataURL: placeholder.base64 }} />
                                     )}
                                 </div>
                             ))}
