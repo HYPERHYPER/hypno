@@ -145,7 +145,7 @@ const PricingPage = (): JSX.Element => {
   };
 
   const inputStyle = {
-    color: '#99F8AA',
+    color: '#00FF99',
     background: 'transparent',
     fontFamily: 'inherit',
     ':-webkit-autofill': {
@@ -162,22 +162,22 @@ const PricingPage = (): JSX.Element => {
     <>
       {success ? (
         <div className='flex flex-col w-full h-screen justify-center items-center'>
-          <span className='text-6xl font-thin mb-8 text-center'>success</span>
-          <span className='md:w-1/3 h-min text-center font-thin text-lg'>
+          <span className='text-6xl font-thin mb-8 text-center text-[#FFFFFF]'>success.</span>
+          <span className='md:w-1/3 h-min text-center font-thin text-lg text-[#FFFFFF]'>
             thanks for your payment. check your email for directions to create
             your hypno account and activate your membership.
           </span>
         </div>
       ) : (
         <div className='flex flex-col justify-items-center justify-center items-center w-full h-screen gap-3 p-8'>
-          <span className='text-6xl font-thin mb-8 text-center'>payment</span>
+          <span className='text-6xl font-thin mb-8 text-center text-[#FFFFFF]'>payment.</span>
           <div className='form-control w-full md:w-2/5 gap-2'>
             <input
               type='text'
               id='email'
               placeholder='email'
               autoComplete='off'
-              className='w-full outline-none bg-transparent border-b border-b-[#333333] placeholder-[#999999] text-[#99F8AA] placeholder:text-xl p-4'
+              className='w-full outline-none bg-transparent border-b border-b-[#333333] placeholder-[#999999] text-[#00FF99] placeholder:text-xl p-4'
               {...register('email')}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -191,7 +191,7 @@ const PricingPage = (): JSX.Element => {
               id='fullName'
               placeholder='name'
               autoComplete='off'
-              className='w-full outline-none bg-transparent border-b border-b-[#333333] placeholder-[#999999] text-[#99F8AA] placeholder:text-xl p-4'
+              className='w-full outline-none bg-transparent border-b border-b-[#333333] placeholder-[#999999] text-[#00FF99] placeholder:text-xl p-4'
               {...register('fullName')}
               onChange={(e) => setName(e.target.value)}
             />
@@ -244,7 +244,7 @@ const PricingPage = (): JSX.Element => {
                 type='text'
                 id='zip'
                 placeholder='zip/postal'
-              className='w-full outline-none bg-transparent border-b border-b-[#333333] placeholder-[#999999] text-[#99F8AA] placeholder:text-xl p-4'
+              className='w-full outline-none bg-transparent border-b border-b-[#333333] placeholder-[#999999] text-[#00FF99] placeholder:text-xl p-4'
                 onChange={(e) => setZip(e.target.value)}
                 pattern='^([0-9]{5})$'
                 autoComplete='off'
