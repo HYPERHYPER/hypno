@@ -97,7 +97,7 @@ const SubGallery = (props: ResponseData) => {
             fallbackData: { photos: initialPhotos },
             refreshInterval: (photoUploadCompleted && !photoUploadPending) ? 0 : 1000
         })
-    let photos: ImageData[] = useMemo(() => data?.photos || [], [data?.photos]);
+    let photos: ImageData[] = data?.photos || [];
     const singleAsset: ImageData | null = photo;
     const isDetailView = !_.isEmpty(photo) && !event.email_delivery;
 
@@ -165,7 +165,7 @@ const SubGallery = (props: ResponseData) => {
     return (
         <>
             <Head>
-                <title>{event.gallery_title + ' | hypno™' || 'hypno™'}</title>
+                <title>{event.name + ' | hypno™' || 'hypno™'}</title>
                 <meta name="description" content="" />
             </Head>
 
@@ -342,7 +342,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         props: {
             ...photosData,
             ...singleAssetData,
-            event: isDefault ? {} : {
+            event: {
                 name: eventData.name,
                 id: eventData.id,
                 ...eventData.metadata,
