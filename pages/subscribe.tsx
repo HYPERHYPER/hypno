@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Spinner from '../../components/Spinner';
+import Spinner from '../components/Spinner';
 import {
   CardElement,
   CardNumberElement,
@@ -17,7 +17,7 @@ import {
   StripeCardNumberElement,
   StripeError,
 } from '@stripe/stripe-js';
-import ArrowRight from '../../public/pop/arrow-right.svg';
+import ArrowRight from '../public/pop/arrow-right.svg';
 
 const PricingPage = (): JSX.Element => {
   const [stripeError, setStripeError] = useState<string | undefined>(undefined);
@@ -148,8 +148,12 @@ const PricingPage = (): JSX.Element => {
     color: '#00FF99',
     background: 'transparent',
     fontFamily: 'inherit',
+    fontSize: '20px',
     ':-webkit-autofill': {
-      color: '#99F8AA',
+      color: '#00FF99',
+      background: 'transparent',
+      fontFamily: 'inherit',
+      fontSize: '20px',
     },
     '::placeholder': {
       color: '#999999',
@@ -177,7 +181,7 @@ const PricingPage = (): JSX.Element => {
               id='email'
               placeholder='email'
               autoComplete='off'
-              className='w-full outline-none bg-transparent border-b border-b-[#333333] placeholder-[#999999] text-[#00FF99] placeholder:text-xl p-4'
+              className='w-full outline-none bg-transparent border-b border-b-[#333333] placeholder-[#999999] text-[#00FF99] text-xl placeholder:text-xl p-4'
               {...register('email')}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -191,7 +195,7 @@ const PricingPage = (): JSX.Element => {
               id='fullName'
               placeholder='name'
               autoComplete='off'
-              className='w-full outline-none bg-transparent border-b border-b-[#333333] placeholder-[#999999] text-[#00FF99] placeholder:text-xl p-4'
+              className='w-full outline-none bg-transparent border-b border-b-[#333333] placeholder-[#999999] text-[#00FF99] text-xl placeholder:text-xl p-4'
               {...register('fullName')}
               onChange={(e) => setName(e.target.value)}
             />
@@ -209,6 +213,7 @@ const PricingPage = (): JSX.Element => {
                 options={{
                   style: {
                     base: inputStyle,
+                    complete: inputStyle,
                   },
                   placeholder: 'card number',
                 }}
@@ -218,6 +223,7 @@ const PricingPage = (): JSX.Element => {
                 options={{
                   style: {
                     base: inputStyle,
+                    complete: inputStyle,
                   },
                   placeholder: 'expiration',
                 }}
@@ -227,6 +233,7 @@ const PricingPage = (): JSX.Element => {
                 options={{
                   style: {
                     base: inputStyle,
+                    complete: inputStyle,
                   },
                   placeholder: 'security',
                 }}
@@ -244,7 +251,7 @@ const PricingPage = (): JSX.Element => {
                 type='text'
                 id='zip'
                 placeholder='zip/postal'
-              className='w-full outline-none bg-transparent border-b border-b-[#333333] placeholder-[#999999] text-[#00FF99] placeholder:text-xl p-4'
+              className='w-full outline-none bg-transparent border-b border-b-[#333333] placeholder-[#999999] text-[#00FF99] text-xl placeholder:text-xl p-4'
                 onChange={(e) => setZip(e.target.value)}
                 pattern='^([0-9]{5})$'
                 autoComplete='off'
