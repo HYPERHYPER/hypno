@@ -128,6 +128,10 @@ const DetailGallery = (props: ResponseData) => {
             <Head>
                 <title>{galleryTitle + ' | hypno™' || 'hypno™'}</title>
                 <meta name="description" content="Taken with HYPNO: The animated, social photo booth" />
+                <meta name="og:image" content={photo.jpeg_3000_thumb_url || photo.posterframe} />
+                <meta name="og:image:type" content='image/jpeg' />
+                <meta name="og:video" content={photo.mp4_url} />
+                <meta name="og:video:type" content='video/mp4' />
             </Head>
 
             <div className='min-h-screen bg-black pb-8'>

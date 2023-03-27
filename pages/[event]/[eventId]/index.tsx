@@ -167,6 +167,10 @@ const SubGallery = (props: ResponseData) => {
             <Head>
                 <title>{event.name + ' | hypno™' || 'hypno™'}</title>
                 <meta name="description" content="" />
+                <meta name="og:image" content={photo ? photo.jpeg_3000_thumb_url : _.first(photos)?.jpeg_3000_thumb_url} />
+                <meta name="og:image:type" content='image/jpeg' />
+                <meta name="og:video" content={photo ? photo.mp4_url : _.first(photos)?.mp4_url} />
+                <meta name="og:video:type" content='video/mp4' />
             </Head>
 
             <CustomGallery event={event}>
