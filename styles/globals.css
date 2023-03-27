@@ -194,6 +194,9 @@
   padding: 0;
   margin: 0;
 }
+html {
+  height: 100%;
+}
 
 html,
 body {

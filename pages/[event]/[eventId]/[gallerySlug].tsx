@@ -1,18 +1,10 @@
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import type { GetServerSideProps } from 'next';
-import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import Head from 'next/head';
 import _ from 'lodash';
-import Spinner from '@/components/Spinner';
 import useSWRInfinite from 'swr/infinite';
 import { fetchWithToken } from '@/lib/fetchWithToken';
-import { FadeIn } from 'react-slide-fade-in';
-import AutosizeImage from '@/components/AutosizeImage';
-import GalleryNavBar from '@/components/Gallery/GalleryNavBar';
-import Link from 'next/link';
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { getAspectRatio } from '@/helpers/image';
 import { CustomGallery } from '@/components/Gallery/CustomGallery';
 import InfiniteMediaGrid from '@/components/Gallery/InfiniteMediaGrid';
 
@@ -105,25 +97,21 @@ const PublicGallery = (props: ResponseData) => {
                 <meta name="description" content="Taken with HYPNO: The animated, social photo booth" />
             </Head>
 
-            <GalleryNavBar name={galleryTitle} gallerySlug={String(gallerySlug)}>
-                <div className='flex flex-row gap-3 items-center text-lg invisible'>
-                    <Link href={'/'}>Newest</Link>
-                    <Link href={'/'}>Oldest</Link>
-                </div>
-            </GalleryNavBar>
-                <section className={`text-white min-h-screen border-t-white/20 border-solid border-t-[1px]`}>
+            <CustomGallery event={event}>
+                <section className={`text-white min-h-screen mt-8`}>
                     <InfiniteMediaGrid
                         next={() => setSize(size + 1)}
                         assets={paginatedPhotos}
                         data={data}
                     />
                 </section>
+            </CustomGallery>
         </>
     );
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    const { gallerySlug, order_by } = context.query;
+    const { gallerySlug } = context.query;
 
     const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
 
@@ -171,9 +159,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             },
         });
         eventData = await eventRes.data?.event.metadata;
-        console.log(eventData)
     });
 
+    // @ts-ignore
+    if (!eventData.public_gallery) {
+        return { notFound: true, }
+    } 
     return {
         props: {
             ...photosData,

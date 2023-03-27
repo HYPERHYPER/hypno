@@ -126,7 +126,7 @@ const DetailGallery = (props: ResponseData) => {
     return (
         <>
             <Head>
-                <title>{galleryTitle + ' | hypno™'  || 'hypno™'}</title>
+                <title>{galleryTitle + ' | hypno™' || 'hypno™'}</title>
                 <meta name="description" content="Taken with HYPNO: The animated, social photo booth" />
             </Head>
 

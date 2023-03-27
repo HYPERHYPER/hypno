@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 import type { GetServerSideProps } from 'next';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { toTextColor } from '@/helpers/color';
 import Spinner from '@/components/Spinner';
@@ -17,6 +17,8 @@ import Link from 'next/link';
 import Head from 'next/head';
 import _ from 'lodash';
 import { getPlaiceholder } from 'plaiceholder';
+import { CustomGallery } from '@/components/Gallery/CustomGallery';
+import Letter from '../../../public/pop/letter.svg';
 
 type ImageData = {
     id: number;
@@ -46,6 +48,8 @@ type ImageData = {
     metadata: Object; // need to type?
     export: boolean;
     export_settings: Object; //need to type
+    width: number;
+    height: number;
 };
 
 type EventData = {
@@ -64,6 +68,8 @@ type EventData = {
     terms_and_conditions: string;
     email_delivery: boolean;
     ai_generation: any;
+    party_slug: string;
+    public_gallery: boolean;
 }
 
 interface ResponseData {
@@ -78,10 +84,9 @@ interface ResponseData {
     placeholder: any;
 }
 
-
 const SubGallery = (props: ResponseData) => {
     const { event, photos: initialPhotos, count, photo, placeholder } = props;
-    const { query: { category, eventId, event: gallerySlug } } = useRouter()
+    const { query: { category, eventId, event: galleryViewSlug } } = useRouter()
 
     const [photoUploadPending, setPhotoUploadPending] = useState<boolean>(true); // waiting for first photo to arrive
     const [photoUploadCompleted, setPhotoUploadCompleted] = useState<boolean>(false);
@@ -92,9 +97,9 @@ const SubGallery = (props: ResponseData) => {
             fallbackData: { photos: initialPhotos },
             refreshInterval: (photoUploadCompleted && !photoUploadPending) ? 0 : 1000
         })
-    let photos: ImageData[] = data?.photos || [];
-    const singleAsset: ImageData | null = event.email_delivery ? (_.first(data?.photos) || null) : null;
-    const isDetailView = !_.isEmpty(photo);
+    let photos: ImageData[] = useMemo(() => data?.photos || [], [data?.photos]);
+    const singleAsset: ImageData | null = photo;
+    const isDetailView = !_.isEmpty(photo) && !event.email_delivery;
 
     const expectedPhotoUploads = _.get(_.first(photos)?.metadata, 'category_count') || count;
     const uploadingCount = expectedPhotoUploads - photos.length;
@@ -124,8 +129,9 @@ const SubGallery = (props: ResponseData) => {
         console.log("submitDataCapture", { data });
 
         /* Save data capture to metadata field of first photo in category */
-        const photoSlug = _.first(photos)?.slug;
-        let metadata = _.first(photos)?.metadata || {};
+        /* unless is just email delivery */
+        const photoSlug = event.email_delivery ? photo.slug : _.first(photos)?.slug;
+        let metadata = event.email_delivery ? photo.metadata : _.first(photos)?.metadata || {};
         metadata = {
             ...metadata,
             ...data,
@@ -144,10 +150,18 @@ const SubGallery = (props: ResponseData) => {
         setDataCapture(false);
     }
 
+    /* MINI GALLERY ?category= */
     // No photos uploaded: loading view
     // All photos uploaded + data capture required: data capture -> gallery
     // Atleast 1 photo uploaded with more uploading + data capture: data capture -> gallery w loading images
     // Photos uploaded + no data cap: gallery
+
+    /* DETAIL VIEW ?i= */
+    // 1. Single asset view
+
+    /* SINGLE ASSET EMAIL DELIVERY ?slug= */
+    // 1. Data capture
+    // 2. Confirmation message
     return (
         <>
             <Head>
@@ -155,30 +169,14 @@ const SubGallery = (props: ResponseData) => {
                 <meta name="description" content="" />
             </Head>
 
-            <section
-                className={`text-white bg-black min-h-screen p-10 ${!_.isEmpty(event.logo) && 'pt-0'}`}
-                style={event.background ? {
-                    background: `url(${event.background}) no-repeat center center fixed`,
-                    backgroundSize: 'cover',
-                    WebkitBackgroundSize: 'cover',
-                    //@ts-ignore
-                    '-moz-background-size': 'cover',
-                    '-o-background-size': 'cover'
-                } : {}}>
-
-                <div className='min-h-[50px] translate-y-1/2'>
-                    <div className='flex justify-center'>
-                        <Image className='h-auto' src={event.logo ? event.logo : 'https://hypno-web-assets.s3.amazonaws.com/hypno-logo-white-drop.png'} alt={event.name + " logo"} width={150} height={150} priority />
-                    </div>
-                </div>
-
+            <CustomGallery event={event}>
                 {isDetailView ? (
                     <div className='text-white mt-8'>
                         <DetailView asset={photo} config={{ aiGeneration: event.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
                     </div>
                 ) : (
                     <div className={`sm:mx-auto h-full ${_.isEmpty(event.logo) ? 'mt-8' : ''}`}>
-                        {!photos.length ? (
+                        {(!photos.length && !event.email_delivery) ? (
                             <div className='fixed hero top-0 left-0 h-screen p-10'>
                                 <div className='hero-content max-w-[24rem] sm:max-w-2xl flex flex-row gap-4 items-center justify-center bg-white/10 backdrop-blur-[50px] p-8'>
                                     <Spinner />
@@ -220,25 +218,39 @@ const SubGallery = (props: ResponseData) => {
                                 </div>
                             ) : (
                                 <div className='sm:max-w-2xl md:max-w-6xl block mx-auto h-full'>
-                                    <div className='mb-4'>
-                                        <h2>{event.gallery_title || 'Share and tag all over social.'}</h2>
-                                        <h2 className='text-gray-400 whitespace-pre-line'>{event.gallery_subtitle || '#hypno #pro #iphone'}</h2>
+                                    <div className='mb-4 flex flex-col justify-start items-start gap-3 sm:flex-row sm:justify-between sm:items-end'>
+                                        <div>
+                                            <h2>{event.gallery_title || 'Share and tag all over social.'}</h2>
+                                            <h2 className='text-gray-400 whitespace-pre-line'>{event.gallery_subtitle || '#hypno #pro #iphone'}</h2>
+                                        </div>
+                                        {event.public_gallery && <Link href={`/${galleryViewSlug}/${eventId}/${event.party_slug}`} className='btn btn-sm rounded-full'>View all</Link>}
                                     </div>
                                     {!singleAsset ? (
                                         <FadeIn
                                             from="bottom" positionOffset={300} triggerOffset={0}>
                                             <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
                                                 <Masonry gutter='15px'>
-                                                    {photos.map((p) => (
-                                                        <Link key={p.id} href={`/${gallerySlug}/${eventId}?i=${p.slug}`}>
-                                                            <div className='w-full block relative bg-white/10 backdrop-blur-[50px] cursor'>
+                                                    {photos.map((p, i) => (
+                                                        <Link key={p.id} href={`/${galleryViewSlug}/${eventId}?i=${p.slug}`}>
+                                                            <div className='w-full block relative bg-white/10 backdrop-blur-[50px] overflow-hidden'>
                                                                 <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
                                                                     <Spinner />
                                                                 </div>
-                                                                <AutosizeImage
-                                                                    src={p.jpeg_url}
-                                                                    alt={p.event_name + p.id}
-                                                                />
+                                                                <div className='hover:scale-110 transition'>
+                                                                    <AutosizeImage
+                                                                        src={p.gif ? p.posterframe : p.jpeg_thumb_url}
+                                                                        alt={p.event_name + p.id}
+                                                                        width={p.width}
+                                                                        height={p.height}
+                                                                        priority={i < 11}
+                                                                    />
+                                                                    {p.gif &&
+                                                                        <div
+                                                                            className='absolute top-0 left-0 w-full h-full animate-jpeg-strip'
+                                                                            style={{ backgroundImage: `url(${p.jpeg_url})`, backgroundSize: '100% 500%' }}
+                                                                        />
+                                                                    }
+                                                                </div>
                                                             </div>
                                                         </Link>
                                                     ))}
@@ -251,19 +263,28 @@ const SubGallery = (props: ResponseData) => {
                                             </ResponsiveMasonry>
                                         </FadeIn>
                                     ) : (
-                                        <DetailView asset={singleAsset} config={{ aiGeneration: event.ai_generation }} imageProps={{ img: placeholder.img, blurDataURL: placeholder.base64 }} />
+                                        event.email_delivery ? (
+                                            <div className='fixed hero top-0 left-0 h-screen p-10'>
+                                                <div className='hero-content max-w-[24rem] sm:max-w-2xl flex flex-row gap-4 items-center bg-white/10 backdrop-blur-[50px] p-8'>
+                                                    <span className='flex-1'><Letter /></span>
+                                                    <p className='text-white'>Thank you! <br /> Your content will be delivered to your email shortly.</p>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <DetailView asset={singleAsset} config={{ aiGeneration: event.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
+                                        )
                                     )}
                                 </div>
                             ))}
                     </div>
                 )}
-            </section>
+            </CustomGallery>
         </>
     );
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    const { event, eventId, category, i: photoSlug } = context.query;
+    const { event, eventId, category, i: photoSlug, slug: deliverySlug } = context.query;
 
     // Load theme interface based on event
     const isDefault = String(event) === 'pro';
@@ -290,10 +311,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         photosData = await resp.data;
     }
 
-    // Fetch single asset for detail view
+    // Fetch single asset for detail view or for single asset delivery
     let singleAssetData = {}
-    if (photoSlug) {
-        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/${photoSlug}.json`;
+    if (photoSlug || deliverySlug) {
+        let slug = photoSlug || deliverySlug;
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/${slug}.json`;
         let resp = await axios.get(url, {
             headers: {
                 'Content-Type': 'application/json',
@@ -301,14 +323,21 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             },
         }).then(async (res) => {
             singleAssetData = res.data;
-            const placeholder = await getPlaiceholder(res.data.photo.jpeg_url);
-            singleAssetData = {
-                ...singleAssetData,
-                placeholder
+            if (photoSlug) {
+                const placeholder = await getPlaiceholder(res.data.photo.jpeg_url);
+                singleAssetData = {
+                    ...singleAssetData,
+                    placeholder
+                }
             }
         });
     }
 
+    if (deliverySlug && !eventData.metadata.email_delivery) {
+        return {
+            notFound: true
+        }
+    }
     return {
         props: {
             ...photosData,
@@ -318,6 +347,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 id: eventData.id,
                 ...eventData.metadata,
                 terms_and_conditions: eventData.terms_and_conditions,
+                party_slug: eventData.party_slug,
             }
         }
     }
