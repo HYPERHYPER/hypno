@@ -221,3 +221,7 @@ a {
     color-scheme: dark;
   }
 }
+
+.StripeElement--webkit-autofill {
+  background-color: transparent !important;
+}
