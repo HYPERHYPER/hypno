@@ -9,6 +9,7 @@ import S3Uploader from '@/components/S3Uploader';
 import { ThreeDots } from 'react-loader-spinner';
 import nookies, { parseCookies } from 'nookies'
 import AiPlayground from '@/components/AiPlayground/AiPlayground';
+import Link from 'next/link';
 
 interface ResponseData {
     status: number;
@@ -48,6 +49,7 @@ const ManageEventGallery = (props: ResponseData) => {
             terms_and_conditions: terms_and_conditions || DEFAULT_TERMS,
             email_delivery: metadata.email_delivery || false,
             ai_generation: metadata.ai_generation || {},
+            public_gallery: metadata.public_gallery || false,
         }
     });
 
@@ -179,6 +181,20 @@ const ManageEventGallery = (props: ResponseData) => {
                                         placeholder='Hex Color Code'
                                         {...register('color')} />
                                     {config.color && <span className="indicator-item indicator-middle translate-y-[40%] -translate-x-3/4 indicator-end badge" style={{ backgroundColor: config.color }}></span>}
+                                </div>
+
+                                <div className='form-control'>
+                                    <label className='label'>
+                                        <span className='label-text text-white'>Public Gallery</span>
+                                    </label>
+                                    <div className='flex flex-row gap-2 items-center'>
+                                        <input type="checkbox" className="toggle toggle-lg" {...register('public_gallery')} />
+                                        <span className='text-sm text-white/40'>{config.public_gallery ? 'Enabled' : 'Disabled'}
+                                        </span>
+                                    </div>
+                                    <label className='label'>
+                                        <span className='label-text text-white'>Note: enable public gallery link for all photos from event</span>
+                                    </label>
                                 </div>
                             </>
                         )}

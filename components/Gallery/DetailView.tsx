@@ -42,7 +42,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                             fill={!imageProps.width}
                             src={asset.url}
                             alt={asset.event_name + asset.id}
-                            placeholder={imageProps ? 'blur' : 'empty'}
+                            placeholder={imageProps?.blurDataURL ? 'blur' : 'empty'}
                             className="max-h-[75vh] w-auto" />
                     </div>
                 )}
