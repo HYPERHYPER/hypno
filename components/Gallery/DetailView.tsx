@@ -54,7 +54,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                     </div>
 
                     <div className='block'>
-                        <img src={String(output)} alt={asset.event_name + asset.id} className='min-w-[512px] max-h-[75vh] sm:h-[75vh]' />
+                        <img src={String(output)} alt={asset.event_name + asset.id} className='max-h-[75vh] sm:min-w-[512px] sm:h-[75vh]' />
                         {/* <AutosizeImage
                                         src={photo.url}
                                         alt={photo.event_name + photo.id}
