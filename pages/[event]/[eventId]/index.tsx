@@ -116,13 +116,14 @@ const SubGallery = (props: ResponseData) => {
         handleSubmit,
         formState: { errors },
     } = useForm();
-    let acceptTermsRef = useRef<HTMLInputElement>(null);
+    // let acceptTermsRef = useRef<HTMLInputElement>(null);
 
     const submitDataCapture = async (data: any) => {
-        const userAcceptedTerms = acceptTermsRef?.current?.checked;
+        // const userAcceptedTerms = acceptTermsRef?.current?.checked;
+        const userAcceptedTerms = true;
         if (!_.isEmpty(errors) || !userAcceptedTerms) {
             console.log("submitDataCapture errors", { errors });
-            console.log("acceptTerms", acceptTermsRef?.current?.checked);
+            // console.log("acceptTerms", acceptTermsRef?.current?.checked);
             return;
         }
 
@@ -210,7 +211,7 @@ const SubGallery = (props: ResponseData) => {
                                                     />
                                                 ))}
                                                 <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
-                                                    <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} />
+                                                    {/* <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} /> */}
                                                     <p className='text-xs text-gray-400'>
                                                         {parseLink(event.terms_and_conditions, [{ text: 'Terms of Use', url: 'https://hypno.com/app/terms' }, { text: 'Privacy Policy', url: 'https://hypno.com/privacy' }])}
                                                     </p>
@@ -222,13 +223,13 @@ const SubGallery = (props: ResponseData) => {
                                 </div>
                             ) : (
                                 <div className='sm:max-w-2xl md:max-w-6xl block mx-auto h-full'>
-                                    <div className='mb-4 flex flex-col justify-start items-start gap-3 sm:flex-row sm:justify-between sm:items-end'>
+                                    {/* <div className='mb-4 flex flex-col justify-start items-start gap-3 sm:flex-row sm:justify-between sm:items-end'>
                                         <div>
                                             <h2>{event.gallery_title || 'Share and tag all over social.'}</h2>
                                             <h2 className='text-gray-400 whitespace-pre-line'>{event.gallery_subtitle || '#hypno #pro #iphone'}</h2>
                                         </div>
                                         {event.public_gallery && <Link href={`/${galleryViewSlug}/${eventId}/${event.party_slug}`} className='btn btn-sm rounded-full'>View all</Link>}
-                                    </div>
+                                    </div> */}
                                     {!singleAsset ? (
                                         <FadeIn
                                             from="bottom" positionOffset={300} triggerOffset={0}>

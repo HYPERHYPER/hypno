@@ -130,7 +130,7 @@ const ManageEventGallery = (props: ResponseData) => {
                     <form onSubmit={handleSubmit(submitForm)} className={`sm:mt-8 space-y-3 flex-1 flex flex-col p-4 pb-5 ${view !== 'ai' ? 'max-w-xs sm:max-w-lg' : ''}`}>
                         {view == 'basic' && (
                             <>
-                                <div className='form-control '>
+                                {/* <div className='form-control '>
                                     <label className='label'>
                                         <span className='label-text text-white'>Gallery Title</span>
                                     </label>
@@ -148,7 +148,7 @@ const ManageEventGallery = (props: ResponseData) => {
                                         className='input'
                                         placeholder='#hypno #pro #iphone'
                                         {...register('gallery_subtitle')} />
-                                </div>
+                                </div> */}
 
                                 <div>
                                     <S3Uploader
