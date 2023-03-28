@@ -25,7 +25,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
     }
 
     return (
-        <div className={`sm:mx-auto h-[calc(100vh-85px-48px-30px)] md:px-[90px] w-full flex justify-center flex-col items-center`}>
+        <div className={`sm:mx-auto h-[calc(100vh-85px-48px-30px-env(safe-area-inset-bottom))] md:px-[90px] w-full flex justify-center flex-col items-center`}>
                 <div className='relative bg-white/10 backdrop-blur-[50px] max-h-full sm:max-h-[75vh]'>
                     <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
                         <Spinner />
