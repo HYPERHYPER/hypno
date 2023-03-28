@@ -228,7 +228,7 @@ const SubGallery = (props: ResponseData) => {
                                         </div>
                                         {event.public_gallery && <Link href={`/${galleryViewSlug}/${eventId}/${event.party_slug}`} className='btn btn-sm rounded-full'>View all</Link>}
                                     </div> */}
-                                    {!singleAsset ? (
+                                    {(!singleAsset && _.size(photos) > 1) ? (
                                         <FadeIn
                                             from="bottom" positionOffset={300} triggerOffset={0}>
                                             <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
@@ -239,7 +239,7 @@ const SubGallery = (props: ResponseData) => {
                                                                 <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
                                                                     <Spinner />
                                                                 </div>
-                                                                <div className='hover:scale-110 transition'>
+                                                                <div className='transition'>
                                                                     <AutosizeImage
                                                                         src={p.gif ? p.posterframe : p.jpeg_thumb_url}
                                                                         alt={p.event_name + p.id}
@@ -274,7 +274,7 @@ const SubGallery = (props: ResponseData) => {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <DetailView asset={singleAsset} config={{ aiGeneration: event.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
+                                            <DetailView asset={_.first(photos)} config={{ aiGeneration: event.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
                                         )
                                     )}
                                 </div>
