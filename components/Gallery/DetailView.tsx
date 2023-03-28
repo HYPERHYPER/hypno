@@ -33,7 +33,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
 
                     {asset.mp4_url ? (
                         <div className='block'>
-                            <video className='max-w-full max-h-full sm:max-h-[75vh]' src={asset.mp4_url} autoPlay loop playsInline poster={asset.posterframe} />
+                            <video className='max-w-full max-h-full sm:max-h-[75vh]' src={asset.mp4_url} autoPlay loop playsInline muted poster={asset.posterframe} />
                         </div>
                     ) : (
                         <div className='block overflow-hidden max-h-full'>
