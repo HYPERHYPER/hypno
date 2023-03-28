@@ -25,27 +25,28 @@ export default function DetailView({ asset, config, imageProps }: any) {
     }
 
     return (
-        <div className={`sm:mx-auto h-full mb-[35px] md:px-[90px] w-full flex justify-center flex-col items-center`}>
-            <div className='relative bg-white/10 backdrop-blur-[50px] max-h-[75vh]'>
-                <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
-                    {/* <Spinner /> */}
-                </div>
+        <div className={`sm:mx-auto h-[calc(100vh-85px-48px-30px)] md:px-[90px] w-full flex justify-center flex-col items-center`}>
+                <div className='relative bg-white/10 backdrop-blur-[50px] max-h-full sm:max-h-[75vh]'>
+                    <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
+                        <Spinner />
+                    </div>
 
-                {asset.mp4_url ? (
-                    <div className='block'>
-                        <video className='max-w-full max-h-[75vh]' src={asset.mp4_url} autoPlay loop playsInline poster={asset.posterframe} />
-                    </div>
-                ) : (
-                    <div className='block overflow-hidden relative'>
-                        <Image 
-                            {...imageProps} 
-                            fill={!imageProps.width}
-                            src={asset.url}
-                            alt={asset.event_name + asset.id}
-                            placeholder={imageProps?.blurDataURL ? 'blur' : 'empty'}
-                            className="max-h-[75vh] w-auto" />
-                    </div>
-                )}
+                    {asset.mp4_url ? (
+                        <div className='block'>
+                            <video className='max-w-full max-h-full sm:max-h-[75vh]' src={asset.mp4_url} autoPlay loop playsInline poster={asset.posterframe} />
+                        </div>
+                    ) : (
+                        <div className='block overflow-hidden max-h-full'>
+                            <Image
+                                {...imageProps}
+                                priority
+                                fill={!imageProps.width}
+                                src={asset.url}
+                                alt={asset.event_name + asset.id}
+                                placeholder={imageProps?.blurDataURL ? 'blur' : 'empty'}
+                                className="max-h-[calc(100vh-85px-48px-30px)] sm:max-h-[75vh] h-full w-auto" />
+                        </div>
+                    )}
             </div>
             {(isLoadingGeneration || output) && (
                 <div className='relative bg-white/10 backdrop-blur-[50px] max-h-[75vh] sm:h-[75vh] mt-8'>
@@ -63,9 +64,9 @@ export default function DetailView({ asset, config, imageProps }: any) {
                 </div>
             )}
             <div className='mt-3 space-x-3'>
-                <a className='btn btn-primary' href={asset.download_url}>DOWNLOAD</a>
-                {(config?.aiGeneration && config.aiGeneration.enabled) && (
-                    <button className='btn btn-info' onClick={handleRemix}>
+                {asset.mp4_url && <a className='btn btn-primary btn-gallery locked' href={asset.download_url}>download ↓</a>}
+                {(!asset.mp4_url && config?.aiGeneration && config.aiGeneration.enabled) && (
+                    <button className='btn btn-info btn-gallery locked' onClick={handleRemix}>
                         {isLoadingGeneration ?
                             <ThreeDots
                                 height="10"
@@ -74,7 +75,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                                 color="#FFFFFF"
                                 ariaLabel="three-dots-loading"
                                 visible={true}
-                            /> : 'REMIX'}
+                            /> : 'remix ☢︎'}
                     </button>
                 )}
             </div>

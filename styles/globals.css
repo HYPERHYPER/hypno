@@ -87,6 +87,14 @@
     @apply rounded-none font-normal
   }
 
+  .btn-gallery {
+    @apply font-medium tracking-[-0.03em] lowercase no-animation
+  }
+
+  .btn-gallery.locked {
+    @apply fixed bottom-0 left-0 w-full
+  }
+
   .input, .select, .textarea {
     @apply input-ghost bg-white/[.08] text-white focus:bg-white/10 focus:text-white placeholder:text-white/20 disabled:bg-white/[0.03] disabled:border-white/[0.03] disabled:placeholder:text-white/10
   }

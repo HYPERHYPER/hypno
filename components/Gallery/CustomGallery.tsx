@@ -22,7 +22,7 @@ type EventData = {
 export function CustomGallery({ event, children }: { event: EventData, children: React.ReactNode }) {
     return (
         <section
-            className={`text-white bg-black min-h-screen p-10 ${!_.isEmpty(event.logo) && 'pt-0'}`}
+            className={`text-white bg-black min-h-screen px-6 pb-10`}
             style={event.background ? {
                 background: `url(${event.background}) no-repeat center center fixed`,
                 backgroundSize: 'cover',
@@ -32,9 +32,9 @@ export function CustomGallery({ event, children }: { event: EventData, children:
                 '-o-background-size': 'cover'
             } : {}}>
 
-            <div className='min-h-[50px] translate-y-1/2'>
+            <div className='min-h-[85px] pt-[30px]'>
                 <div className='flex justify-center'>
-                    <Image className='h-auto' src={event.logo ? event.logo : 'https://hypno-web-assets.s3.amazonaws.com/hypno-logo-white-drop.png'} alt={event.name + " logo"} width={150} height={150} priority />
+                    <Image className='h-[25px] w-auto' src={event.logo ? event.logo : 'https://hypno-web-assets.s3.amazonaws.com/hypno-logo-white-drop.png'} alt={event.name + " logo"} width={150} height={25} priority />
                 </div>
             </div>
 

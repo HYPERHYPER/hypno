@@ -59,7 +59,7 @@ export default function InfiniteMediaGrid({ next, data, assets }: InfiniteMediaG
 
 export const MediaGrid = ({ assets }: { assets: AssetData[] }) => {
     return (
-        <div className={`sm:mx-auto block h-full my-[35px] xl:px-[90px] mb-[35px]`}>
+        <div className={`sm:mx-auto block h-full mb-[35px] xl:px-[90px]`}>
             <ResponsiveMasonry columnsCountBreakPoints={{ 375: 3, 750: 2, 900: 3, 1200: 4 }}>
                 <Masonry gutter={'10px'} >
                     {assets.map((p, i) => (

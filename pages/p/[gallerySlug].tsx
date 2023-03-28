@@ -105,19 +105,21 @@ const PublicGallery = (props: ResponseData) => {
                 <meta name="description" content="Taken with HYPNO: The animated, social photo booth" />
             </Head>
 
-            <GalleryNavBar name={galleryTitle} gallerySlug={String(gallerySlug)}>
-                <div className='flex flex-row gap-3 items-center text-lg invisible'>
+            {/* <GalleryNavBar name={galleryTitle} gallerySlug={String(gallerySlug)}> */}
+                {/* <div className='flex flex-row gap-3 items-center text-lg invisible'>
                     <Link href={'/'}>Newest</Link>
                     <Link href={'/'}>Oldest</Link>
-                </div>
-            </GalleryNavBar>
-                <section className={`text-white min-h-screen border-t-white/20 border-solid border-t-[1px]`}>
+                </div> */}
+            {/* </GalleryNavBar> */}
+            <CustomGallery event={event}>
+                <section className={`text-white min-h-screen`}>
                     <InfiniteMediaGrid
                         next={() => setSize(size + 1)}
                         assets={paginatedPhotos}
                         data={data}
                     />
                 </section>
+            </CustomGallery>
         </>
     );
 };
@@ -171,7 +173,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             },
         });
         eventData = await eventRes.data?.event.metadata;
-        console.log(eventData)
     });
 
     return {

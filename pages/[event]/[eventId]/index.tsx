@@ -176,11 +176,9 @@ const SubGallery = (props: ResponseData) => {
 
             <CustomGallery event={event}>
                 {isDetailView ? (
-                    <div className='text-white mt-8'>
-                        <DetailView asset={photo} config={{ aiGeneration: event.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
-                    </div>
+                    <DetailView asset={photo} config={{ aiGeneration: event.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
                 ) : (
-                    <div className={`sm:mx-auto h-full ${_.isEmpty(event.logo) ? 'mt-8' : ''}`}>
+                    <div className={`sm:mx-auto h-full`}>
                         {(!photos.length && !event.email_delivery) ? (
                             <div className='fixed hero top-0 left-0 h-screen p-10'>
                                 <div className='hero-content max-w-[24rem] sm:max-w-2xl flex flex-row gap-4 items-center justify-center bg-white/10 backdrop-blur-[50px] p-8'>
@@ -190,12 +188,12 @@ const SubGallery = (props: ResponseData) => {
                             </div>
                         ) : (
                             dataCapture ? (
-                                <div className='fixed hero top-0 left-0 h-screen'>
-                                    <div className='hero-content max-w-[24rem] sm:max-w-2xl p-10'>
-                                        <div className='flex flex-col'>
+                                <div className='h-[calc(100vh-85px-48px-30px)] overflow-auto flex items-center'>
+                                    <div className='sm:max-w-2xl p-4 sm:p-10 mx-auto'>
+                                        <div className='flex flex-col text-center'>
                                             <div className='mb-4'>
-                                                <h2>{event.data_capture_title || 'Want your photos?'}</h2>
-                                                <h2 className='text-gray-400'>{event.data_capture_subtitle || 'Add your info to continue...'}</h2>
+                                                <h2>{event.data_capture_title || 'want your photos?'}</h2>
+                                                <h2 className='text-gray-400'>{event.data_capture_subtitle || 'add your info to continue...'}</h2>
                                             </div>
                                             <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
                                                 {fields?.map((v, i) => (
@@ -213,10 +211,10 @@ const SubGallery = (props: ResponseData) => {
                                                 <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
                                                     {/* <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} /> */}
                                                     <p className='text-xs text-gray-400'>
-                                                        {parseLink(event.terms_and_conditions, [{ text: 'Terms of Use', url: 'https://hypno.com/app/terms' }, { text: 'Privacy Policy', url: 'https://hypno.com/privacy' }])}
+                                                        {parseLink(event.terms_and_conditions, [{ text: 'terms of use', url: 'https://hypno.com/app/terms' }, { text: 'privacy policy', url: 'https://hypno.com/privacy' }])}
                                                     </p>
                                                 </div>
-                                                <input className='btn btn-primary' type='submit' value='GO' style={event.color ? { backgroundColor: event.color, borderColor: event.color, color: toTextColor(event.color) } : {}} />
+                                                <input className='btn btn-primary btn-gallery locked sm:block' type='submit' value='continue →' style={event.color ? { backgroundColor: event.color, borderColor: event.color, color: toTextColor(event.color) } : {}} />
                                             </form>
                                         </div>
                                     </div>

@@ -9,7 +9,6 @@ import S3Uploader from '@/components/S3Uploader';
 import { ThreeDots } from 'react-loader-spinner';
 import nookies, { parseCookies } from 'nookies'
 import AiPlayground from '@/components/AiPlayground/AiPlayground';
-import Link from 'next/link';
 
 interface ResponseData {
     status: number;
@@ -17,7 +16,7 @@ interface ResponseData {
     event: any;
 }
 
-const DEFAULT_TERMS = `By pressing "continue" to access and save your content, you accept the Terms of Use and Privacy Policy provided by Hypno and related partners`
+const DEFAULT_TERMS = `by tapping to get your content, you accept the terms of use and privacy policy provided by hypno and our related partners and services.`
 
 const ManageEventGallery = (props: ResponseData) => {
     const { event: {

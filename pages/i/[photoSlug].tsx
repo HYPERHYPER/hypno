@@ -7,6 +7,7 @@ import GalleryNavBar from '@/components/Gallery/GalleryNavBar';
 import { Footer } from '@/components/Footer';
 import DetailView from '@/components/Gallery/DetailView';
 import { getPlaiceholder } from 'plaiceholder';
+import { CustomGallery } from '@/components/Gallery/CustomGallery';
 
 type ImageData = {
     id: number;
@@ -70,7 +71,7 @@ interface ResponseData {
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const DetailGallery = (props: ResponseData) => {
-    const { photo } = props;
+    const { photo, event } = props;
 
     const galleryTitle = photo?.event_name;
     const aiGeneration = props.event.metadata.ai_generation || null;
@@ -134,13 +135,11 @@ const DetailGallery = (props: ResponseData) => {
                 <meta name="og:video:type" content='video/mp4' />
             </Head>
 
-            <div className='min-h-screen bg-black pb-8'>
-                <GalleryNavBar name={galleryTitle} gallerySlug={String(photo?.event_id)} />
-                <section className={`text-white bg-black`}>
+            <CustomGallery event={event} >
+                {/* <GalleryNavBar name={galleryTitle} gallerySlug={String(photo?.event_id)} /> */}
                     <DetailView asset={photo} config={{ aiGeneration }} imageProps={imageProps} />
-                </section>
-                <Footer />
-            </div>
+                {/* <Footer /> */}
+            </CustomGallery>
         </>
     );
 };
