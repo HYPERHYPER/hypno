@@ -92,7 +92,7 @@
   }
 
   .btn-gallery.locked {
-    @apply fixed bottom-0 left-0 w-full
+    @apply fixed bottom-0 left-0 w-full sm:static
   }
 
   .input, .select, .textarea {
