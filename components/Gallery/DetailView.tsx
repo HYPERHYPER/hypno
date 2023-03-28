@@ -44,7 +44,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                                 src={asset.url}
                                 alt={asset.event_name + asset.id}
                                 placeholder={imageProps?.blurDataURL ? 'blur' : 'empty'}
-                                className="max-h-[calc(100vh-85px-48px-30px)] sm:max-h-[75vh] h-full w-auto" />
+                                className="max-h-[calc(100vh-85px-48px-30px)] sm:max-h-[75vh] w-auto" />
                         </div>
                     )}
             </div>
