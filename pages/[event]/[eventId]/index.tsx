@@ -231,7 +231,7 @@ const SubGallery = (props: ResponseData) => {
                                     {(!singleAsset && _.size(photos) > 1) ? (
                                         <FadeIn
                                             from="bottom" positionOffset={300} triggerOffset={0}>
-                                            <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
+                                            <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }} className='pb-8'>
                                                 <Masonry gutter='15px'>
                                                     {photos.map((p, i) => (
                                                         <Link key={p.id} href={`/${galleryViewSlug}/${eventId}?i=${p.slug}`}>

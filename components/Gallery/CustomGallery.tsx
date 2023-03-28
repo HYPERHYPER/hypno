@@ -23,7 +23,7 @@ export function CustomGallery({ event, children }: { event: EventData, children:
     return (
         <section className={`text-white min-h-screen`}>
             <div
-                className='fixed bg-black top-0 bottom-0 left-0 w-screen h-screen'
+                className='fixed bg-black top-0 bottom-0 left-0 w-screen h-screen overflow-hidden'
                 style={event.background ? {
                     background: `url(${event.background}) no-repeat center center fixed`,
                     backgroundSize: 'cover',
