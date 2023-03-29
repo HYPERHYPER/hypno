@@ -101,6 +101,8 @@ const SubGallery = (props: ResponseData) => {
     const singleAsset: ImageData | null = photo;
     const isDetailView = !_.isEmpty(photo) && !event.email_delivery;
 
+    console.log(photos)
+
     const expectedPhotoUploads = _.get(_.first(photos)?.metadata, 'category_count') || count;
     const uploadingCount = expectedPhotoUploads - photos.length;
     useEffect(() => {
@@ -163,6 +165,7 @@ const SubGallery = (props: ResponseData) => {
     /* SINGLE ASSET EMAIL DELIVERY ?slug= */
     // 1. Data capture
     // 2. Confirmation message
+    console.log(isDetailView)
     return (
         <>
             <Head>
@@ -274,7 +277,7 @@ const SubGallery = (props: ResponseData) => {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <DetailView asset={_.first(photos)} config={{ aiGeneration: event.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
+                                            <DetailView asset={_.first(photos)} config={{ aiGeneration: event.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64, width: _.first(photos)?.width, height: _.first(photos)?.height }} />
                                         )
                                     )}
                                 </div>
