@@ -42,14 +42,14 @@ interface InfiniteMediaGridProps {
     assets: AssetData[];
 }
 export default function InfiniteMediaGrid({ next, data, assets }: InfiniteMediaGridProps) {
-    const hasReachedEnd = data && data[data.length - 1]?.length < data[0]?.returned;
+    const hasReachedEnd = data && data[data.length - 1]?.count <= data[0]?.returned;
 
     return (
         <InfiniteScroll
             next={next}
             hasMore={!hasReachedEnd}
             loader={<div className='w-full flex justify-center h-[100px] mb-8'><Spinner /></div>}
-            endMessage={<p>Reached the end</p>}
+            endMessage={<div></div>}
             dataLength={assets?.length}
         >
             <MediaGrid assets={assets} />

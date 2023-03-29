@@ -112,7 +112,7 @@ const PublicGallery = (props: ResponseData) => {
                 </div> */}
             {/* </GalleryNavBar> */}
             <CustomGallery event={event}>
-                <section className={`text-white min-h-screen`}>
+                <section className={`text-white min-h-[100vh-85px]`}>
                     <InfiniteMediaGrid
                         next={() => setSize(size + 1)}
                         assets={paginatedPhotos}
