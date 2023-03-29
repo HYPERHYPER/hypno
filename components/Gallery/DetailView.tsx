@@ -48,7 +48,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                 </div>
 
                 {asset.mp4_url ? (
-                    <div className='block relative'>
+                    <div className='block relative' style={{ height }}>
                         {muted && (
                             <div className="absolute top-[10px] left-[10px] z-10">
                                 <button onClick={unmuteVideo} className="cursor-pointer w-[35px] h-[35px] sm:w-[50px] sm:h-[50px] btn-circle bg-black flex items-center justify-center"><SpeakerOff /></button>
