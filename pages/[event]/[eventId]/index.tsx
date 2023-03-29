@@ -200,7 +200,7 @@ const SubGallery = (props: ResponseData) => {
                                         <div className='flex flex-col text-center'>
                                             <div className='mb-4'>
                                                 <h2>{event.data_capture_title || 'want your photos?'}</h2>
-                                                <h2 className='text-gray-400'>{event.data_capture_subtitle || 'add your info to continue...'}</h2>
+                                                <h2 className='text-white/50'>{event.data_capture_subtitle || 'add your info to continue...'}</h2>
                                             </div>
                                             <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
                                                 {fields?.map((v, i) => (
@@ -217,7 +217,7 @@ const SubGallery = (props: ResponseData) => {
                                                 ))}
                                                 <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
                                                     {/* <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} /> */}
-                                                    <p className='text-xs text-gray-400'>
+                                                    <p className='text-xs text-white/50'>
                                                         {parseLink(event.terms_and_conditions, [{ text: 'terms of use', url: 'https://hypno.com/app/terms' }, { text: 'privacy policy', url: 'https://hypno.com/privacy' }])}
                                                     </p>
                                                 </div>
