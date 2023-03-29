@@ -86,6 +86,7 @@ const ManageEventGallery = (props: ResponseData) => {
         eventMetadata = {
             ...props.event.metadata,
             ...data,
+            color: `${_.startsWith(config.color, '#') ? "": "#"}${config.color}`,
             fields: (!_.isEmpty(data.fields) && _.first(data.fields) != '') ? _.map(_.split(data.fields, ','), (f) => f.trim()) : [],
         }
 
@@ -179,7 +180,7 @@ const ManageEventGallery = (props: ResponseData) => {
                                         className='input'
                                         placeholder='Hex Color Code'
                                         {...register('color')} />
-                                    {config.color && <span className="indicator-item indicator-middle translate-y-[40%] -translate-x-3/4 indicator-end badge" style={{ backgroundColor: config.color }}></span>}
+                                    {config.color && <span className="indicator-item indicator-middle translate-y-[40%] -translate-x-3/4 indicator-end badge" style={{ backgroundColor: `${_.startsWith(config.color, '#') ? "": "#"}${config.color}`  }}></span>}
                                 </div>
 
                                 <div className='form-control'>
