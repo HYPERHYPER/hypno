@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import _ from 'lodash';
+import useHeight from '@/hooks/useHeight';
 
 type EventData = {
     name: string;
@@ -20,8 +21,9 @@ type EventData = {
 }
 
 export function CustomGallery({ event, children }: { event: EventData, children: React.ReactNode }) {
+    const windowHeight = useHeight();
     return (
-        <section className={`text-white min-h-screen`}>
+        <section className={`text-white min-h-screen`} style={{ minHeight: windowHeight }}>
             <div
                 className='fixed bg-black top-0 bottom-0 left-0 w-screen h-screen'
                 style={event.background ? {
@@ -29,7 +31,8 @@ export function CustomGallery({ event, children }: { event: EventData, children:
                     backgroundSize: 'cover',
                     WebkitBackgroundSize: 'cover',
                     MozBackgroundSize: 'cover',
-                    OBackgroundSize: 'cover'
+                    OBackgroundSize: 'cover',
+                    height: windowHeight,
                 } : {}}
             />
 

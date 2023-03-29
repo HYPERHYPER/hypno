@@ -19,6 +19,7 @@ import _ from 'lodash';
 import { getPlaiceholder } from 'plaiceholder';
 import { CustomGallery } from '@/components/Gallery/CustomGallery';
 import Letter from '../../../public/pop/letter.svg';
+import useContentHeight from '@/hooks/useContentHeight';
 
 type ImageData = {
     id: number;
@@ -85,6 +86,8 @@ interface ResponseData {
 }
 
 const SubGallery = (props: ResponseData) => {
+    const outerHeight = useContentHeight({footer: false});
+    const contentHeight = useContentHeight({footer: true});
     const { event, photos: initialPhotos, count, photo, placeholder } = props;
     const { query: { category, eventId, event: galleryViewSlug } } = useRouter()
 
@@ -100,8 +103,6 @@ const SubGallery = (props: ResponseData) => {
     let photos: ImageData[] = data?.photos || [];
     const singleAsset: ImageData | null = photo;
     const isDetailView = !_.isEmpty(photo) && !event.email_delivery;
-
-    console.log(photos)
 
     const expectedPhotoUploads = _.get(_.first(photos)?.metadata, 'category_count') || count;
     const uploadingCount = expectedPhotoUploads - photos.length;
@@ -165,7 +166,6 @@ const SubGallery = (props: ResponseData) => {
     /* SINGLE ASSET EMAIL DELIVERY ?slug= */
     // 1. Data capture
     // 2. Confirmation message
-    console.log(isDetailView)
     return (
         <>
             <Head>
@@ -181,7 +181,9 @@ const SubGallery = (props: ResponseData) => {
                 {isDetailView ? (
                     <DetailView asset={photo} config={{ aiGeneration: event.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
                 ) : (
-                    <div className={`sm:mx-auto h-full`}>
+                    <div 
+                        style={{ height: outerHeight }}
+                        className={`sm:mx-auto h-[calc(100vh-85px-env(safe-area-inset-bottom))]`}>
                         {(!photos.length && !event.email_delivery) ? (
                             <div className='fixed hero top-0 left-0 h-screen p-10'>
                                 <div className='hero-content max-w-[24rem] sm:max-w-2xl flex flex-row gap-4 items-center justify-center bg-white/10 backdrop-blur-[50px] p-8'>
@@ -191,7 +193,9 @@ const SubGallery = (props: ResponseData) => {
                             </div>
                         ) : (
                             dataCapture ? (
-                                <div className='h-[calc(100vh-85px-48px-30px)] overflow-auto flex items-center'>
+                                <div 
+                                    style={{ height: contentHeight }}
+                                    className={`h-[calc(100vh-85px-48px-30px-env(safe-area-inset-bottom))] overflow-auto flex items-center`}>
                                     <div className='sm:max-w-2xl p-4 sm:p-10 mx-auto'>
                                         <div className='flex flex-col text-center'>
                                             <div className='mb-4'>
@@ -222,7 +226,7 @@ const SubGallery = (props: ResponseData) => {
                                         </div>
                                     </div>
                                 </div>
-                            ) : (
+                            ) : (!singleAsset && _.size(photos) > 1) ? (
                                 <div className='sm:max-w-2xl md:max-w-6xl block mx-auto h-full'>
                                     {/* <div className='mb-4 flex flex-col justify-start items-start gap-3 sm:flex-row sm:justify-between sm:items-end'>
                                         <div>
@@ -231,57 +235,58 @@ const SubGallery = (props: ResponseData) => {
                                         </div>
                                         {event.public_gallery && <Link href={`/${galleryViewSlug}/${eventId}/${event.party_slug}`} className='btn btn-sm rounded-full'>View all</Link>}
                                     </div> */}
-                                    {(!singleAsset && _.size(photos) > 1) ? (
-                                        <FadeIn
-                                            from="bottom" positionOffset={300} triggerOffset={0}>
-                                            <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }} className='pb-8'>
-                                                <Masonry gutter='15px'>
-                                                    {photos.map((p, i) => (
-                                                        <Link key={p.id} href={`/${galleryViewSlug}/${eventId}?i=${p.slug}`}>
-                                                            <div className='w-full block relative bg-white/10 backdrop-blur-[50px] overflow-hidden'>
-                                                                <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
-                                                                    <Spinner />
-                                                                </div>
-                                                                <div className='transition'>
-                                                                    <AutosizeImage
-                                                                        src={p.gif ? p.posterframe : p.jpeg_thumb_url}
-                                                                        alt={p.event_name + p.id}
-                                                                        width={p.width}
-                                                                        height={p.height}
-                                                                        priority={i < 11}
-                                                                    />
-                                                                    {p.gif &&
-                                                                        <div
-                                                                            className='absolute top-0 left-0 w-full h-full animate-jpeg-strip'
-                                                                            style={{ backgroundImage: `url(${p.jpeg_url})`, backgroundSize: '100% 500%' }}
-                                                                        />
-                                                                    }
-                                                                </div>
+
+                                    <FadeIn
+                                        from="bottom" positionOffset={300} triggerOffset={0}>
+                                        <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }} className='pb-8'>
+                                            <Masonry gutter='15px'>
+                                                {photos.map((p, i) => (
+                                                    <Link key={p.id} href={`/${galleryViewSlug}/${eventId}?i=${p.slug}`}>
+                                                        <div className='w-full block relative bg-white/10 backdrop-blur-[50px] overflow-hidden'>
+                                                            <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
+                                                                <Spinner />
                                                             </div>
-                                                        </Link>
-                                                    ))}
-                                                    {_.range(0, uploadingCount).map((v, i) => (
-                                                        <div key={i} className='bg-white/10 backdrop-blur-[50px] px-3 py-6 flex flex-col gap-3 justify-center items-center aspect-[4/3]'>
-                                                            <Spinner />
+                                                            <div className='transition'>
+                                                                <AutosizeImage
+                                                                    src={p.gif ? p.posterframe : p.jpeg_thumb_url}
+                                                                    alt={p.event_name + p.id}
+                                                                    width={p.width}
+                                                                    height={p.height}
+                                                                    priority={i < 11}
+                                                                />
+                                                                {p.gif &&
+                                                                    <div
+                                                                        className='absolute top-0 left-0 w-full h-full animate-jpeg-strip'
+                                                                        style={{ backgroundImage: `url(${p.jpeg_url})`, backgroundSize: '100% 500%' }}
+                                                                    />
+                                                                }
+                                                            </div>
                                                         </div>
-                                                    ))}
-                                                </Masonry>
-                                            </ResponsiveMasonry>
-                                        </FadeIn>
-                                    ) : (
-                                        event.email_delivery ? (
-                                            <div className='fixed hero top-0 left-0 h-screen p-10'>
-                                                <div className='hero-content max-w-[24rem] sm:max-w-2xl flex flex-row gap-4 items-center bg-white/10 backdrop-blur-[50px] p-8'>
-                                                    <span className='flex-1'><Letter /></span>
-                                                    <p className='text-white'>Thank you! <br /> Your content will be delivered to your email shortly.</p>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <DetailView asset={_.first(photos)} config={{ aiGeneration: event.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64, width: _.first(photos)?.width, height: _.first(photos)?.height }} />
-                                        )
-                                    )}
+                                                    </Link>
+                                                ))}
+                                                {_.range(0, uploadingCount).map((v, i) => (
+                                                    <div key={i} className='bg-white/10 backdrop-blur-[50px] px-3 py-6 flex flex-col gap-3 justify-center items-center aspect-[4/3]'>
+                                                        <Spinner />
+                                                    </div>
+                                                ))}
+                                            </Masonry>
+                                        </ResponsiveMasonry>
+                                    </FadeIn>
                                 </div>
-                            ))}
+                            )
+                                : (
+                                    event.email_delivery ? (
+                                        <div className='fixed hero top-0 left-0 h-screen p-10'>
+                                            <div className='hero-content max-w-[24rem] sm:max-w-2xl flex flex-row gap-4 items-center bg-white/10 backdrop-blur-[50px] p-8'>
+                                                <span className='flex-1'><Letter /></span>
+                                                <p className='text-white'>Thank you! <br /> Your content will be delivered to your email shortly.</p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <DetailView asset={_.first(photos)} config={{ aiGeneration: event.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64, width: _.first(photos)?.width, height: _.first(photos)?.height }} />
+                                    )
+                                ))
+                        }
                     </div>
                 )}
             </CustomGallery>
