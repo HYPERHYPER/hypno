@@ -16,7 +16,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>((props, re
                 {...props}
                 type='date'
                 ref={ref}
-                className={`input data-capture w-full flex items-center absolute inset-0 ${props.error && 'error text-red-600'}`}
+                className={`input data-capture w-full absolute inset-0 ${props.error && 'error text-red-600'}`}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
                 style={{ boxSizing: 'border-box' }}
