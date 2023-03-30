@@ -221,16 +221,13 @@ a {
   text-decoration: none;
 }
 
-  input[type="date"]::-webkit-inner-spin-button,
-  input[type="date"]::-webkit-calendar-picker-indicator,
-  input[type="datetime-local"]::-webkit-calendar-picker-indicator,
-  input[type="datetime-local"]::-webkit-inner-spin-button, {
-    display: none;
-    -webkit-appearance: none;
-}
-
 input[type="date"] {
   width: 100%;
+  -webkit-appearance: none;
+}
+
+input[type="date"]::-webkit-date-and-time-value {
+    text-align: left;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -14,6 +14,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>((props, re
         <div className="relative h-12 w-full">
             <input
                 {...props}
+                placeholder={props.name}
                 type='date'
                 ref={ref}
                 className={`input data-capture w-full absolute inset-0 ${props.error && 'error text-red-600'}`}
