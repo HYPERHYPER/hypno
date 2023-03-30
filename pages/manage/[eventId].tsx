@@ -9,6 +9,7 @@ import S3Uploader from '@/components/S3Uploader';
 import { ThreeDots } from 'react-loader-spinner';
 import nookies, { parseCookies } from 'nookies'
 import AiPlayground from '@/components/AiPlayground/AiPlayground';
+import { replaceLinks } from '@/helpers/text';
 
 interface ResponseData {
     status: number;
@@ -16,7 +17,7 @@ interface ResponseData {
     event: any;
 }
 
-const DEFAULT_TERMS = `by tapping to get your content, you accept the terms of use and privacy policy provided by hypno and our related partners and services.`
+const DEFAULT_TERMS = `by tapping to get your content, you accept the <terms of use|https://hypno.com/app/terms> and <privacy policy|https://hypno.com/privacy> provided by hypno and our related partners and services.`
 
 const ManageEventGallery = (props: ResponseData) => {
     const { event: {
@@ -86,7 +87,7 @@ const ManageEventGallery = (props: ResponseData) => {
         eventMetadata = {
             ...props.event.metadata,
             ...data,
-            color: `${_.startsWith(config.color, '#') ? "": "#"}${config.color}`,
+            color: `${_.startsWith(config.color, '#') ? "" : "#"}${config.color}`,
             fields: (!_.isEmpty(data.fields) && _.first(data.fields) != '') ? _.map(_.split(data.fields, ','), (f) => f.trim()) : [],
         }
 
@@ -155,7 +156,7 @@ const ManageEventGallery = (props: ResponseData) => {
                                         eventName={id}
                                         label={'Logo'}
                                         inputId='logo'
-                                        onInputChange={(value: string) => setValue('logo', value)} 
+                                        onInputChange={(value: string) => setValue('logo', value)}
                                         value={config.logo}
                                     />
                                 </div>
@@ -180,7 +181,7 @@ const ManageEventGallery = (props: ResponseData) => {
                                         className='input'
                                         placeholder='Hex Color Code'
                                         {...register('color')} />
-                                    {config.color && <span className="indicator-item indicator-middle translate-y-[40%] -translate-x-3/4 indicator-end badge" style={{ backgroundColor: `${_.startsWith(config.color, '#') ? "": "#"}${config.color}`  }}></span>}
+                                    {config.color && <span className="indicator-item indicator-middle translate-y-[40%] -translate-x-3/4 indicator-end badge" style={{ backgroundColor: `${_.startsWith(config.color, '#') ? "" : "#"}${config.color}` }}></span>}
                                 </div>
 
                                 <div className='form-control'>
@@ -250,6 +251,10 @@ const ManageEventGallery = (props: ResponseData) => {
                                         <span className='label-text-alt cursor-pointer text-white/40 hover:text-white transition' onClick={() => setValue('terms_and_conditions', DEFAULT_TERMS)}>Reset</span>
                                     </label>
                                     <textarea className='textarea w-full leading-[1.1rem]' rows={3} disabled={!config.data_capture_screen} {...register('terms_and_conditions')} />
+                                    <label className='label'>
+                                        <span className='label-text text-white'>Note: to insert a link, use the pattern &#60;display text|url&#62;</span>
+                                        <label htmlFor='terms-preview-modal' className='label-text-alt cursor-pointer text-white/40 hover:text-white transition'>Preview</label>
+                                    </label>
                                 </div>
 
                                 <div className='form-control'>
@@ -266,6 +271,7 @@ const ManageEventGallery = (props: ResponseData) => {
                                 </div>
                             </>
                         )}
+
                         {view !== 'ai' && (
                             <div className='fixed bottom-[30px] right-1/2 translate-x-1/2'>
                                 {savedChangesStatus ? (
@@ -334,6 +340,14 @@ const ManageEventGallery = (props: ResponseData) => {
                             </div>
                         )}
                     </form>
+
+                    <input type="checkbox" id="terms-preview-modal" className="modal-toggle" />
+                    <label htmlFor="terms-preview-modal" className="modal cursor-pointer bg-white/10 mt-0">
+                        <label className="modal-box relative bg-black/70 backdrop-blur-sm" htmlFor="">
+                            <h3 className="text-lg font-medium">Terms and Conditions Preview</h3>
+                            <p className="py-4 text-white/50">{replaceLinks(config.terms_and_conditions)}</p>
+                        </label>
+                    </label>
                 </div>
             </section>
         </>

@@ -2,16 +2,15 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 import type { GetServerSideProps } from 'next';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { toTextColor } from '@/helpers/color';
 import Spinner from '@/components/Spinner';
 import useSWR from 'swr';
 import { axiosGetWithToken } from '@/lib/fetchWithToken';
 import { FadeIn } from 'react-slide-fade-in';
-import Image from 'next/image';
 import AutosizeImage from '@/components/AutosizeImage';
-import { parseLink } from '@/helpers/text';
+import { replaceLinks } from '@/helpers/text';
 import DetailView from '@/components/Gallery/DetailView';
 import Link from 'next/link';
 import Head from 'next/head';
@@ -235,7 +234,7 @@ const SubGallery = (props: ResponseData) => {
                                                 <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
                                                     {/* <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} /> */}
                                                     <p className='text-xs text-white/50'>
-                                                        {parseLink(event.terms_and_conditions, [{ text: 'terms of use', url: 'https://hypno.com/app/terms' }, { text: 'privacy policy', url: 'https://hypno.com/privacy' }])}
+                                                        {replaceLinks(event.terms_and_conditions)}
                                                     </p>
                                                 </div>
                                                 <input className='btn btn-primary btn-gallery locked sm:block' type='submit' value='continue →' style={event.color ? { backgroundColor: event.color, borderColor: event.color, color: toTextColor(event.color) } : {}} />

@@ -21,3 +21,15 @@ export const parseLink = (text: string, links: Link[]): any => {
     const reactElement = parse(elem);
     return reactElement;
 };
+
+/**
+ * It takes a string, finds all the links in it, and replaces them with React elements
+ * @param {string} text - The text that you want to replace the links in.
+ * @returns A React element.
+ */
+export const replaceLinks = (text: string): any => {
+    const pattern = /<([^|]+)\|([^>]+)>/g;
+    const replacedText = text.replace(pattern, `<a href="$2" className='text-white' rel="noreferrer" target='_blank'>$1</a>`)
+    const reactElement = parse(replacedText)
+    return reactElement;
+};
