@@ -103,12 +103,12 @@
     @apply text-white/40
   }
 
-  .input.data-capture {
-    @apply rounded-none bg-white text-black placeholder:text-black text-[16px] sm:text-sm
+  .input.data-capture, .select.data-capture {
+    @apply rounded-none bg-white text-black placeholder:text-black text-[16px] sm:text-sm font-normal
   }
 
-  .input.error {
-    @apply placeholder:text-red-600
+  .input.error, .select.error {
+    @apply placeholder:text-red-600 text-red-600
   }
 
   .tab {

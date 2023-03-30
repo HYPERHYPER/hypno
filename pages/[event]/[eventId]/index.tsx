@@ -20,6 +20,9 @@ import { getPlaiceholder } from 'plaiceholder';
 import { CustomGallery } from '@/components/Gallery/CustomGallery';
 import Letter from '../../../public/pop/letter.svg';
 import useContentHeight from '@/hooks/useContentHeight';
+import { CountrySelect } from '@/components/DataCapture/CountrySelect';
+import { DateInput } from '@/components/DataCapture/DateInput';
+import { formatDate } from '@/helpers/date';
 
 type ImageData = {
     id: number;
@@ -86,8 +89,8 @@ interface ResponseData {
 }
 
 const SubGallery = (props: ResponseData) => {
-    const outerHeight = useContentHeight({footer: false});
-    const contentHeight = useContentHeight({footer: true});
+    const outerHeight = useContentHeight({ footer: false });
+    const contentHeight = useContentHeight({ footer: true });
     const { event, photos: initialPhotos, count, photo, placeholder } = props;
     const { query: { category, eventId, event: galleryViewSlug } } = useRouter()
 
@@ -118,8 +121,10 @@ const SubGallery = (props: ResponseData) => {
         register,
         handleSubmit,
         formState: { errors },
+        watch,
     } = useForm();
     // let acceptTermsRef = useRef<HTMLInputElement>(null);
+    const formData = watch();
 
     const submitDataCapture = async (data: any) => {
         // const userAcceptedTerms = acceptTermsRef?.current?.checked;
@@ -136,6 +141,10 @@ const SubGallery = (props: ResponseData) => {
         /* unless is just email delivery */
         const photoSlug = event.email_delivery ? photo.slug : _.first(photos)?.slug;
         let metadata = event.email_delivery ? photo.metadata : _.first(photos)?.metadata || {};
+
+        if (data.birthday) {
+            data.birthday = formatDate(data.birthday);
+        }
         metadata = {
             ...metadata,
             ...data,
@@ -181,7 +190,7 @@ const SubGallery = (props: ResponseData) => {
                 {isDetailView ? (
                     <DetailView asset={photo} config={{ aiGeneration: event.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
                 ) : (
-                    <div 
+                    <div
                         style={{ height: outerHeight }}
                         className={`sm:mx-auto h-[calc(100vh-85px-env(safe-area-inset-bottom))]`}>
                         {(!photos.length && !event.email_delivery) ? (
@@ -193,7 +202,7 @@ const SubGallery = (props: ResponseData) => {
                             </div>
                         ) : (
                             dataCapture ? (
-                                <div 
+                                <div
                                     style={{ height: contentHeight }}
                                     className={`h-[calc(100vh-85px-48px-30px-env(safe-area-inset-bottom))] overflow-auto flex items-center`}>
                                     <div className='sm:max-w-2xl p-4 sm:p-10 mx-auto'>
@@ -203,18 +212,26 @@ const SubGallery = (props: ResponseData) => {
                                                 <h2 className='text-white/50'>{event.data_capture_subtitle || 'add your info to continue...'}</h2>
                                             </div>
                                             <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
-                                                {fields?.map((v, i) => (
-                                                    <input
-                                                        className={`input data-capture ${errors[v.id] && 'error text-red-600'}`}
-                                                        placeholder={`${v.name}${errors[v.id] ? (errors[v.id]?.type === 'pattern' ? ' is not valid' : ' is required') : ''}`}
-                                                        key={i}
-                                                        {...register(v.id, {
-                                                            required: true,
-                                                            ...(v.id == 'email' && { pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ }),
-                                                            ...(v.id == 'age' && { pattern: /^[0-9]*$/ })
-                                                        })}
-                                                    />
-                                                ))}
+                                                {fields?.map((v, i) => {
+                                                    if (v.id == 'country') {
+                                                        return <CountrySelect key={i} error={!_.isEmpty(errors[v.id])} {...register(v.id, {required: true})} />
+                                                    }
+                                                    if (v.id == 'birthday') {
+                                                        return <DateInput key={i} hasvalue={!_.isEmpty(formData[v.id])} error={!_.isEmpty(errors[v.id])} {...register(v.id, {required: true})} />
+                                                    }
+                                                    return (
+                                                        <input
+                                                            className={`input data-capture ${errors[v.id] && 'error text-red-600'}`}
+                                                            placeholder={`${v.name}${errors[v.id] ? (errors[v.id]?.type === 'pattern' ? ' is not valid' : ' is required') : ''}`}
+                                                            key={i}
+                                                            {...register(v.id, {
+                                                                required: true,
+                                                                ...(v.id == 'email' && { pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ }),
+                                                                ...(v.id == 'age' && { pattern: /^[0-9]*$/ })
+                                                            })}
+                                                        />
+                                                    )
+                                                })}
                                                 <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
                                                     {/* <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} /> */}
                                                     <p className='text-xs text-white/50'>
