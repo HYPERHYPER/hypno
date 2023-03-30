@@ -74,7 +74,7 @@ const DetailGallery = (props: ResponseData) => {
     const { photo, event } = props;
 
     const galleryTitle = photo?.event_name;
-    const aiGeneration = props.event.metadata.ai_generation || null;
+    const aiGeneration = props.event.metadata?.ai_generation || null;
     const { base64, img } = props.placeholder;
     const imageProps = {
         ...img,
@@ -135,7 +135,7 @@ const DetailGallery = (props: ResponseData) => {
                 <meta name="og:video:type" content='video/mp4' />
             </Head>
 
-            <CustomGallery event={event} >
+            <CustomGallery event={event}>
                 {/* <GalleryNavBar name={galleryTitle} gallerySlug={String(photo?.event_id)} /> */}
                     <DetailView asset={photo} config={{ aiGeneration }} imageProps={imageProps} />
                 {/* <Footer /> */}
@@ -169,12 +169,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         eventData = await eventRes.data?.event;
 
         placeholder = await getPlaiceholder(res.data.photo.jpeg_url);
-    });
+    })
 
+    if (_.isEmpty(photoData)) { return { notFound: true }}
     return {
         props: {
             ...photoData,
-            event: eventData,
+            event: {
+                ...eventData,
+                //@ts-ignore
+                ...eventData.metadata,
+            },
             placeholder: placeholder,
         }
     }
