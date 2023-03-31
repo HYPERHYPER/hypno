@@ -55,7 +55,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                                 <button onClick={unmuteVideo} className="cursor-pointer w-[35px] h-[35px] sm:w-[50px] sm:h-[50px] btn-circle bg-black flex items-center justify-center"><SpeakerOff /></button>
                             </div>
                         )}
-                        <video ref={vidRef} className='max-w-full max-h-full sm:max-h-[75vh]' src={asset.mp4_url} autoPlay loop playsInline muted poster={asset.posterframe} />
+                        <video ref={vidRef} style={{ maxHeight: height }} className='max-w-full max-h-full sm:max-h-[75vh]' src={asset.mp4_url} autoPlay loop playsInline muted poster={asset.posterframe} />
                     </div>
                 ) : (
                     <div className='block overflow-hidden' style={{ maxHeight: height }}>
