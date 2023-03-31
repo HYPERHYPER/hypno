@@ -191,7 +191,7 @@ const SubGallery = (props: ResponseData) => {
                 ) : (
                     <div
                         style={{ height: outerHeight }}
-                        className={`sm:mx-auto h-[calc(100vh-85px-env(safe-area-inset-bottom))]`}>
+                        className={`sm:mx-auto h-[calc(100vh-85px-env(safe-area-inset-bottom))] w-full`}>
                         {(!photos.length && !event.email_delivery) ? (
                             <div className='fixed hero top-0 left-0 h-screen p-10'>
                                 <div className='hero-content max-w-[24rem] sm:max-w-2xl flex flex-row gap-4 items-center justify-center bg-white/10 backdrop-blur-[50px] p-8'>
@@ -243,7 +243,7 @@ const SubGallery = (props: ResponseData) => {
                                     </div>
                                 </div>
                             ) : (!singleAsset && _.size(photos) > 1) ? (
-                                <div className='sm:max-w-2xl md:max-w-6xl block mx-auto h-full'>
+                                <div className='sm:max-w-2xl md:max-w-6xl block mx-auto h-full flex-1 w-full'>
                                     {/* <div className='mb-4 flex flex-col justify-start items-start gap-3 sm:flex-row sm:justify-between sm:items-end'>
                                         <div>
                                             <h2>{event.gallery_title || 'Share and tag all over social.'}</h2>

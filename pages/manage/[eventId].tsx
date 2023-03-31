@@ -221,6 +221,9 @@ const ManageEventGallery = (props: ResponseData) => {
                                         placeholder='Name, Email'
                                         disabled={!config.data_capture_screen}
                                         {...register('fields')} />
+                                    <label className='label'>
+                                        <span className='label-text text-white'>Note: fields must be comma seperated (ex. Name,Email,Country)</span>
+                                    </label>
                                 </div>
 
                                 <div className='form-control'>

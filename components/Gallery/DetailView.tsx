@@ -7,7 +7,8 @@ import { useCallback, useRef, useState } from "react";
 import useContentHeight from "@/hooks/useContentHeight";
 
 export default function DetailView({ asset, config, imageProps }: any) {
-    const height = useContentHeight({ footer: Boolean(config.aiGeneration?.enabled || asset.mp4_url) });
+    const footer = Boolean(config.aiGeneration?.enabled || asset.mp4_url);
+    const height = useContentHeight({ footer });
     const vidRef = useRef<HTMLVideoElement>(null);
     const [muted, setMuted] = useState<boolean>(true);
 
@@ -41,14 +42,14 @@ export default function DetailView({ asset, config, imageProps }: any) {
     return (
         <div
             style={{ height }}
-            className={`sm:mx-auto h-[calc(100vh-85px-48px-30px-env(safe-area-inset-bottom))] md:px-[90px] w-full flex justify-center flex-col items-center`}>
-            <div className='relative bg-white/10 backdrop-blur-[50px] max-h-full sm:max-h-[75vh]'>
+            className={`sm:mx-auto h-[${height}] md:px-[90px] w-full flex flex-1 justify-center flex-col items-center ${footer ? 'pb-12' : ''} `}>
+            <div className='relative bg-white/10 backdrop-blur-[50px] sm:max-h-[75vh]'>
                 <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
                     <Spinner />
                 </div>
 
                 {asset.mp4_url ? (
-                    <div className='block relative' style={{ height }}>
+                    <div className='block relative' style={{ maxHeight: height }}>
                         {muted && (
                             <div className="absolute top-[10px] left-[10px] z-10">
                                 <button onClick={unmuteVideo} className="cursor-pointer w-[35px] h-[35px] sm:w-[50px] sm:h-[50px] btn-circle bg-black flex items-center justify-center"><SpeakerOff /></button>
@@ -57,7 +58,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                         <video ref={vidRef} className='max-w-full max-h-full sm:max-h-[75vh]' src={asset.mp4_url} autoPlay loop playsInline muted poster={asset.posterframe} />
                     </div>
                 ) : (
-                    <div className='block overflow-hidden max-h-full'>
+                    <div className='block overflow-hidden' style={{ maxHeight: height }}>
                         <Image
                             {...imageProps}
                             priority
@@ -65,8 +66,8 @@ export default function DetailView({ asset, config, imageProps }: any) {
                             src={asset.url}
                             alt={asset.event_name + asset.id}
                             placeholder={imageProps?.blurDataURL ? 'blur' : 'empty'}
-                            style={{ maxHeight: height }}
-                            className="max-h-[calc(100vh-85px-48px-30px-env(safe-area-inset-bottom))] sm:max-h-[75vh] w-auto" />
+                            // style={{ maxHeight: height }}
+                            className={`max-h-[calc(100vh-85px-48px-30px-env(safe-area-inset-bottom))] max-h-[${height}] sm:max-h-[75vh] w-auto`} />
                     </div>
                 )}
             </div>
