@@ -204,7 +204,7 @@ const SubGallery = (props: ResponseData) => {
                                 <div
                                     style={{ height: contentHeight }}
                                     className={`h-[calc(100vh-85px-48px-30px-env(safe-area-inset-bottom))] overflow-auto flex items-center`}>
-                                    <div className='sm:max-w-2xl p-4 sm:p-10 mx-auto'>
+                                    <div className='sm:max-w-2xl py-2 sm:px-10 mx-auto'>
                                         <div className='flex flex-col text-center'>
                                             <div className='mb-4'>
                                                 <h2>{event.data_capture_title || 'want your photos?'}</h2>
@@ -213,10 +213,10 @@ const SubGallery = (props: ResponseData) => {
                                             <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
                                                 {fields?.map((v, i) => {
                                                     if (v.id == 'country') {
-                                                        return <CountrySelect key={i} error={!_.isEmpty(errors[v.id])} {...register(v.id, {required: true})} />
+                                                        return <CountrySelect key={i} error={!_.isEmpty(errors[v.id])} placeholder={v.name} {...register(v.id, {required: true})} />
                                                     }
                                                     if (v.id == 'birthday') {
-                                                        return <DateInput key={i} hasvalue={!_.isEmpty(formData[v.id])} error={!_.isEmpty(errors[v.id])} {...register(v.id, {required: true})} />
+                                                        return <DateInput key={i} hasvalue={!_.isEmpty(formData[v.id])} placeholder={v.name} error={!_.isEmpty(errors[v.id])} name={v.name} {...register(v.id, {required: true, valueAsDate: true})} />
                                                     }
                                                     return (
                                                         <input

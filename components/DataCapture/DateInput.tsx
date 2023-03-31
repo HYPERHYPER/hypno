@@ -3,7 +3,7 @@ import _ from 'lodash';
 
 interface DateInputProps extends InputHTMLAttributes<HTMLInputElement> {
     hasvalue?: boolean;
-    name?: string;
+    placeholder?: string;
     error?: boolean;
 }
 
@@ -26,7 +26,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>((props, re
                 <div 
                     onClick={() => setIsFocused(true)}
                     style={{ boxSizing: 'border-box' }}
-                    className={`absolute inset-0 flex items-center w-full input data-capture border-none ${props.error && 'error text-red-600'}`}>{props.error ? `${props.name} is required` : props.name}</div>
+                    className={`absolute inset-0 flex items-center w-full input data-capture border-none ${props.error && 'error text-red-600'}`}>{props.error ? `${props.placeholder} is required` : props.placeholder}</div>
             }
         </div>
     )

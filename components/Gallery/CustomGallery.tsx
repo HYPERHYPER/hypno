@@ -37,7 +37,7 @@ export function CustomGallery({ event, children }: { event: EventData, children:
             />
 
             <div className='fixed top-0 bottom-0 left-0 right-0 overflow-x-hidden overflow-y-scroll px-6'>
-                <div className='min-h-[85px] pt-[30px] w-full mb-4'>
+                <div className='min-h-[85px] pt-[30px] w-full'>
                     <div className='flex justify-center'>
                         <Image className='max-h-[22vw] max-w-[33vw] w-auto' src={event.logo ? event.logo : 'https://hypno-web-assets.s3.amazonaws.com/hypno-logo-white-drop.png'} alt={event.name + " logo"} width={150} height={25} priority />
                     </div>
