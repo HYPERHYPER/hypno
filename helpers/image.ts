@@ -7,8 +7,8 @@
  */
 export function getAspectRatio(width?: number, height?: number) {
     if (!width || !height) return '';
-    const ratio = (height / width) * 100;
-    return `${ratio}%`;
+    const ratio = (width / height);
+    return `${ratio}`;
 }
 
 /**

@@ -8,8 +8,10 @@ export default function useContentHeight({footer}:{footer?: boolean}) {
   useEffect(() => {
     const updateHeight = () => {
       const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+      const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
       const safeAreaInsetBottom = (hasWindow && window.safeAreaInsets) ? window.safeAreaInsets.bottom : 0;
-      setHeight(vh - 85 - (footer ? 48 : 0) - 30 - safeAreaInsetBottom);
+      const spacer = vw > 635 ? 0.33*vh : 2*(vw * 0.22);
+      setHeight(vh - spacer - safeAreaInsetBottom);
     };
     updateHeight();
     window.addEventListener('resize', updateHeight);
