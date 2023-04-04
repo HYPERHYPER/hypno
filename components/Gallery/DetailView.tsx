@@ -9,7 +9,7 @@ import { getAspectRatio } from "@/helpers/image";
 
 export default function DetailView({ asset, config, imageProps }: any) {
     const footer = Boolean(config.aiGeneration?.enabled || asset.mp4_url);
-    const height = useContentHeight({ footer });
+    const height = useContentHeight({ footer: true });
     const vidRef = useRef<HTMLVideoElement>(null);
     const [muted, setMuted] = useState<boolean>(true);
 
@@ -41,7 +41,6 @@ export default function DetailView({ asset, config, imageProps }: any) {
     }, [vidRef]);
 
     const aspectRatio = getAspectRatio(asset.metadata.aspect_ratio.split(":")[0], asset.metadata.aspect_ratio.split(":")[1]);
-    const noBottomButton = !asset.mp4_url && !(config?.aiGeneration && config.aiGeneration.enabled);
     return (
         <>
             <div

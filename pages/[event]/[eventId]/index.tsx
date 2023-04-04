@@ -203,7 +203,7 @@ const SubGallery = (props: ResponseData) => {
                             dataCapture ? (
                                 <div
                                     style={{ height: contentHeight }}
-                                    className={`h-[calc(100vh-85px-48px-30px-env(safe-area-inset-bottom))] overflow-auto flex items-center`}>
+                                    className={`h-[calc(100vh-85px-48px-30px-env(safe-area-inset-bottom))] overflow-auto flex items-center px-6`}>
                                     <div className='sm:max-w-2xl py-2 sm:px-10 mx-auto'>
                                         <div className='flex flex-col text-center'>
                                             <div className='mb-4'>
@@ -243,7 +243,7 @@ const SubGallery = (props: ResponseData) => {
                                     </div>
                                 </div>
                             ) : (!singleAsset && _.size(photos) > 1) ? (
-                                <div className='sm:max-w-2xl md:max-w-6xl block mx-auto h-full flex-1 w-full'>
+                                <div className='sm:max-w-2xl md:max-w-6xl block mx-auto h-full flex-1 w-full px-6'>
                                     {/* <div className='mb-4 flex flex-col justify-start items-start gap-3 sm:flex-row sm:justify-between sm:items-end'>
                                         <div>
                                             <h2>{event.gallery_title || 'Share and tag all over social.'}</h2>
