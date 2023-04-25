@@ -206,7 +206,7 @@ const SubGallery = (props: ResponseData) => {
                                     className={`h-[calc(100vh-85px-48px-30px-env(safe-area-inset-bottom))] overflow-auto flex items-center px-6`}>
                                     <div className='sm:max-w-2xl py-2 sm:px-10 mx-auto'>
                                         <div className='flex flex-col text-center'>
-                                            <div className='mb-4'>
+                                            <div className='mb-4 sm:mb-8 text-lg leading-5 sm:text-3xl'>
                                                 <h2>{event.data_capture_title || 'want your photos?'}</h2>
                                                 <h2 className='text-white/50'>{event.data_capture_subtitle || 'add your info to continue...'}</h2>
                                             </div>
@@ -233,7 +233,7 @@ const SubGallery = (props: ResponseData) => {
                                                 })}
                                                 <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
                                                     {/* <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} /> */}
-                                                    <p className='text-xs text-white/50'>
+                                                    <p className='text-xs sm:text-xl sm:leading-5 text-white/50'>
                                                         {replaceLinks(event.terms_and_conditions)}
                                                     </p>
                                                 </div>

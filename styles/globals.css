@@ -88,7 +88,7 @@
   }
 
   .btn-gallery {
-    @apply font-medium tracking-[-0.03em] lowercase no-animation
+    @apply font-medium tracking-[-0.03em] lowercase no-animation text-[16px] sm:text-xl
   }
 
   .btn-gallery.locked {
@@ -104,7 +104,7 @@
   }
 
   .input.data-capture, .select.data-capture {
-    @apply rounded-none bg-white text-black placeholder:text-black text-[16px] sm:text-sm font-normal
+    @apply rounded-none bg-white text-black placeholder:text-black text-[16px] sm:text-xl font-normal
   }
 
   .input.error, .select.error {
