@@ -233,7 +233,7 @@ const SubGallery = (props: ResponseData) => {
                                                 })}
                                                 <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
                                                     {/* <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} /> */}
-                                                    <p className='text-xs sm:text-xl sm:leading-5 text-white/50'>
+                                                    <p className='text-xs sm:text-xl text-white/50'>
                                                         {replaceLinks(event.terms_and_conditions)}
                                                     </p>
                                                 </div>
