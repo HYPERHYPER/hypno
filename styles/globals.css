@@ -78,13 +78,23 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  h1 {
+    @apply text-3xl sm:text-6xl
+  }
+
+  h2 {
+    @apply text-lg sm:text-3xl
+  }
+}
+
 @layer components {
   .checkbox {
     @apply rounded-none border-none bg-white checked:bg-white
   }
 
   .btn {
-    @apply rounded-none font-normal
+    @apply rounded-none font-medium tracking-[-0.03em] lowercase
   }
 
   .btn-gallery {
@@ -93,6 +103,18 @@
 
   .btn-gallery.locked {
     @apply fixed bottom-0 left-0 w-full sm:static
+  }
+
+  .divider {
+    @apply before:bg-white/20 after:bg-white/20 rounded-sm before:h-[1px] after:h-[1px]
+  }
+
+  .list.pro {
+    @apply first:border-t-2 first:border-white/20
+  }
+
+  .list .item {
+    @apply border-white/20 border-b-2 py-3 sm:py-7 sm:h-[100px] text-lg sm:text-4xl font-normal flex flex-row justify-between items-center
   }
 
   .input, .select, .textarea {
@@ -111,6 +133,14 @@
     @apply placeholder:text-red-600 text-red-600
   }
 
+  .input.pro, .textarea.pro {
+    @apply bg-transparent active:border-none text-right text-xl sm:text-4xl text-primary outline-none h-auto
+  }
+
+  .select.pro {
+    @apply h-auto bg-transparent active:border-none outline-none min-h-fit
+  }
+
   .tab {
     @apply opacity-30 hover:opacity-100 transition-opacity
   }
@@ -118,89 +148,39 @@
   .tab-active {
     @apply opacity-100 
   }
+
+  .table.table-ghost :where(tbody th, tbody td, thead) {
+    @apply bg-transparent border-white/20 border-b-[1px] tracking-tight text-lg leading-4 py-5
+  }
+
+  .table.table-ghost :where(thead th) {
+    @apply text-base normal-case font-medium
+  }
+
+  .table.table-ghost :where(thead) {
+    @apply border-t-[1px]
+  }
+
+  .toggle.pro {
+    @apply bg-black
+  }
+
+  .icon svg {
+    @apply scale-150
+  }
+
 }
 
 @supports (font: -apple-system-body) and (-webkit-appearance: none) { img[loading="lazy"] { clip-path: inset(0.6px) } }
-
-:root {
-  --max-width: 1100px;
-  --border-radius: 12px;
-  --font-mono: ui-monospace, Menlo, Monaco, 'Cascadia Mono', 'Segoe UI Mono',
-    'Roboto Mono', 'Oxygen Mono', 'Ubuntu Monospace', 'Source Code Pro',
-    'Fira Mono', 'Droid Sans Mono', 'Courier New', monospace;
-
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-
-  --primary-glow: conic-gradient(
-    from 180deg at 50% 50%,
-    #16abff33 0deg,
-    #0885ff33 55deg,
-    #54d6ff33 120deg,
-    #0071ff33 160deg,
-    transparent 360deg
-  );
-  --secondary-glow: radial-gradient(
-    rgba(255, 255, 255, 1),
-    rgba(255, 255, 255, 0)
-  );
-
-  --tile-start-rgb: 239, 245, 249;
-  --tile-end-rgb: 228, 232, 233;
-  --tile-border: conic-gradient(
-    #00000080,
-    #00000040,
-    #00000030,
-    #00000020,
-    #00000010,
-    #00000010,
-    #00000080
-  );
-
-  --callout-rgb: 238, 240, 241;
-  --callout-border-rgb: 172, 175, 176;
-  --card-rgb: 180, 185, 188;
-  --card-border-rgb: 131, 134, 135;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-
-    --primary-glow: radial-gradient(rgba(1, 65, 255, 0.4), rgba(1, 65, 255, 0));
-    --secondary-glow: linear-gradient(
-      to bottom right,
-      rgba(1, 65, 255, 0),
-      rgba(1, 65, 255, 0),
-      rgba(1, 65, 255, 0.3)
-    );
-
-    --tile-start-rgb: 2, 13, 46;
-    --tile-end-rgb: 2, 5, 19;
-    --tile-border: conic-gradient(
-      #ffffff80,
-      #ffffff40,
-      #ffffff30,
-      #ffffff20,
-      #ffffff10,
-      #ffffff10,
-      #ffffff80
-    );
-
-    --callout-rgb: 20, 20, 20;
-    --callout-border-rgb: 108, 108, 108;
-    --card-rgb: 100, 100, 100;
-    --card-border-rgb: 200, 200, 200;
-  }
-}
 
 * {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+}
+
+:root {
+  background-color: black;
 }
 
 html,
@@ -219,6 +199,24 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+.input.pro:-webkit-autofill {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: #00FF99 !important;
+}
+
+.toggle.pro {
+  background-color: black;
+  border-color: #333333;
+  height: 40px;
+  width: 80px;
+  box-shadow: calc(40px * -1) 0 0 2px #333333 inset, 0 0 0 2px #333333 inset, 0 0;
+}
+
+.toggle.pro:checked {
+  border: none;
+  box-shadow: calc(40px) 0 0 2px #00FF99 inset, 0 0 0 2px #00FF99 inset, 0 0;
 }
 
 input[type="date"] {

@@ -6,16 +6,26 @@ import _ from 'lodash';
 import axios from 'axios';
 import { useState } from 'react';
 import Link from 'next/link';
+import useUserStore from '@/store/userStore';
+import withAuth from '@/components/hoc/withAuth';
+import GlobalLayout from '@/components/GlobalLayout';
+import FormControl from '@/components/Form/FormControl';
 
-export default function Login() {
+
+export default withAuth(LoginPage, 'auth');
+function LoginPage() {
+    const login = useUserStore.useLogin();
+    const user = useUserStore.useUser();
+    const error = useUserStore.useError();
+
     const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
     const {
         register,
         handleSubmit,
         formState: { errors },
     } = useForm();
-    
-    const submitLogin = async (data: any) => {
+
+    const submitLogin = (data: any) => {
         setIsLoggingIn(true)
         if (!_.isEmpty(errors)) {
             setIsLoggingIn(false);
@@ -24,16 +34,7 @@ export default function Login() {
         }
 
         console.log("submitLogin", { data });
-        // const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/`;
-        // const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-        // const payload = { email: data.email, password: data.password };
-        // let resp = await axios.put(url, payload, {
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //         Authorization: 'Bearer ' + token,
-        //     },
-        // });
-
+        login(data.email, data.password);
         setIsLoggingIn(false);
     }
 
@@ -45,39 +46,53 @@ export default function Login() {
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <main className='fixed inset-0 bg-black w-screen min-h-screen'>
-                <div className='absolute top-0 bottom-0 left-0 right-0 w-full'>
-                    <div className='flex justify-center'>
-                        <Image className='max-h-[22vw] max-w-[33vw] w-auto py-[25px]' src={'https://hypno-web-assets.s3.amazonaws.com/hypno-logo-white-drop.png'} alt={"hypno™ logo"} width={150} height={25} priority />
+            <GlobalLayout>
+                <main className='fixed inset-0 bg-black w-screen min-h-screen'>
+                    <div className='hero min-h-screen'>
+                        <div className='hero-content sm:max-w-2xl w-full flex-col items-start space-y-9'>
+                            <div className='space-y-3'>
+                            <h1 className='text-white'>login</h1>
+                            <div><Link href='/signup' className='text-primary hover:underline transition text-3xl'>don't have an account yet?</Link></div>
+                            </div>
+                            <form className='flex flex-col w-full border-t-2 border-white/20' onSubmit={handleSubmit(submitLogin)}>
+                                <FormControl label='email'>
+                                    <input
+                                        className={`input pro ${errors['email'] && 'error text-red-600'}`}
+                                        placeholder={`${errors['email'] ? (errors['email']?.type === 'pattern' ? ' is not valid' : ' is required') : ''}`}
+                                        {...register('email', {
+                                            required: true,
+                                            pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/,
+                                        })}
+                                    />
+                                </FormControl>
+
+                                <FormControl label='password'>
+                                    <input
+                                        className={`input pro ${errors['password'] && 'error text-red-600'}`}
+                                        placeholder={`${errors['password'] ? (errors['password']?.type === 'pattern' ? ' is not valid' : ' is required') : ''}`}
+                                        type='password'
+                                        {...register('password', {
+                                            required: true,
+                                        })}
+                                    />
+                                </FormControl>
+
+                                <input type='submit' value='ok' className='btn btn-primary rounded-lg mt-10 text-4xl h-[80px]' />
+                            </form>
+                            
+                            {error && (
+                                <div className="alert alert-error justify-center mt-3">
+                                    <div className='font-medium'>
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        <span>oops! {error.toLowerCase()}</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-                <div className='hero min-h-screen'>
-                    <div className='hero-content px-6 sm:max-w-xl w-full text-center flex-col'>
-                        <h1 className='text-white text-3xl sm:text-5xl'>login.</h1>
-                        <form className='flex flex-col gap-4 w-full my-4' onSubmit={handleSubmit(submitLogin)}>
-                            <input
-                                className={`input sm:input-lg ${errors['email'] && 'error text-red-600'}`}
-                                placeholder={`email${errors['email'] ? (errors['email']?.type === 'pattern' ? ' is not valid' : ' is required') : ''}`}
-                                {...register('email', {
-                                    required: true,
-                                    pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ ,
-                                })}
-                            />
-                            <input
-                                className={`input sm:input-lg ${errors['password'] && 'error text-red-600'}`}
-                                placeholder={`password${errors['password'] ? (errors['password']?.type === 'pattern' ? ' is not valid' : ' is required') : ''}`}
-                                type='password'
-                                {...register('password', {
-                                    required: true,
-                                })}
-                            />
-                            <input type='submit' value='continue →' className='btn btn-gallery sm:btn-lg btn-primary rounded-full mt-3' />
-                        </form>
-                        <Link href='/signup' className='text-white/30 hover:text-white transition-colors text-lg'>don't have an account yet? sign up.</Link>
-                    </div>
-                </div>
-                <Footer />
-            </main>
+                    <Footer />
+                </main>
+            </GlobalLayout>
         </>
     )
 }

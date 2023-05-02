@@ -9,8 +9,8 @@ const stripePromise = loadStripe(
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <Elements stripe={stripePromise}>
-      <Component {...pageProps} />
-    </Elements>
+      <Elements stripe={stripePromise}>
+        <Component {...pageProps} />
+      </Elements>
   );
 }

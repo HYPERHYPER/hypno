@@ -20,6 +20,6 @@
       "*": ["types/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "pages/u/[eventSlug]"],
   "exclude": ["node_modules"]
 }

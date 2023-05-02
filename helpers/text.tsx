@@ -28,8 +28,25 @@ export const parseLink = (text: string, links: Link[]): any => {
  * @returns A React element.
  */
 export const replaceLinks = (text: string): any => {
+    if (!text) return;
     const pattern = /<([^|]+)\|([^>]+)>/g;
     const replacedText = text.replace(pattern, `<a href="$2" className='text-white' rel="noreferrer" target='_blank'>$1</a>`)
     const reactElement = parse(replacedText)
     return reactElement;
+};
+
+/**
+ * This function takes a URL string and returns the filename by splitting the URL and returning the
+ * last part.
+ * @param {string} url (https://admin-web-assets.s3.amazonaws.com/{eventId}/{filename}) - The `url` parameter is a string representing a URL from which we want to
+ * extract the filename.
+ * @returns the filename extracted from the input URL
+ */
+export const getFilename = (url: string): any => {
+    // Split the URL by "/"
+    const url_parts = url.split("/")
+    // The last part of the URL should be the filename
+    const filename = url_parts[url_parts.length - 1]
+    
+    return filename;
 };

@@ -61,7 +61,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                             <video ref={vidRef} style={{ maxHeight: height }} className='max-w-full max-h-full' src={asset.mp4_url} autoPlay loop playsInline muted poster={asset.posterframe} />
                         </div>
                     ) : (
-                        <div className='block overflow-hidden' style={{ maxHeight: height, aspectRatio }}>
+                        <div className='block overflow-hidden' style={{ maxHeight: height }}>
                             <Image
                                 {...imageProps}
                                 priority
@@ -69,7 +69,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                                 src={asset.url}
                                 alt={asset.event_name + asset.id}
                                 placeholder={imageProps?.blurDataURL ? 'blur' : 'empty'}
-                                style={{ maxHeight: height, aspectRatio }}
+                                style={{ maxHeight: height }}
                                 className={`max-h-[calc(100vh-22vw-22vw-env(safe-area-inset-bottom))] max-h-[${height}] w-auto`} />
                         </div>
                     )}
