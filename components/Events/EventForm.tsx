@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import _ from 'lodash';
+import { useState, useEffect, useCallback } from 'react';
+import _, { debounce } from 'lodash';
 import { useForm } from 'react-hook-form';
 import S3Uploader from '@/components/S3Uploader';
 import { ThreeDots } from 'react-loader-spinner';
@@ -17,20 +17,25 @@ interface FormData {
     onSubmit: ((payload: any) => Promise<AxiosResponse<any, any>>);
     view: 'default' | 'legal' | 'data';
     changeView: (view: 'default' | 'legal' | 'data') => void;
+    updateStatus?: (stauts: string) => void;
+    updateData?: (data: any) => void;
 }
 
 const DEFAULT_TERMS = `by tapping to get your content, you accept the <terms of use|https://hypno.com/app/terms> and <privacy policy|https://hypno.com/privacy> provided by hypno and our related partners and services.`
 const FILTERS = ['raw', 'daze', 'moon', 'custom']
+type AspectRatio = `${number}:${number}`;
+const ASPECT_RATIOS: AspectRatio[] = ["9:16", "2:3", "3:4", "1:1", "4:3", "3:2", "16:9"];
 
 const EventForm = (props: FormData) => {
-    const { onSubmit, event, view, changeView } = props;
+    const { onSubmit, event, view, changeView, updateData, updateStatus } = props;
     const user = useUserStore.useUser();
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, isDirty, isSubmitted, isValid },
         watch,
         setValue,
+        reset
     } = useForm({
         defaultValues: {
             event_name: event?.name || '',
@@ -49,6 +54,8 @@ const EventForm = (props: FormData) => {
             public_gallery: event?.metadata?.public_gallery || false,
             enable_legal: event?.metadata?.legal || false,
             enable_gallery: event?.metadata?.gallery || false,
+            filter: 1,
+            watermarks: {}
         }
     });
 
@@ -60,18 +67,8 @@ const EventForm = (props: FormData) => {
         }
     }, [config.email_delivery])
 
-    const [savedChangesStatus, setSavedChangesStatus] = useState<'saving' | 'completed'>()
-
-    useEffect(() => {
-        if (savedChangesStatus == 'completed') {
-            setTimeout(() => {
-                setSavedChangesStatus(undefined)
-            }, 3000)
-        }
-    }, [config]);
-
     const submitForm = async (data: any) => {
-        setSavedChangesStatus('saving');
+        updateStatus && updateStatus('saving');
         if (!_.isEmpty(errors)) {
             console.log("submitForm errors", { errors });
             return;
@@ -93,11 +90,42 @@ const EventForm = (props: FormData) => {
         const payload = { metadata: { ...eventMetadata }, terms_and_conditions }
         onSubmit && onSubmit(payload).then((e) => {
             console.log(e)
-            setSavedChangesStatus('completed')
+            updateStatus && updateStatus('success');
+            reset(...data)
         }).catch((e) => {
             console.log(e)
         });
     }
+
+    const debouncedSave = useCallback(
+        debounce(() => {
+            console.log("Saving");
+            if (event) {
+                handleSubmit(onSubmit)();
+                return;
+            }
+
+            updateData && updateData(config)
+        }, 1000),
+        []
+    );
+
+    useEffect(() => {
+        if (isDirty && isValid) {
+            debouncedSave();
+        }
+    }, [config]);
+
+    useEffect(() => {
+        if (updateStatus) {
+            if (isSubmitted) {
+                updateStatus('success')
+                setTimeout(() => {
+                    updateStatus('ready')
+                }, 3000)
+            }
+        }
+    }, [isSubmitted]);
 
     return (
         <>
@@ -111,13 +139,17 @@ const EventForm = (props: FormData) => {
                         </FormControl>
 
                         <FormControl label='organization'>
-                            <select className='select font-normal lowercase bg-transparent active:bg-transparent text-4xl'>
-                                <option>{user.organization.name}</option>
-                            </select>
+                            {event ?
+                                <div className='lowercase text-xl sm:text-4xl'>{user.organization.name}</div>
+                                : (
+                                    <select className='select font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl'>
+                                        <option>{user.organization.name}</option>
+                                    </select>
+                                )}
                         </FormControl>
 
                         <FormControl label='capture'>
-                            <div className='flex flex-row gap-3 text-4xl'>
+                            <div className='flex flex-row gap-3 text-xl sm:text-4xl'>
                                 <div className='text-primary'>photo</div>
                                 <div className="tooltip" data-tip="coming soon">
                                     <div className='text-primary/40'>video</div>
@@ -130,9 +162,9 @@ const EventForm = (props: FormData) => {
 
                         <FormControl label='filters'>
                             <Modal.Trigger id='filters-modal'>
-                                <div className='flex flex-row gap-3 text-4xl'>
+                                <div className='flex flex-row gap-3 text-xl sm:text-4xl'>
                                     {_.map(FILTERS, (f, i) => (
-                                        <span className={`transition ${f == 'raw' ? 'text-primary' : 'text-primary/40'}`}>{f}</span>
+                                        <span className={`transition ${config.filter == i + 1 ? 'text-primary' : 'text-primary/40'}`}>{f}</span>
                                     ))}
                                 </div>
                             </Modal.Trigger>
@@ -140,35 +172,53 @@ const EventForm = (props: FormData) => {
                         <Modal id='filters-modal' title='filters'>
                             <div className='list pro'>
                                 {_.map(FILTERS, (f, i) => (
-                                    <div className='item' key={i}>
-                                        <span className={`transition ${f == 'raw' ? 'text-white' : 'text-white/20'}`}>{f}</span>
-                                        {f == 'raw' && <div className='badge badge-primary' />}
+                                    <div className='item cursor-pointer' key={i} onClick={() => setValue('filter', i + 1)}>
+                                        <span className={`transition ${config.filter == i + 1 ? 'text-white' : 'text-white/20'}`}>{f}</span>
+                                        {config.filter == i + 1 && <div className='badge badge-primary' />}
                                     </div>
                                 ))}
                             </div>
                         </Modal>
 
                         <FormControl label='graphics'>
-                            <div className='text-4xl text-white/20'>coming soon</div>
+                            <Modal.Trigger id='graphics-modal'>
+                                <div className='text-xl sm:text-4xl text-white/20'>coming soon</div>
+                            </Modal.Trigger>
                         </FormControl>
+                        <Modal id='graphics-modal' title='graphics'>
+                            <div className='list pro'>
+                                {_.map(ASPECT_RATIOS, (ar, i) => (
+                                    <div className='item' key={i}>
+                                        <span className={`transition ${ar == '3:4' ? 'text-white' : 'text-white/20'}`}>{ar}</span>
+                                        <FileInput
+                                            orgId={user.organization.id}
+                                            inputId={ar}
+                                            onInputChange={(value: string) => setValue(`watermarks.${ar}`, value)}
+                                            value={_.get(config.watermarks, ar)}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </Modal>
 
                         <FormControl label='effects'>
-                            <div className='text-4xl text-white/20'>coming soon</div>
+                            <div className='text-xl sm:text-4xl text-white/20'>coming soon</div>
                         </FormControl>
 
                         <FormControl label='delivery'>
                             <input type="checkbox" className="toggle pro toggle-lg" {...register('public_gallery')} />
                         </FormControl>
-                    </div>
+                    </div >
                 )}
 
-                {view == 'default' && (
-                    <div className='lg:border-t-2 lg:border-white/20'>
-                        <FormControl label='gallery'>
-                            <input type="checkbox" className="toggle pro toggle-lg" {...register('enable_gallery')} />
-                        </FormControl>
+                {
+                    view == 'default' && (
+                        <div className='lg:border-t-2 lg:border-white/20'>
+                            <FormControl label='gallery'>
+                                <input type="checkbox" className="toggle pro toggle-lg" {...register('enable_gallery')} />
+                            </FormControl>
 
-                        {/* <div className='form-control '>
+                            {/* <div className='form-control '>
                                     <label className='label'>
                                         <span className='label-text text-white'>Gallery Title</span>
                                     </label>
@@ -187,64 +237,48 @@ const EventForm = (props: FormData) => {
                                         placeholder='#hypno #pro #iphone'
                                         {...register('gallery_subtitle')} />
                                 </div> */}
-                        <FormControl label='logo'>
-                            <div className='flex gap-3'>
-                                <span className='text-4xl text-primary truncate'>{getFilename(config.logo)}</span>
-                                <label htmlFor='logo-modal' className="cursor-pointer h-10 w-10 rounded-full bg-white/20 text-black flex items-center justify-center"><Plus /></label>
-                            </div>
-                        </FormControl>
-                        <Modal id='logo-modal' title='logo'>
-                            <div className='list pro'>
-                                <FormControl label='url'>
-                                    <FileInput
-                                        orgId={user.organization.id}
-                                        inputId='logo'
-                                        onInputChange={(value: string) => setValue('logo', value)}
-                                        value={config.logo}
-                                    />
-                                </FormControl>
-                            </div>
-                        </Modal>
+                            <FormControl label='logo'>
+                                <FileInput
+                                    orgId={user.organization.id}
+                                    inputId='logo'
+                                    onInputChange={(value: string) => setValue('logo', value)}
+                                    value={config.logo}
+                                />
+                            </FormControl>
 
-                        <FormControl label='background'>
-                            <div className='flex gap-3'>
-                                <span className='text-4xl text-primary truncate'>{getFilename(config.background)}</span>
-                                <label htmlFor='background-modal' className="cursor-pointer h-10 w-10 rounded-full bg-white/20 text-black flex items-center justify-center"><Plus /></label>
-                            </div>
-                        </FormControl>
-                        <Modal id='background-modal' title='background'>
-                            <FileInput
-                                orgId={user.organization.id}
-                                inputId='background'
-                                onInputChange={(value: string) => setValue('background', value)}
-                                value={config.background}
-                            />
-                        </Modal>
+                            <FormControl label='background'>
+                                <FileInput
+                                    orgId={user.organization.id}
+                                    inputId='background'
+                                    onInputChange={(value: string) => setValue('background', value)}
+                                    value={config.background}
+                                />
+                            </FormControl>
 
-                        <FormControl label='color'>
-                            <input
-                                className='input pro'
-                                placeholder='# hex code'
-                                {...register('color')} />
-                            <span className="h-10 w-10 rounded-full border-4 border-white/20" style={{ backgroundColor: `${_.startsWith(config.color, '#') ? "" : "#"}${config.color}` }}></span>
-                        </FormControl>
+                            <FormControl label='color'>
+                                <input
+                                    className='input pro'
+                                    placeholder='# hex code'
+                                    {...register('color')} />
+                                <span className="h-10 w-10 rounded-full border-4 border-white/20" style={{ backgroundColor: `${_.startsWith(config.color, '#') ? "" : "#"}${config.color}` }}></span>
+                            </FormControl>
 
-                        <FormControl label='public'>
-                            <input type="checkbox" className="toggle pro toggle-lg" {...register('public_gallery')} />
-                        </FormControl>
+                            <FormControl label='public'>
+                                <input type="checkbox" className="toggle pro toggle-lg" {...register('public_gallery')} />
+                            </FormControl>
 
-                        <FormControl label='data'>
-                            {config.data_capture_screen && <button className="tracking-tight text-4xl text-primary mr-5" onClick={() => changeView('data')}>custom</button>}
-                            <input type="checkbox" className="toggle pro toggle-lg" {...register('data_capture_screen')} />
-                        </FormControl>
+                            <FormControl label='data'>
+                                {config.data_capture_screen && <button className="tracking-tight text-xl sm:text-4xl text-primary mr-5" onClick={() => changeView('data')}>custom</button>}
+                                <input type="checkbox" className="toggle pro toggle-lg" {...register('data_capture_screen')} />
+                            </FormControl>
 
-                        <FormControl label='legal'>
-                            {config.enable_legal && <button className="tracking-tight text-4xl text-primary mr-5" onClick={() => changeView('legal')}>custom</button>}
-                            <input type="checkbox" className="toggle pro toggle-lg" {...register('enable_legal')} />
-                        </FormControl>
+                            <FormControl label='legal'>
+                                {config.enable_legal && <button className="tracking-tight text-xl sm:text-4xl text-primary mr-5" onClick={() => changeView('legal')}>custom</button>}
+                                <input type="checkbox" className="toggle pro toggle-lg" {...register('enable_legal')} />
+                            </FormControl>
 
 
-                        {/* <div className='form-control'>
+                            {/* <div className='form-control'>
                         <label className='label'>
                             <span className='label-text text-white'>Single Asset Email Delivery</span>
                         </label>
@@ -256,78 +290,63 @@ const EventForm = (props: FormData) => {
                             <span className='label-text text-white'>Note: enabling email delivery will automatically enable data capture screen with email field</span>
                         </label>
                     </div> */}
-                    </div>
-                )}
+                        </div>
+                    )
+                }
 
-                {view == 'data' && (
-                    <div className='border-t-2 border-white/20'>
-                        <FormControl label='fields' altLabel='separate multiple fields with commas'>
-                            <input
-                                className='input pro flex-1'
-                                placeholder='name, email, phone'
-                                disabled={!config.data_capture_screen}
-                                {...register('fields')} />
-                        </FormControl>
-
-                        <FormControl label='headline' altLabel='this appears on your web gallery during delivery (optional)'>
-                            <input
-                                className='input pro flex-1'
-                                placeholder='want your content?'
-                                disabled={!config.data_capture_screen}
-                                {...register('data_capture_title')} />
-                        </FormControl>
-
-                        <FormControl label='blurb' altLabel='this appears on your web gallery during delivery (optional)'>
-                            <input
-                                className='input pro flex-1'
-                                placeholder='enter your info to continue'
-                                disabled={!config.data_capture_screen}
-                                {...register('data_capture_subtitle')} />
-                        </FormControl>
-                    </div>
-                )}
-
-                {view == 'legal' && (
-                    <>
+                {
+                    view == 'data' && (
                         <div className='border-t-2 border-white/20'>
-                            <FormControl label='terms/privacy' altLabel='this appears in your web gallery during delivery; format links like <link|https://domain.com>'>
-                                {/* <label className='label'>
+                            <FormControl label='fields' altLabel='separate multiple fields with commas'>
+                                <input
+                                    className='input pro flex-1'
+                                    placeholder='name, email, phone'
+                                    disabled={!config.data_capture_screen}
+                                    {...register('fields')} />
+                            </FormControl>
+
+                            <FormControl label='headline' altLabel='this appears on your web gallery during delivery (optional)'>
+                                <input
+                                    className='input pro flex-1'
+                                    placeholder='want your content?'
+                                    disabled={!config.data_capture_screen}
+                                    {...register('data_capture_title')} />
+                            </FormControl>
+
+                            <FormControl label='blurb' altLabel='this appears on your web gallery during delivery (optional)'>
+                                <input
+                                    className='input pro flex-1'
+                                    placeholder='enter your info to continue'
+                                    disabled={!config.data_capture_screen}
+                                    {...register('data_capture_subtitle')} />
+                            </FormControl>
+                        </div>
+                    )
+                }
+
+                {
+                    view == 'legal' && (
+                        <>
+                            <div className='border-t-2 border-white/20'>
+                                <FormControl label='terms/privacy' altLabel='this appears in your web gallery during delivery; format links like <link|https://domain.com>'>
+                                    {/* <label className='label'>
                             <span className='label-text-alt cursor-pointer text-white/40 hover:text-white transition' onClick={() => setValue('terms_and_conditions', DEFAULT_TERMS)}>Reset</span>
                         </label> */}
-                                <textarea className='flex-1 textarea pro w-full leading-[1.1rem]' rows={5} disabled={!config.data_capture_screen} {...register('terms_and_conditions')} />
-                                {/* <label className='label'>
+                                    <textarea className='flex-1 textarea pro w-full leading-[1.1rem]' rows={5} disabled={!config.data_capture_screen} {...register('terms_and_conditions')} />
+                                    {/* <label className='label'>
                             <span className='label-text text-white'>Note: to insert a link, use the pattern &#60;display text|url&#62;</span>
                             <label htmlFor='terms-preview-modal' className='label-text-alt cursor-pointer text-white/40 hover:text-white transition'>Preview</label>
                         </label> */}
-                            </FormControl>
-                        </div>
-                        <div className=''>
-                        <FormControl label='explicit opt-in' altLabel='this shows a checkbox'>
-                            <input type="checkbox" className="toggle pro toggle-lg" />
-                        </FormControl>
-                    </div>
-                    </>
-                )}
-                
-
-                <div className='fixed bottom-[30px] right-1/2 translate-x-1/2'>
-                    {savedChangesStatus ? (
-                        <button className='btn btn-wide rounded-full shadow-lg'>{savedChangesStatus == 'saving' ?
-                            <ThreeDots
-                                height="20"
-                                width="50"
-                                radius="4"
-                                color="#FFFFFF"
-                                ariaLabel="three-dots-loading"
-                                visible={true}
-                            />
-                            :
-                            'CHANGES SAVED!'
-                        }</button>
-                    ) :
-                        <input className='btn btn-primary btn-wide rounded-full shadow-lg' type='submit' value='SAVE' />
-                    }
-                </div>
+                                </FormControl>
+                            </div>
+                            <div className=''>
+                                <FormControl label='explicit opt-in' altLabel='this shows a checkbox'>
+                                    <input type="checkbox" className="toggle pro toggle-lg" />
+                                </FormControl>
+                            </div>
+                        </>
+                    )
+                }
 
                 {/* <div className='flex-1 pb-5'>
                         <div className='space-y-5 w-1/2 mr-[30px]'>
@@ -373,7 +392,7 @@ const EventForm = (props: FormData) => {
                         <div className='divider before:bg-white/[.03] after:bg-white/[.03] mr-[30px] my-[30px]' />
                         <AiPlayground gallerySlug={event?.party_slug} onSaveCurrent={(val: any) => setValue('ai_generation', { ...val, enabled: config.ai_generation.enabled })} />
                     </div> */}
-            </form>
+            </form >
 
             <input type="checkbox" id="terms-preview-modal" className="modal-toggle" />
             <label htmlFor="terms-preview-modal" className="modal cursor-pointer bg-white/10 mt-0">
