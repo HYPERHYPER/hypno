@@ -174,7 +174,15 @@ const EventForm = (props: FormData) => {
                                 {_.map(FILTERS, (f, i) => (
                                     <div className='item cursor-pointer' key={i} onClick={() => setValue('filter', i + 1)}>
                                         <span className={`transition ${config.filter == i + 1 ? 'text-white' : 'text-white/20'}`}>{f}</span>
-                                        {config.filter == i + 1 && <div className='badge badge-primary' />}
+                                        {f == 'custom' && (
+                                            <FileInput
+                                                inputId='custom-filter'
+                                                onInputChange={() => null}
+                                                value=''
+                                                orgId={user.organization.id}
+                                            />
+                                        )}
+                                        {(f != 'custom' && config.filter == i + 1) && <div className='badge badge-primary' />}
                                     </div>
                                 ))}
                             </div>
