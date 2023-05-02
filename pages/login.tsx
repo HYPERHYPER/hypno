@@ -52,7 +52,7 @@ function LoginPage() {
                         <div className='hero-content sm:max-w-2xl w-full flex-col items-start space-y-9'>
                             <div className='space-y-3'>
                             <h1 className='text-white'>login</h1>
-                            <div><Link href='/signup' className='text-primary hover:underline transition text-3xl'>don't have an account yet?</Link></div>
+                            <div><Link href='/signup' className='text-primary hover:underline transition text-3xl'>don&apos;t have an account yet?</Link></div>
                             </div>
                             <form className='flex flex-col w-full border-t-2 border-white/20' onSubmit={handleSubmit(submitLogin)}>
                                 <FormControl label='email'>

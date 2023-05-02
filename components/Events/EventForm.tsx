@@ -39,8 +39,8 @@ const EventForm = (props: FormData) => {
     } = useForm({
         defaultValues: {
             event_name: event?.name || '',
-            gallery_title: event?.metadata?.gallery_title || '',
-            gallery_subtitle: event?.metadata?.gallery_subtitle || '',
+            // gallery_title: event?.metadata?.gallery_title || '',
+            // gallery_subtitle: event?.metadata?.gallery_subtitle || '',
             data_capture_screen: event?.metadata?.data_capture_screen || false,
             data_capture_title: event?.metadata?.data_capture_title || '',
             data_capture_subtitle: event?.metadata?.data_capture_subtitle || '',

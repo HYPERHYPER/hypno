@@ -92,7 +92,7 @@ function ResetPasswordPage() {
                             </>
                         ) : (
                             <div className='text-white/50 w-full space-y-10'>
-                                <p className='text-xl'>you're all set, {formData.user?.first_name}! <br />you can now use your new password to login.</p>
+                                <p className='text-xl'>you&apos;re all set, {formData.user?.first_name}! <br />you can now use your new password to login.</p>
                                 <Link href='/login' className='w-full btn btn-gallery sm:btn-lg btn-primary rounded-full'>continue to login →</Link>
                             </div>
                         )}

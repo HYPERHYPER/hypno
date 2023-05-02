@@ -62,10 +62,7 @@ function AcceptInvitePage() {
                 </div>
                 <div className='hero min-h-screen'>
                     <div className='hero-content px-6 sm:max-w-xl w-full flex-col'>
-                        <h1 className='text-white text-3xl sm:text-5xl text-center'>{success ? 'welcome.' : `join ${organization}.`}</h1>
-                        <p className='text-white/40 text-xl'>you're invited to join {inviter}'s organization on hypno.</p>
-                        <p className='text-white/40 text-xl'>as a {role}, you can invite other users to join and are granted data access.</p>
-                        {!success ? (
+                        <h1 className='text-white text-3xl sm:text-5xl text-center'>{success ? 'welcome.' : `join ${organization}.`}</h1>{!success ? (
                             <>
                                 <form className='flex flex-col gap-4 w-full my-4' onSubmit={handleSubmit(submitAccept)}>
                                     <input
@@ -118,7 +115,7 @@ function AcceptInvitePage() {
                             </>
                         ) : (
                             <div className='text-white/50 w-full space-y-10'>
-                                <p className='text-xl'>you're all set, {formData.user?.first_name}! <br />you can now login to view {organization}'s events.</p>
+                                <p className='text-xl'>you&apos;re all set, {formData.user?.first_name}! <br />you can now login to view {organization}&apos;s events.</p>
                                 <Link href='/login' className='w-full btn btn-gallery sm:btn-lg btn-primary rounded-full'>continue to login →</Link>
                             </div>
                         )}

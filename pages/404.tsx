@@ -25,7 +25,7 @@ function NotFoundPage() {
                 <GlobalLayout.Header
                     title='oops! 404!'
                 >
-                    <h2>this page does not exist or you don't have access...</h2>
+                    <h2>this page does not exist or you don&apos;t have access...</h2>
                 </GlobalLayout.Header>
             </GlobalLayout>
         </>
