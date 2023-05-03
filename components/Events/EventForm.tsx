@@ -160,7 +160,7 @@ const EventForm = (props: FormData) => {
                             {event ?
                                 <div className='lowercase text-xl sm:text-4xl'>{event.organization.name}</div>
                                 : (
-                                    <select className='select font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl'>
+                                    <select className='select min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl'>
                                         <option value={user.organization.id}>{user.organization.name}</option>
                                     </select>
                                 )}
