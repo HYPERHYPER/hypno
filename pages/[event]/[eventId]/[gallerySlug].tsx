@@ -144,7 +144,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     });
 
     // @ts-ignore
-    if (!eventData.public_gallery) {
+    if (eventData.is_private) {
         return { notFound: true, }
     } 
     return {

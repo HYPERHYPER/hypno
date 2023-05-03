@@ -122,7 +122,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
     }).then(async (res) => {
         if (res.status === 200) {
-            console.log(res.data)
             data = await res.data;
         }
     }).catch((e) => {

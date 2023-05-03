@@ -356,7 +356,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 name: eventData.name,
                 id: eventData.id,
                 party_slug: eventData.party_slug,
-                client_id: eventData.client_id,
                 is_private: eventData.is_private,
                 metadata: eventData.metadata,
             }
