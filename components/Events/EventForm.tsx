@@ -152,7 +152,7 @@ const EventForm = (props: FormData) => {
                     <div className='border-t-2 border-white/20'>
                         <FormControl label='title'>
                             <input
-                                className='input pro'
+                                className='input pro flex-1'
                                 {...register('event_name')} />
                         </FormControl>
 

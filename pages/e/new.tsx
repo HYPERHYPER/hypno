@@ -54,7 +54,7 @@ function NewEventPage(props: ResponseData) {
             microsite: {
                 logo: eventData.logo,
                 background: eventData.background,
-                color: `${_.startsWith(eventData.color, '#') ? "" : "#"}${eventData.color}`,
+                color: eventData.color ? `${_.startsWith(eventData.color, '#') ? "" : "#"}${eventData.color}` : '',
                 data_capture: eventData.data_capture,
                 fields: (!_.isEmpty(eventData.fields) && _.first(eventData.fields) != '') ? _.map(_.split(eventData.fields, ','), (f) => f.trim()) : [],
                 data_capture_title: eventData.data_capture_title,
