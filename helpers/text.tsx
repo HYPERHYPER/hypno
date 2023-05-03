@@ -50,3 +50,7 @@ export const getFilename = (url: string): any => {
     
     return filename;
 };
+
+export const getNestedFormField = (baseKey: string, subKey: string): string => {
+    return `${baseKey}.${subKey}`;
+}

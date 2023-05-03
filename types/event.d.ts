@@ -17,6 +17,7 @@ export type EventConfig = {
     client_id?: number;
     terms_and_conditions?: string;
     is_private?: boolean;
+    delivery?: string; // "qr_gallery" to show qr code to microsite, "qr" to disable
     metadata?: EventMicrosite | null;
 }
 

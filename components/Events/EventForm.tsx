@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import S3Uploader from '@/components/S3Uploader';
 import { ThreeDots } from 'react-loader-spinner';
 import AiPlayground from '@/components/AiPlayground/AiPlayground';
-import { getFilename, replaceLinks } from '@/helpers/text';
+import { getFilename, getNestedFormField, replaceLinks } from '@/helpers/text';
 import { AxiosResponse } from 'axios';
 import FormControl from '../Form/FormControl';
 import Plus from 'public/pop/plus.svg'
@@ -13,8 +13,8 @@ import FileInput from '../Form/FileInput';
 import useUserStore from '@/store/userStore';
 
 interface FormData {
-    event: any;
-    onSubmit: ((payload: any) => Promise<AxiosResponse<any, any>>);
+    event?: any;
+    onSubmit?: ((payload: any) => Promise<AxiosResponse<any, any>>);
     view: 'default' | 'legal' | 'data';
     changeView: (view: 'default' | 'legal' | 'data') => void;
     updateStatus?: (stauts: string) => void;
@@ -25,6 +25,9 @@ const DEFAULT_TERMS = `by tapping to get your content, you accept the <terms of 
 const FILTERS = ['raw', 'daze', 'moon', 'custom']
 type AspectRatio = `${number}:${number}`;
 const ASPECT_RATIOS: AspectRatio[] = ["9:16", "2:3", "3:4", "1:1", "4:3", "3:2", "16:9"];
+const AspectRatioWatermark = (ar: string): ('watermarks.9:16' | 'watermarks.2:3' | 'watermarks.3:4' | 'watermarks.1:1' | 'watermarks.4:3' | 'watermarks.3:2' | 'watermarks.16:9') => {
+    return Object(`watermarks.${ar}`);
+}
 
 const EventForm = (props: FormData) => {
     const { onSubmit, event, view, changeView, updateData, updateStatus } = props;
@@ -32,40 +35,52 @@ const EventForm = (props: FormData) => {
     const {
         register,
         handleSubmit,
-        formState: { errors, isDirty, isSubmitted, isValid },
+        formState: { errors, isDirty, isSubmitSuccessful, isValid, isSubmitting },
         watch,
         setValue,
         reset
     } = useForm({
         defaultValues: {
             event_name: event?.name || '',
+            org_id: event?.client_id || user.organization_id,
             // gallery_title: event?.metadata?.gallery_title || '',
             // gallery_subtitle: event?.metadata?.gallery_subtitle || '',
-            data_capture_screen: event?.metadata?.data_capture_screen || false,
-            data_capture_title: event?.metadata?.data_capture_title || '',
-            data_capture_subtitle: event?.metadata?.data_capture_subtitle || '',
-            fields: event?.metadata?.fields || [],
+            filter: 1,
+            watermarks: {
+                '9:16': "",
+                '2:3': "",
+                '3:4': "",
+                '1:1': "",
+                '4:3': "",
+                '3:2': "",
+                '16:9': "",
+            },
+            qr_delivery: event ? (event?.delivery == "qr_gallery") : true,
+            custom_gallery: false,
             logo: event?.metadata?.logo || '',
             background: event?.metadata?.background || '',
             color: event?.metadata?.color || '',
-            terms_and_conditions: event?.terms_and_conditions || DEFAULT_TERMS,
-            email_delivery: event?.metadata?.email_delivery || false,
-            ai_generation: event?.metadata?.ai_generation || {},
-            public_gallery: event?.metadata?.public_gallery || false,
-            enable_legal: event?.metadata?.legal || false,
-            enable_gallery: event?.metadata?.gallery || false,
-            filter: 1,
-            watermarks: {}
+            public_gallery: !event?.is_private || false,
+            data_capture: event?.metadata?.data_capture || false,
+            fields: event?.metadata?.fields || [],
+            data_capture_title: event?.metadata?.data_capture_title || '',
+            data_capture_subtitle: event?.metadata?.data_capture_subtitle || '',
+            enable_legal: event?.metadata?.enable_legal || false,
+            terms_privacy: event?.metadata?.terms_privacy || DEFAULT_TERMS,
+            explicit_opt_in: event?.metadata?.explicit_opt_in || false,
+            // email_delivery: event?.metadata?.email_delivery || false,
+            // ai_generation: event?.metadata?.ai_generation || {},
         }
     });
 
     const config = watch();
-    useEffect(() => {
-        if (config.email_delivery) {
-            setValue('data_capture_screen', true);
-            setValue('fields', ['Email'])
-        }
-    }, [config.email_delivery])
+    // TODO: hiding email delivery for now
+    // useEffect(() => {
+    //     if (config.email_delivery) {
+    //         setValue('data_capture', true);
+    //         setValue('fields', ['Email'])
+    //     }
+    // }, [config.email_delivery])
 
     const submitForm = async (data: any) => {
         updateStatus && updateStatus('saving');
@@ -87,7 +102,9 @@ const EventForm = (props: FormData) => {
             fields: (!_.isEmpty(data.fields) && _.first(data.fields) != '') ? _.map(_.split(data.fields, ','), (f) => f.trim()) : [],
         }
 
-        const payload = { metadata: { ...eventMetadata }, terms_and_conditions }
+        const payload = {
+            metadata: { ...eventMetadata }, terms_and_conditions
+        }
         onSubmit && onSubmit(payload).then((e) => {
             console.log(e)
             updateStatus && updateStatus('success');
@@ -99,33 +116,33 @@ const EventForm = (props: FormData) => {
 
     const debouncedSave = useCallback(
         debounce(() => {
-            console.log("Saving");
-            if (event) {
+            // console.log("Saving");
+            if (event && onSubmit) {
                 handleSubmit(onSubmit)();
                 return;
             }
-
             updateData && updateData(config)
         }, 1000),
-        []
+        [config] // fix for edit
     );
 
     useEffect(() => {
-        if (isDirty && isValid) {
+        if (isDirty) {
             debouncedSave();
         }
     }, [config]);
 
     useEffect(() => {
         if (updateStatus) {
-            if (isSubmitted) {
+            if (isSubmitting) updateStatus('saving')
+            if (isSubmitSuccessful) {
                 updateStatus('success')
                 setTimeout(() => {
                     updateStatus('ready')
                 }, 3000)
             }
         }
-    }, [isSubmitted]);
+    }, [isSubmitSuccessful, isSubmitting]);
 
     return (
         <>
@@ -143,7 +160,7 @@ const EventForm = (props: FormData) => {
                                 <div className='lowercase text-xl sm:text-4xl'>{user.organization.name}</div>
                                 : (
                                     <select className='select font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl'>
-                                        <option>{user.organization.name}</option>
+                                        <option value={user.organization.id}>{user.organization.name}</option>
                                     </select>
                                 )}
                         </FormControl>
@@ -164,7 +181,7 @@ const EventForm = (props: FormData) => {
                             <Modal.Trigger id='filters-modal'>
                                 <div className='flex flex-row gap-3 text-xl sm:text-4xl'>
                                     {_.map(FILTERS, (f, i) => (
-                                        <span className={`transition ${config.filter == i + 1 ? 'text-primary' : 'text-primary/40'}`}>{f}</span>
+                                        <span key={i} className={`transition ${config.filter == i + 1 ? 'text-primary' : 'text-primary/40'}`}>{f}</span>
                                     ))}
                                 </div>
                             </Modal.Trigger>
@@ -190,18 +207,28 @@ const EventForm = (props: FormData) => {
 
                         <FormControl label='graphics'>
                             <Modal.Trigger id='graphics-modal'>
-                                <div className='text-xl sm:text-4xl text-white/20'>coming soon</div>
+                                {_.every(config.watermarks, (value) => value === "") ?
+                                    <div className='text-xl sm:text-4xl text-white/20'>none</div>
+                                    : (
+                                        <div className='text-xl sm:text-4xl text-primary flex flex-row gap-2'>
+                                            {Object.entries(config.watermarks).map(([ar, value]) => {
+                                                if (!_.isEmpty(value)) {
+                                                    return <span key={ar}>{ar}</span>;
+                                                }
+                                            })}
+                                        </div>
+                                    )}
                             </Modal.Trigger>
                         </FormControl>
                         <Modal id='graphics-modal' title='graphics'>
                             <div className='list pro'>
                                 {_.map(ASPECT_RATIOS, (ar, i) => (
                                     <div className='item' key={i}>
-                                        <span className={`transition ${ar == '3:4' ? 'text-white' : 'text-white/20'}`}>{ar}</span>
+                                        <span className={`transition ${_.get(config.watermarks, ar) ? 'text-white' : 'text-white/20'}`}>{ar}</span>
                                         <FileInput
                                             orgId={user.organization.id}
                                             inputId={ar}
-                                            onInputChange={(value: string) => setValue(`watermarks.${ar}`, value)}
+                                            onInputChange={(value: string) => setValue(AspectRatioWatermark(ar), value)}
                                             value={_.get(config.watermarks, ar)}
                                         />
                                     </div>
@@ -213,8 +240,8 @@ const EventForm = (props: FormData) => {
                             <div className='text-xl sm:text-4xl text-white/20'>coming soon</div>
                         </FormControl>
 
-                        <FormControl label='delivery'>
-                            <input type="checkbox" className="toggle pro toggle-lg" {...register('public_gallery')} />
+                        <FormControl label='show qr code'>
+                            <input type="checkbox" className="toggle pro toggle-lg" {...register('qr_delivery')} />
                         </FormControl>
                     </div >
                 )}
@@ -222,8 +249,8 @@ const EventForm = (props: FormData) => {
                 {
                     view == 'default' && (
                         <div className='lg:border-t-2 lg:border-white/20'>
-                            <FormControl label='gallery'>
-                                <input type="checkbox" className="toggle pro toggle-lg" {...register('enable_gallery')} />
+                            <FormControl label='branded gallery'>
+                                <input type="checkbox" className="toggle pro toggle-lg" {...register('custom_gallery')} />
                             </FormControl>
 
                             {/* <div className='form-control '>
@@ -245,6 +272,7 @@ const EventForm = (props: FormData) => {
                                         placeholder='#hypno #pro #iphone'
                                         {...register('gallery_subtitle')} />
                                 </div> */}
+
                             <FormControl label='logo'>
                                 <FileInput
                                     orgId={user.organization.id}
@@ -276,8 +304,8 @@ const EventForm = (props: FormData) => {
                             </FormControl>
 
                             <FormControl label='data'>
-                                {config.data_capture_screen && <button className="tracking-tight text-xl sm:text-4xl text-primary mr-5" onClick={() => changeView('data')}>custom</button>}
-                                <input type="checkbox" className="toggle pro toggle-lg" {...register('data_capture_screen')} />
+                                {config.data_capture && <button className="tracking-tight text-xl sm:text-4xl text-primary mr-5" onClick={() => changeView('data')}>custom</button>}
+                                <input type="checkbox" className="toggle pro toggle-lg" {...register('data_capture')} />
                             </FormControl>
 
                             <FormControl label='legal'>
@@ -309,7 +337,7 @@ const EventForm = (props: FormData) => {
                                 <input
                                     className='input pro flex-1'
                                     placeholder='name, email, phone'
-                                    disabled={!config.data_capture_screen}
+                                    disabled={!config.data_capture}
                                     {...register('fields')} />
                             </FormControl>
 
@@ -317,7 +345,7 @@ const EventForm = (props: FormData) => {
                                 <input
                                     className='input pro flex-1'
                                     placeholder='want your content?'
-                                    disabled={!config.data_capture_screen}
+                                    disabled={!config.data_capture}
                                     {...register('data_capture_title')} />
                             </FormControl>
 
@@ -325,7 +353,7 @@ const EventForm = (props: FormData) => {
                                 <input
                                     className='input pro flex-1'
                                     placeholder='enter your info to continue'
-                                    disabled={!config.data_capture_screen}
+                                    disabled={!config.data_capture}
                                     {...register('data_capture_subtitle')} />
                             </FormControl>
                         </div>
@@ -336,20 +364,14 @@ const EventForm = (props: FormData) => {
                     view == 'legal' && (
                         <>
                             <div className='border-t-2 border-white/20'>
-                                <FormControl label='terms/privacy' altLabel='this appears in your web gallery during delivery; format links like <link|https://domain.com>'>
-                                    {/* <label className='label'>
-                            <span className='label-text-alt cursor-pointer text-white/40 hover:text-white transition' onClick={() => setValue('terms_and_conditions', DEFAULT_TERMS)}>Reset</span>
-                        </label> */}
-                                    <textarea className='flex-1 textarea pro w-full leading-[1.1rem]' rows={5} disabled={!config.data_capture_screen} {...register('terms_and_conditions')} />
-                                    {/* <label className='label'>
-                            <span className='label-text text-white'>Note: to insert a link, use the pattern &#60;display text|url&#62;</span>
-                            <label htmlFor='terms-preview-modal' className='label-text-alt cursor-pointer text-white/40 hover:text-white transition'>Preview</label>
-                        </label> */}
+                                <FormControl dir='col' label='terms/privacy' altLabel='this appears in your web gallery during delivery; format links like <link|https://domain.com>'>
+                                    <button className='ml-4 text-primary text-xl mt-3 tracking-tight' onClick={(e) => { e.preventDefault(); setValue('terms_privacy', DEFAULT_TERMS) }}>reset</button>
+                                    <textarea className='flex-1 textarea pro left w-full leading-[1.1rem]' rows={5} {...register('terms_privacy')} />
                                 </FormControl>
                             </div>
                             <div className=''>
                                 <FormControl label='explicit opt-in' altLabel='this shows a checkbox'>
-                                    <input type="checkbox" className="toggle pro toggle-lg" />
+                                    <input type="checkbox" className="toggle pro toggle-lg" {...register('explicit_opt_in')} />
                                 </FormControl>
                             </div>
                         </>
@@ -406,7 +428,7 @@ const EventForm = (props: FormData) => {
             <label htmlFor="terms-preview-modal" className="modal cursor-pointer bg-white/10 mt-0">
                 <label className="modal-box relative bg-black/70 backdrop-blur-sm" htmlFor="">
                     <h3 className="text-lg font-medium">Terms and Conditions Preview</h3>
-                    <p className="py-4 text-white/50">{replaceLinks(config.terms_and_conditions)}</p>
+                    <p className="py-4 text-white/50">{replaceLinks(config.terms_privacy)}</p>
                 </label>
             </label>
         </>

@@ -1,13 +1,12 @@
 import axios from 'axios';
-import type { GetServerSideProps } from 'next';
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import _ from 'lodash';
-import nookies, { parseCookies } from 'nookies'
+import { parseCookies } from 'nookies'
 import EventForm from '@/components/Events/EventForm';
-import useUserStore from '@/store/userStore';
 import withAuth from '@/components/hoc/withAuth';
 import GlobalLayout from '@/components/GlobalLayout';
+import { useRouter } from 'next/router';
 
 interface ResponseData {
     status: number;
@@ -15,31 +14,43 @@ interface ResponseData {
     event: any;
 }
 
+const transformWatermarks = (watermarks: any) => {
+    const arr = [];
+    for (const key in watermarks) {
+      if (Object.hasOwnProperty.call(watermarks, key)) {
+        if (watermarks[key]) {
+            arr.push({title: key, url: watermarks[key]});
+        }
+      }
+    }
+    return arr;
+}
+
 export default withAuth(NewEventPage, 'protected');
 function NewEventPage(props: ResponseData) {
-    const user = useUserStore.useUser();
+    const router = useRouter();
+
     const [view, setView] = useState<'default' | 'data' | 'legal'>('default');
-    const [status, setStatus] = useState<'saving' | 'ready' | 'dirty' | 'success' | string>('ready');
+    const [status, setStatus] = useState<'saving' | 'ready' | 'valid' | 'success' | 'error' | string>('ready');
 
     const [eventData, setEventData] = useState<any>();
 
-    const submitForm = () => {
-        // setSavedChangesStatus('saving');
-        // if (!_.isEmpty(errors)) {
-        //     console.log("submitForm errors", { errors });
-        //     return;
-        // }
+    useEffect(() => {
+        if (eventData?.event_name) setStatus('valid')
+        else setStatus('ready')
+    }, [eventData])
+
+    const submitForm = async () => {
+        setStatus('saving')
 
         console.log("submitForm", { eventData });
         const payload = {
             event: {
                 name: eventData.event_name,
-                party_slug: "",
-                first_starts_at: "",
-                last_ends_at: "",
-                client_id: eventData.client_id,
-                is_private: eventData.is_private,
+                client_id: eventData.org_id,
+                is_private: !eventData.public_gallery,
             },
+            ...(eventData.custom_gallery && { custom_gallery: { logo_image: "" }}),
             microsite: {
                 logo: eventData.logo,
                 background: eventData.background,
@@ -53,23 +64,29 @@ function NewEventPage(props: ResponseData) {
                 terms_privacy: eventData.terms_privacy,
             },
             filter: {
-                id: eventData.filterId
+                id: eventData.filter
             },
-            watermarks: eventData.watermarks,
-            delivery: eventData.delivery ? "mini gallery" : ""
+            watermarks: transformWatermarks(eventData.watermarks),
+            delivery: eventData.qr_delivery ? "qr_gallery" : "qr"
         }
 
-        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events`;
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events`;
         const token = parseCookies().hypno_token;
-        return axios.post(url, payload, {
+        await axios.post(url, payload, {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: 'Bearer ' + token,
             },
-        })
+        }).then(async (res) => {
+            setStatus('success');
+            const data = await res.data;
+            const editEventUrl = `/e/${data.event.id}/edit`
+            router.push(editEventUrl);
+        }).catch((e) => {
+            console.log(e)
+            setStatus('error');
+        });
     }
-
-    console.log(eventData)
 
     return (
         <>
@@ -82,21 +99,20 @@ function NewEventPage(props: ResponseData) {
                     returnLink={view == 'default' ? { slug: '/dashboard', name: 'dashboard' } : undefined}
                     returnAction={view !== 'default' ? { onClick: () => setView('default'), name: 'new event' } : undefined}
                 >
-                    {!eventData?.event_name ? (
-                        <h2>ready for changes</h2>
-                    ) : (
+                    {status == 'ready' && <h2>ready for changes</h2>}
+                    {status == 'valid' &&
                         <button className='tracking-tight' onClick={submitForm}>
                             <h2 className={'text-primary'}>create</h2>
                         </button>
-                    )}
-
+                    }
+                    {status == 'error' && <h2 className='text-red-500'>oops! error...</h2>}
+                    {status == 'success' && <h2 className='text-primary'>success!</h2>}
+                    {status == 'saving' && <h2 className='text-white'>saving...</h2>}
                 </GlobalLayout.Header>
                 <GlobalLayout.Content>
                     <EventForm
                         view={view}
                         changeView={(view) => setView(view)}
-                        event={props.event}
-                        onSubmit={submitForm}
                         updateData={(data) => setEventData(data)}
                     />
                 </GlobalLayout.Content>

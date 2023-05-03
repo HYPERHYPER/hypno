@@ -137,6 +137,10 @@
     @apply bg-transparent active:border-none text-right text-xl sm:text-4xl text-primary outline-none h-auto
   }
 
+  .textarea.pro.left {
+    @apply text-left
+  }
+
   .select.pro {
     @apply h-auto bg-transparent active:border-none outline-none min-h-fit
   }

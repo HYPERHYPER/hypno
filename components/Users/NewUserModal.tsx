@@ -9,7 +9,7 @@ export default function NewUserModal() {
                     <input className='input pro' />
                 </FormControl>
                 <FormControl label='role'>
-                    <div className='flex gap-3 text-4xl'>
+                    <div className='flex gap-3 text-xl sm:text-4xl'>
                         <span className='text-primary'>member</span>
                         <span className='text-primary/40'>admin</span>
                     </div>

@@ -46,7 +46,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
             <div
                 style={{ height }}
                 className={`absolute top-1/2 left-0 right-0 -translate-y-1/2 sm:mx-auto h-[${height}] px-[25px] md:px-[90px] flex flex-1 flex-col justify-center items-center`}>
-                <div style={{ aspectRatio }} className='relative bg-white/10 backdrop-blur-[50px]'>
+                <div style={{ aspectRatio }} className='relative backdrop-blur-[50px]'>
                     <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
                         <Spinner />
                     </div>

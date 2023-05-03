@@ -25,7 +25,6 @@ function EventPage(props: ResponseData) {
     const { event, photos } = props;
     const { name, id } = event;
 
-    console.log(event)
     return (
         <>
             <Head>

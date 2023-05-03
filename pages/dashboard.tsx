@@ -14,6 +14,7 @@ import NewUserModal from '@/components/Users/NewUserModal';
 import { fetchWithToken } from '@/lib/fetchWithToken';
 import useSWRInfinite from 'swr/infinite';
 import Spinner from '@/components/Spinner';
+import { LoadingGrid } from '@/components/Gallery/LoadingAsset';
 
 interface ResponseData {
     events: any;
@@ -71,8 +72,11 @@ function DashboardPage(props: ResponseData) {
                         next={() => setSize(_.last(data).meta.next_page)}
                         hasMore={size != meta.total_pages}
                         dataLength={paginatedEvents?.length}    
-                        loader={<div className='relative rounded-box animate-pulse bg-white/30 w-full aspect-[2/3]' />
-                    }               
+                        loader={
+                            <div className='mt-5 lg:mt-10 grid grid-cols-2 sm:grid-cols-3 gap-5 lg:grid-cols-4 lg:gap-10 xl:grid-cols-5 3xl:grid-cols-6'>
+                                <LoadingGrid count={10} />
+                            </div>
+                        }               
                     >
                     <div className='grid grid-cols-2 sm:grid-cols-3 gap-5 lg:grid-cols-4 lg:gap-10 xl:grid-cols-5 3xl:grid-cols-6'>
                         {!_.isEmpty(paginatedEvents) ? _.map(paginatedEvents, (event, i) => (
