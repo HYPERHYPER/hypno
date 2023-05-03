@@ -8,6 +8,7 @@ import { Footer } from '@/components/Footer';
 import DetailView from '@/components/Gallery/DetailView';
 import { getPlaiceholder } from 'plaiceholder';
 import { CustomGallery } from '@/components/Gallery/CustomGallery';
+import GlobalLayout from '@/components/GlobalLayout';
 
 type ImageData = {
     id: number;
@@ -135,11 +136,15 @@ const DetailGallery = (props: ResponseData) => {
                 <meta name="og:video:type" content='video/mp4' />
             </Head>
 
-            <CustomGallery event={event}>
-                {/* <GalleryNavBar name={galleryTitle} gallerySlug={String(photo?.event_id)} /> */}
+            <GlobalLayout>
+                <GlobalLayout.Content>
                     <DetailView asset={photo} config={{ aiGeneration }} imageProps={imageProps} />
-                {/* <Footer /> */}
-            </CustomGallery>
+                </GlobalLayout.Content>
+            </GlobalLayout>
+
+            {/* <CustomGallery event={event}>
+                    <DetailView asset={photo} config={{ aiGeneration }} imageProps={imageProps} />
+            </CustomGallery> */}
         </>
     );
 };
