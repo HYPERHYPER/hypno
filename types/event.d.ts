@@ -9,11 +9,14 @@ export type EventMicrosite = {
     enable_legal?: boolean;
     explicit_opt_in?: boolean;
     terms_privacy?: string;
+    email_delivery?: boolean;
+    ai_generation?: any;
 } | any;
 
 export type EventConfig = {
     id?: number;
     name?: string;
+    party_slug?: string;
     client_id?: number;
     terms_and_conditions?: string;
     is_private?: boolean;

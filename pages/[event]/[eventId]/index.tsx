@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 import type { GetServerSideProps } from 'next';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { toTextColor } from '@/helpers/color';
 import Spinner from '@/components/Spinner';
@@ -22,6 +22,7 @@ import useContentHeight from '@/hooks/useContentHeight';
 import { CountrySelect } from '@/components/DataCapture/CountrySelect';
 import { DateInput } from '@/components/DataCapture/DateInput';
 import { formatDate } from '@/helpers/date';
+import { EventConfig, EventMicrosite } from '@/types/event';
 
 type ImageData = {
     id: number;
@@ -55,26 +56,6 @@ type ImageData = {
     height: number;
 };
 
-type EventData = {
-    name: string;
-    fields: string[];
-    gallery_title: string;
-    gallery_subtitle: string;
-    data_capture_title: string;
-    data_capture_subtitle: string;
-    data_capture_screen: boolean;
-    terms: string;
-    privacy: string;
-    logo: string;
-    background: string;
-    color: string;
-    terms_and_conditions: string;
-    email_delivery: boolean;
-    ai_generation: any;
-    party_slug: string;
-    public_gallery: boolean;
-}
-
 interface ResponseData {
     status: number;
     message: string;
@@ -82,7 +63,7 @@ interface ResponseData {
     returned: number;
     pages: number;
     photos: ImageData[];
-    event: EventData;
+    event: EventConfig;
     photo: ImageData;
     placeholder: any;
 }
@@ -91,6 +72,7 @@ const SubGallery = (props: ResponseData) => {
     const outerHeight = useContentHeight({ footer: false });
     const contentHeight = useContentHeight({ footer: true });
     const { event, photos: initialPhotos, count, photo, placeholder } = props;
+    const gallery : EventMicrosite = event.metadata;
     const { query: { category, eventId, event: galleryViewSlug } } = useRouter()
 
     const [photoUploadPending, setPhotoUploadPending] = useState<boolean>(true); // waiting for first photo to arrive
@@ -104,7 +86,7 @@ const SubGallery = (props: ResponseData) => {
         })
     let photos: ImageData[] = data?.photos || [];
     const singleAsset: ImageData | null = photo;
-    const isDetailView = !_.isEmpty(photo) && !event.email_delivery;
+    const isDetailView = !_.isEmpty(photo) && !gallery.email_delivery;
 
     const expectedPhotoUploads = _.get(_.first(photos)?.metadata, 'category_count') || count;
     const uploadingCount = expectedPhotoUploads - photos.length;
@@ -114,23 +96,22 @@ const SubGallery = (props: ResponseData) => {
     }, [photos, expectedPhotoUploads])
 
     /* Setting up the data capture form for the gallery. */
-    const [dataCapture, setDataCapture] = useState<boolean>(event.data_capture_screen || event.email_delivery);
-    const fields = _.map(event.fields, (f) => ({ id: f.toLowerCase().replaceAll(" ", "_"), name: f }));
+    const [dataCapture, setDataCapture] = useState<boolean>(gallery.data_capture || gallery.email_delivery);
+    const fields = _.map(gallery.fields, (f) => ({ id: f.toLowerCase().replaceAll(" ", "_"), name: f }));
     const {
         register,
         handleSubmit,
         formState: { errors },
         watch,
     } = useForm();
-    // let acceptTermsRef = useRef<HTMLInputElement>(null);
+    let acceptTermsRef = useRef<HTMLInputElement>(null);
     const formData = watch();
 
     const submitDataCapture = async (data: any) => {
-        // const userAcceptedTerms = acceptTermsRef?.current?.checked;
-        const userAcceptedTerms = true;
+        const userAcceptedTerms = gallery.explicit_opt_in ? acceptTermsRef?.current?.checked : true;
         if (!_.isEmpty(errors) || !userAcceptedTerms) {
             console.log("submitDataCapture errors", { errors });
-            // console.log("acceptTerms", acceptTermsRef?.current?.checked);
+            console.log("acceptTerms", acceptTermsRef?.current?.checked);
             return;
         }
 
@@ -138,8 +119,8 @@ const SubGallery = (props: ResponseData) => {
 
         /* Save data capture to metadata field of first photo in category */
         /* unless is just email delivery */
-        const photoSlug = event.email_delivery ? photo.slug : _.first(photos)?.slug;
-        let metadata = event.email_delivery ? photo.metadata : _.first(photos)?.metadata || {};
+        const photoSlug = gallery.email_delivery ? photo.slug : _.first(photos)?.slug;
+        let metadata = gallery.email_delivery ? photo.metadata : _.first(photos)?.metadata || {};
 
         if (data.birthday) {
             data.birthday = formatDate(data.birthday);
@@ -149,9 +130,9 @@ const SubGallery = (props: ResponseData) => {
             ...data,
         }
 
-        const url = event.email_delivery ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/deliver/${photoSlug}.json` : `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/${photoSlug}.json`;
+        const url = gallery.email_delivery ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/deliver/${photoSlug}.json` : `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/${photoSlug}.json`;
         const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-        const payload = event.email_delivery ? { email: data.email } : { metadata };
+        const payload = gallery.email_delivery ? { email: data.email } : { metadata };
         let resp = await axios.put(url, payload, {
             headers: {
                 'Content-Type': 'application/json',
@@ -187,12 +168,12 @@ const SubGallery = (props: ResponseData) => {
 
             <CustomGallery event={event}>
                 {isDetailView ? (
-                    <DetailView asset={photo} config={{ aiGeneration: event.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
+                    <DetailView asset={photo} config={{ aiGeneration: gallery.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
                 ) : (
                     <div
                         style={{ height: outerHeight }}
                         className={`sm:mx-auto h-[calc(100vh-85px-env(safe-area-inset-bottom))] w-full`}>
-                        {(!photos.length && !event.email_delivery) ? (
+                        {(!photos.length && !gallery.email_delivery) ? (
                             <div className='fixed hero top-0 left-0 h-screen p-10'>
                                 <div className='hero-content max-w-[24rem] sm:max-w-2xl flex flex-row gap-4 items-center justify-center bg-white/10 backdrop-blur-[50px] p-8'>
                                     <Spinner />
@@ -207,16 +188,16 @@ const SubGallery = (props: ResponseData) => {
                                     <div className='sm:max-w-2xl py-2 sm:px-10 mx-auto'>
                                         <div className='flex flex-col text-center'>
                                             <div className='mb-4'>
-                                                <h2>{event.data_capture_title || 'want your photos?'}</h2>
-                                                <h2 className='text-white/50'>{event.data_capture_subtitle || 'add your info to continue...'}</h2>
+                                                <h2>{gallery.data_capture_title || 'want your photos?'}</h2>
+                                                <h2 className='text-white/50'>{gallery.data_capture_subtitle || 'add your info to continue...'}</h2>
                                             </div>
                                             <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
                                                 {fields?.map((v, i) => {
                                                     if (v.id == 'country') {
-                                                        return <CountrySelect key={i} error={!_.isEmpty(errors[v.id])} placeholder={v.name} {...register(v.id, {required: true})} />
+                                                        return <CountrySelect key={i} error={!_.isEmpty(errors[v.id])} placeholder={v.name} {...register(v.id, { required: true })} />
                                                     }
                                                     if (v.id == 'birthday') {
-                                                        return <DateInput key={i} hasvalue={!_.isEmpty(formData[v.id])} placeholder={v.name} error={!_.isEmpty(errors[v.id])} {...register(v.id, {required: true, valueAsDate: true})} />
+                                                        return <DateInput key={i} hasvalue={!_.isEmpty(formData[v.id])} placeholder={v.name} error={!_.isEmpty(errors[v.id])} {...register(v.id, { required: true, valueAsDate: true })} />
                                                     }
                                                     return (
                                                         <input
@@ -231,13 +212,15 @@ const SubGallery = (props: ResponseData) => {
                                                         />
                                                     )
                                                 })}
-                                                <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
-                                                    {/* <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} /> */}
-                                                    <p className='text-xs text-white/50'>
-                                                        {replaceLinks(event.terms_and_conditions)}
-                                                    </p>
-                                                </div>
-                                                <input className='btn btn-primary btn-gallery locked sm:block' type='submit' value='continue →' style={event.color ? { backgroundColor: event.color, borderColor: event.color, color: toTextColor(event.color) } : {}} />
+                                                {gallery.enable_legal && (
+                                                    <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
+                                                        {gallery.explicit_opt_in && <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} />}
+                                                        <p className='text-xs text-white/50'>
+                                                            {replaceLinks(gallery.terms_privacy)}
+                                                        </p>
+                                                    </div>
+                                                )}
+                                                <input className='btn btn-primary btn-gallery locked sm:block' type='submit' value='continue →' style={gallery.color ? { backgroundColor: gallery.color, borderColor: gallery.color, color: toTextColor(gallery.color) } : {}} />
                                             </form>
                                         </div>
                                     </div>
@@ -291,7 +274,7 @@ const SubGallery = (props: ResponseData) => {
                                 </div>
                             )
                                 : (
-                                    event.email_delivery ? (
+                                    gallery.email_delivery ? (
                                         <div className='fixed hero top-0 left-0 h-screen p-10'>
                                             <div className='hero-content max-w-[24rem] sm:max-w-2xl flex flex-row gap-4 items-center bg-white/10 backdrop-blur-[50px] p-8'>
                                                 <span className='flex-1'><Letter /></span>
@@ -299,7 +282,7 @@ const SubGallery = (props: ResponseData) => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <DetailView asset={_.first(photos)} config={{ aiGeneration: event.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64, width: _.first(photos)?.width, height: _.first(photos)?.height }} />
+                                        <DetailView asset={_.first(photos)} config={{ aiGeneration: gallery.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64, width: _.first(photos)?.width, height: _.first(photos)?.height }} />
                                     )
                                 ))
                         }
@@ -372,9 +355,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             event: {
                 name: eventData.name,
                 id: eventData.id,
-                ...eventData.metadata,
-                terms_and_conditions: eventData.terms_and_conditions,
                 party_slug: eventData.party_slug,
+                client_id: eventData.client_id,
+                is_private: eventData.is_private,
+                metadata: eventData.metadata,
             }
         }
     }

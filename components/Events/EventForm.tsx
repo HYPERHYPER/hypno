@@ -31,6 +31,7 @@ const AspectRatioWatermark = (ar: string): ('watermarks.9:16' | 'watermarks.2:3'
 
 const EventForm = (props: FormData) => {
     const { onSubmit, event, view, changeView, updateData, updateStatus } = props;
+    console.log(event)
     const user = useUserStore.useUser();
     const {
         register,
@@ -105,13 +106,13 @@ const EventForm = (props: FormData) => {
         const payload = {
             metadata: { ...eventMetadata }, terms_and_conditions
         }
-        onSubmit && onSubmit(payload).then((e) => {
-            console.log(e)
-            updateStatus && updateStatus('success');
-            reset(...data)
-        }).catch((e) => {
-            console.log(e)
-        });
+        // onSubmit && onSubmit(payload).then((e) => {
+        //     console.log(e)
+        //     updateStatus && updateStatus('success');
+        //     reset(...data)
+        // }).catch((e) => {
+        //     console.log(e)
+        // });
     }
 
     const debouncedSave = useCallback(
@@ -157,7 +158,7 @@ const EventForm = (props: FormData) => {
 
                         <FormControl label='organization'>
                             {event ?
-                                <div className='lowercase text-xl sm:text-4xl'>{user.organization.name}</div>
+                                <div className='lowercase text-xl sm:text-4xl'>{event.organization.name}</div>
                                 : (
                                     <select className='select font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl'>
                                         <option value={user.organization.id}>{user.organization.name}</option>

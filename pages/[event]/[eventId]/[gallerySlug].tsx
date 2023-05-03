@@ -7,6 +7,7 @@ import useSWRInfinite from 'swr/infinite';
 import { fetchWithToken } from '@/lib/fetchWithToken';
 import { CustomGallery } from '@/components/Gallery/CustomGallery';
 import InfiniteMediaGrid from '@/components/Gallery/InfiniteMediaGrid';
+import { EventConfig } from '@/types/event';
 
 type ImageData = {
     id: number;
@@ -39,25 +40,6 @@ type ImageData = {
     height: number;
 };
 
-type EventData = {
-    name: string;
-    fields: string[];
-    gallery_title: string;
-    gallery_subtitle: string;
-    data_capture_title: string;
-    data_capture_subtitle: string;
-    data_capture_screen: boolean;
-    terms: string;
-    privacy: string;
-    logo: string;
-    background: string;
-    color: string;
-    terms_and_conditions: string;
-    email_delivery: boolean;
-    ai_generation: any;
-    metadata: any;
-}
-
 interface ResponseData {
     status: number;
     message: string;
@@ -65,7 +47,7 @@ interface ResponseData {
     returned: number;
     pages: number;
     photos: ImageData[];
-    event: EventData;
+    event: EventConfig;
 }
 
 const PublicGallery = (props: ResponseData) => {
@@ -158,7 +140,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 Authorization: 'Bearer ' + token,
             },
         });
-        eventData = await eventRes.data?.event.metadata;
+        eventData = await eventRes.data?.event;
     });
 
     // @ts-ignore
