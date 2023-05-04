@@ -134,7 +134,7 @@
   }
 
   .input.pro, .textarea.pro {
-    @apply bg-transparent active:border-none text-right text-xl sm:text-4xl text-primary outline-none h-auto
+    @apply bg-transparent active:border-none text-right text-xl sm:text-4xl text-primary outline-none h-auto flex-1
   }
 
   .textarea.pro.left {
