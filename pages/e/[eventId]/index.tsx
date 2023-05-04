@@ -54,7 +54,7 @@ function EventPage(props: ResponseData) {
                     <div className='divider' />
                     <div className='grid grid-cols-2 sm:grid-cols-3 gap-5 lg:grid-cols-4 lg:gap-10 xl:grid-cols-5 3xl:grid-cols-6'>
                         {_.map(photos.photos, (p, i) => (
-                            <Link href={`/i/${p.slug}`} key={i} className='rounded-box'>
+                            <div key={i} className='rounded-box'>
                                 <div className='group relative rounded-box bg-white/10 w-full aspect-[2/3] overflow-hidden'>
                                     <div className='absolute inset-0 hover:scale-110 transition rounded-box'>
                                         {/* <div
@@ -84,8 +84,8 @@ function EventPage(props: ResponseData) {
                                             <button><Trash /></button>
                                             <button><Hide /></button>
                                             <button><Favorite /></button>
-                                            <button><Save /></button>
-                                            <button><Share /></button>
+                                            <a href={p.download_url}><Save /></a>
+                                            <Link href={`/i/${p.slug}`}><Share /></Link>
                                         </div>
 
                                         {p.gif && (
@@ -95,7 +95,7 @@ function EventPage(props: ResponseData) {
                                         )}
                                     </div>
                                 </div>
-                            </Link>
+                            </div>
                         ))}
                     </div>
                 </GlobalLayout.Content>
