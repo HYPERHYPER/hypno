@@ -15,11 +15,47 @@ import Share from 'assets/icons/share.svg'
 import Save from 'assets/icons/save.svg'
 import Play from 'assets/icons/play.svg'
 import { getPlaiceholder } from 'plaiceholder';
+import { useEffect, useState } from 'react';
+
+type PhotosResponse = {
+    photos: any;
+    meta: {
+        total_count: number,
+        next_page?: number,
+        per_page?: number,
+    }
+}
 
 interface ResponseData {
     event: any;
-    photos: any;
+    photos: PhotosResponse;
 }
+
+// function GridImage({ src, alt, priority }: { src: string, alt: string, priority?: boolean }) {
+//     const [blurDataURL, setBlurDataURL] = useState<string>('');
+
+//     useEffect(() => {
+//         const getBlurDataUrl = async () => {
+//             const res = await fetch(`/api/image?url=${src}`);
+//             const placeholderData = await res.json();
+//             setBlurDataURL(placeholderData.base64);
+//         }
+
+//         getBlurDataUrl();
+//     }, [])
+
+//     return (
+//         <Image
+//             className='absolute top-0 left-0 w-full h-full rounded-box object-cover'
+//             priority={priority}
+//             src={src}
+//             fill
+//             alt={alt}
+//             placeholder={blurDataURL ? 'blur' : 'empty'}
+//             blurDataURL={blurDataURL || undefined}
+//         />
+//     )
+// }
 
 function EventPage(props: ResponseData) {
     const { event, photos } = props;
@@ -44,7 +80,7 @@ function EventPage(props: ResponseData) {
                         </div>
                     }
                 >
-                    <h2>{photos.count} posts</h2>
+                    <h2>{photos.meta.total_count} posts</h2>
                     <Link href={`/e/${id}`}><h2 className='text-white'>all</h2></Link>
                     <Link href=''><h2 className='text-primary'>favorites</h2></Link>
                     <Link href=''><h2 className='text-primary'>data</h2></Link>
@@ -64,7 +100,7 @@ function EventPage(props: ResponseData) {
                                         <Image
                                             className='absolute top-0 left-0 w-full h-full rounded-box object-cover'
                                             priority={Number(i) < 10}
-                                            src={p.gif ? p.posterframe : p.jpeg_thumb_url}
+                                            src={p.posterframe}
                                             fill
                                             alt={p.event_name + p.id}
                                             placeholder={p.blurDataURL ? 'blur' : 'empty'}
@@ -107,46 +143,44 @@ function EventPage(props: ResponseData) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const { eventId } = context.query;
 
-    // Fetch event config
-    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}`;
+    // Fetch event config + event photos
+    const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}`;
+    const photosUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}/photos`;
     const token = nookies.get(context).hypno_token;
     let eventData: any = {};
     let photosData: any = {};
-    await axios.get(url, {
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + token,
-        },
-    }).then(async (res) => {
-        if (res.status === 200) {
-            eventData = await res.data;
-            const eventSlug = eventData.event.party_slug;
 
-            // Fetch event photos
-            const photosUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${eventSlug}/photos.json`;
-            await axios.get(photosUrl, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: 'Bearer ' + token,
-                },
-            }).then(async (photosRes) => {
-                if (photosRes.status === 200) {
-                    const photos = await Promise.all(
-                        photosRes.data.photos.map(async (photo: any) => {
-                            const placeholder = await getPlaiceholder(photo.jpeg_url);
-                            return {
-                                ...photo,
-                                blurDataURL: placeholder.base64,
-                            };
-                        })
-                    );
-                    photosData = { ...photosRes.data, photos };
-                }
+    const [eventRes, photosRes] = await Promise.all([
+        axios.get(eventUrl, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
+            }
+        }),
+        axios.get(photosUrl, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
+            }
+        })
+    ])
+
+    if (eventRes.status === 200) {
+        eventData = await eventRes.data;
+    }
+
+    if (photosRes.status === 200) {
+        const photos = await Promise.all(
+            photosRes.data.photos.map(async (photo: any) => {
+                const placeholder = await getPlaiceholder(photo.posterframe);
+                return {
+                    ...photo,
+                    blurDataURL: placeholder.base64,
+                };
             })
-        }
-    }).catch((e) => {
-        console.log(e);
-    })
+        );
+        photosData = { ...photosRes.data, photos };
+    }
 
     if (_.isEmpty(eventData)) {
         return {

@@ -1,9 +1,7 @@
 import { Footer } from '@/components/Footer'
 import Head from 'next/head'
-import Image from 'next/image'
 import { useForm } from 'react-hook-form';
 import _ from 'lodash';
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import useUserStore from '@/store/userStore';
@@ -17,7 +15,6 @@ import { ThreeDots } from 'react-loader-spinner';
 export default withAuth(LoginPage, 'auth');
 function LoginPage() {
     const login = useUserStore.useLogin();
-    const user = useUserStore.useUser();
     const error = useUserStore.useError();
 
     const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
