@@ -4,12 +4,14 @@ import Image from 'next/image'
 import { useForm } from 'react-hook-form';
 import _ from 'lodash';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import useUserStore from '@/store/userStore';
 import withAuth from '@/components/hoc/withAuth';
 import GlobalLayout from '@/components/GlobalLayout';
 import FormControl from '@/components/Form/FormControl';
+import clsx from 'clsx';
+import { ThreeDots } from 'react-loader-spinner';
 
 
 export default withAuth(LoginPage, 'auth');
@@ -35,8 +37,11 @@ function LoginPage() {
 
         console.log("submitLogin", { data });
         login(data.email, data.password);
-        setIsLoggingIn(false);
     }
+
+    useEffect(() => {
+        setIsLoggingIn(false);
+    }, [error]);
 
     return (
         <>
@@ -51,8 +56,8 @@ function LoginPage() {
                     <div className='hero min-h-screen'>
                         <div className='hero-content sm:max-w-2xl w-full flex-col items-start space-y-9'>
                             <div className='space-y-3'>
-                            <h1 className='text-white'>login</h1>
-                            <div><Link href='/signup' className='text-primary hover:underline transition text-3xl'>don&apos;t have an account yet?</Link></div>
+                                <h1 className='text-white'>login</h1>
+                                <div><Link href='/signup' className='text-primary hover:underline transition text-3xl'>don&apos;t have an account yet?</Link></div>
                             </div>
                             <form className='flex flex-col w-full border-t-2 border-white/20' onSubmit={handleSubmit(submitLogin)}>
                                 <FormControl label='email'>
@@ -77,9 +82,20 @@ function LoginPage() {
                                     />
                                 </FormControl>
 
-                                <input type='submit' value='ok' className='btn btn-primary rounded-lg mt-10 text-4xl h-[80px]' />
+                                <input type='submit' value='ok' className={clsx('btn btn-primary rounded-lg mt-10 text-4xl h-[80px]', isLoggingIn && 'hidden')} />
+                                {isLoggingIn && <button disabled className='btn btn-primary rounded-lg mt-10 text-4xl h-[80px]'>
+                                    <ThreeDots
+                                        height="20"
+                                        width="50"
+                                        radius="4"
+                                        color="#FFF"
+                                        ariaLabel="three-dots-loading"
+                                        visible={true}
+                                    />
+                                </button>}
+
                             </form>
-                            
+
                             {error && (
                                 <div className="alert alert-error justify-center mt-3">
                                     <div className='font-medium'>
