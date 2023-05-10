@@ -116,7 +116,7 @@ function EventPage(props: ResponseData) {
                                     <div
                                         style={{ background: '-webkit-linear-gradient(top, rgba(0,0,0,0.65), rgba(0,0,0,0))' }}
                                         className='opacity-0 group-hover:opacity-100 transition-opacity absolute top-0 left-0 w-full h-full z-10 p-5 rounded-box'>
-                                        <div className='flex flex-row justify-between text-white'>
+                                        <div className='flex flex-row justify-end text-white'>
                                             {/* <button><Trash /></button> */}
                                             {/* <button><Hide /></button> */}
                                             {/* <button><Favorite /></button> */}
