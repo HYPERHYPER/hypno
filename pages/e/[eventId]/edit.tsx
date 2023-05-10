@@ -7,6 +7,7 @@ import nookies, { parseCookies } from 'nookies'
 import EventForm from '@/components/Events/EventForm';
 import GlobalLayout from '@/components/GlobalLayout';
 import withAuth from '@/components/hoc/withAuth';
+import { EventMicrosite } from '@/types/event';
 
 interface ResponseData {
     status: number;
@@ -14,10 +15,19 @@ interface ResponseData {
     event: any;
 }
 
+const isCustomGallery = (metadata: EventMicrosite) => {
+    const { logo, color, background, enable_legal, data_capture } = metadata;
+    const customGalleryConfig = {
+        logo, color, background, enable_legal, data_capture
+    }
+    return _.some(customGalleryConfig, _.identity);
+}
+
 const EditEventPage = (props: ResponseData) => {
     const { event: {
         id,
         name,
+        metadata
     } } = props;
 
     const [view, setView] = useState<'default' | 'data' | 'legal'>('default');
@@ -32,6 +42,7 @@ const EditEventPage = (props: ResponseData) => {
         const micrositeKeys = ['logo', 'background', 'color', 'data_capture', 'fields', 'data_capture_title', 'data_capture_subtitle', 'enable_legal', 'explicit_opt_in', 'terms_privacy', 'email_delivery', 'ai_generation'];
         let filter: any = {};
         let delivery: string = '';
+        let custom_gallery = isCustomGallery(metadata);
 
         // Build event payload - any field that's not watermark
         // Build watermark payload in seperate reqs by watermark_id
@@ -45,7 +56,6 @@ const EditEventPage = (props: ResponseData) => {
                     filter = {id: field[key]}
                 }
                 if (_.includes(micrositeKeys, key)) {
-                    console.log('hereeee', key)
                     microsite[key] = field[key]
                 }
                 if (_.includes(eventKeys, key)) {
@@ -54,12 +64,25 @@ const EditEventPage = (props: ResponseData) => {
                 if (key == 'watermark') {
                     payloadArr.push(field);
                 }
+                if (key == 'custom_gallery') {
+                    custom_gallery = field[key];
+                }
             }
         })
 
+        if (!custom_gallery) {
+            microsite = {
+                logo: '',
+                background: '',
+                color: '',
+                enable_legal: false,
+                data_capture: false,
+            }
+        }
+        
         const eventPayload = {
             ...(!_.isEmpty(event) && { event }),
-            ...(!_.isEmpty(microsite)&& { microsite }),
+            ...(!_.isEmpty(microsite) && { microsite }),
             ...(!_.isEmpty(filter) && { filter }),
             ...(delivery && { delivery }),
         }
