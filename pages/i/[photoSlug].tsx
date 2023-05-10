@@ -136,15 +136,15 @@ const DetailGallery = (props: ResponseData) => {
                 <meta name="og:video:type" content='video/mp4' />
             </Head>
 
-            <GlobalLayout>
+            {/* <GlobalLayout>
                 <GlobalLayout.Content>
                     <DetailView asset={photo} config={{ aiGeneration }} imageProps={imageProps} />
                 </GlobalLayout.Content>
-            </GlobalLayout>
+            </GlobalLayout> */}
 
-            {/* <CustomGallery event={event}>
-                    <DetailView asset={photo} config={{ aiGeneration }} imageProps={imageProps} />
-            </CustomGallery> */}
+            <CustomGallery event={event}>
+                <DetailView asset={photo} config={{ aiGeneration }} imageProps={imageProps} />
+            </CustomGallery>
         </>
     );
 };
@@ -164,7 +164,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         },
     }).then(async (res) => {
         photoData = res.data;
-        const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${res.data.photo.event_id}.json`;
+        const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${res.data.photo.event_id}`;
         let eventRes = await axios.get(eventUrl, {
             headers: {
                 'Content-Type': 'application/json',
