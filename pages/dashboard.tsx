@@ -58,10 +58,10 @@ function DashboardPage(props: ResponseData) {
                     title='dashboard'
                 >
                     <Link href='/e/new' className='text-primary'><h2>new event</h2></Link>
-                    <Modal.Trigger id='new-user-modal'><h2 className='text-primary cursor-pointer'>new user</h2></Modal.Trigger>
+                    {/* <Modal.Trigger id='new-user-modal'><h2 className='text-primary cursor-pointer'>new user</h2></Modal.Trigger> */}
                 </GlobalLayout.Header>
 
-                <NewUserModal />
+                {/* <NewUserModal /> */}
 
                 <GlobalLayout.Content>
                     <div className='divider mt-0 h-1' />

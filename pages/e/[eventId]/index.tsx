@@ -82,8 +82,8 @@ function EventPage(props: ResponseData) {
                 >
                     <h2>{photos.meta.total_count} posts</h2>
                     <Link href={`/e/${id}`}><h2 className='text-white'>all</h2></Link>
-                    <Link href=''><h2 className='text-primary'>favorites</h2></Link>
-                    <Link href=''><h2 className='text-primary'>data</h2></Link>
+                    {/* <Link href=''><h2 className='text-primary'>favorites</h2></Link> */}
+                    {/* <Link href=''><h2 className='text-primary'>data</h2></Link> */}
                     <Link href={`/e/${id}/edit`}><h2 className='text-primary'>edit</h2></Link>
                 </GlobalLayout.Header>
                 <GlobalLayout.Content>
@@ -117,10 +117,10 @@ function EventPage(props: ResponseData) {
                                         style={{ background: '-webkit-linear-gradient(top, rgba(0,0,0,0.65), rgba(0,0,0,0))' }}
                                         className='opacity-0 group-hover:opacity-100 transition-opacity absolute top-0 left-0 w-full h-full z-10 p-5 rounded-box'>
                                         <div className='flex flex-row justify-between text-white'>
-                                            <button><Trash /></button>
-                                            <button><Hide /></button>
-                                            <button><Favorite /></button>
-                                            <a href={p.download_url}><Save /></a>
+                                            {/* <button><Trash /></button> */}
+                                            {/* <button><Hide /></button> */}
+                                            {/* <button><Favorite /></button> */}
+                                            {/* <a href={p.download_url}><Save /></a> */}
                                             <Link href={`/i/${p.slug}`}><Share /></Link>
                                         </div>
 
