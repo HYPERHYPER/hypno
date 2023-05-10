@@ -223,6 +223,10 @@ a {
   box-shadow: calc(40px) 0 0 2px #00FF99 inset, 0 0 0 2px #00FF99 inset, 0 0;
 }
 
+.toggle.pro:disabled {
+  opacity: 0.5;
+}
+
 input[type="date"] {
   width: 100%;
   -webkit-appearance: none;

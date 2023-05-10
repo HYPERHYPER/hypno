@@ -43,8 +43,9 @@ export const replaceLinks = (text: string): any => {
  * @returns the filename extracted from the input URL
  */
 export const getFilename = (url: string): any => {
+    if (!url) return "";
     // Split the URL by "/"
-    const url_parts = url.split("/")
+    const url_parts = String(url).split("/")
     // The last part of the URL should be the filename
     const filename = url_parts[url_parts.length - 1]
     

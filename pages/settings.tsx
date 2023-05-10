@@ -9,6 +9,7 @@ import FormControl from '@/components/Form/FormControl';
 import { parseCookies } from 'nookies';
 import axios from 'axios';
 import { useRef } from 'react';
+import clsx from 'clsx';
 
 export default withAuth(SettingsPage, 'protected');
 function SettingsPage() {
@@ -90,7 +91,7 @@ const Item = ({ name, value, href, modalId }: { name: string, value: string, hre
     return (
         <div className='item'>
             <span className='text-white/40'>{name}</span>
-            <label htmlFor={modalId} className='text-primary lowercase'>
+            <label htmlFor={modalId} className={clsx('text-primary lowercase', modalId && 'cursor-pointer')}>
                 {href ? <Link href={href}>{value}</Link> : value}
             </label>
         </div>

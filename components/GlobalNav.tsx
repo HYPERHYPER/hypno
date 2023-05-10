@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import clsx from 'clsx';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import useUserStore from '@/store/userStore';
 import { useRouter } from 'next/router';
 
@@ -16,7 +16,6 @@ export function GlobalNav() {
     const [isOpen, setIsOpen] = useState(false);
     const close = () => setIsOpen(false);
 
-    if (typeof window === 'undefined') return null;
     return (
         <div 
             className="fixed top-0 left-0 right-0 z-10 flex flex-row justify-between w-full py-2 sm:py-6 px-5 sm:px-8"
@@ -40,7 +39,7 @@ export function GlobalNav() {
                     // hidden: !isOpen,
                 })}
             >
-                {user && (
+                {typeof window !== 'undefined' && user && (
                     <nav className="h-full flex flex-row items-center gap-3 sm:gap-5 tracking-tight">
                         <GlobalNavItem key='dashboard' item={{ slug: 'dashboard', name: 'dashboard' }} close={close} />
                         <GlobalNavItem key='settings' item={{ slug: 'settings', name: 'settings' }} close={close} />

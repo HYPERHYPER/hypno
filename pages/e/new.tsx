@@ -7,6 +7,8 @@ import EventForm from '@/components/Events/EventForm';
 import withAuth from '@/components/hoc/withAuth';
 import GlobalLayout from '@/components/GlobalLayout';
 import { useRouter } from 'next/router';
+import { toHexCode } from '@/helpers/color';
+import { EventPayload } from '@/types/event';
 
 interface ResponseData {
     status: number;
@@ -36,7 +38,7 @@ function NewEventPage(props: ResponseData) {
     const [eventData, setEventData] = useState<any>();
 
     useEffect(() => {
-        if (eventData?.event_name) setStatus('valid')
+        if (eventData?.name) setStatus('valid')
         else setStatus('ready')
     }, [eventData])
 
@@ -44,9 +46,9 @@ function NewEventPage(props: ResponseData) {
         setStatus('saving')
 
         console.log("submitForm", { eventData });
-        const payload = {
+        const payload: EventPayload = {
             event: {
-                name: eventData.event_name,
+                name: eventData.name,
                 client_id: eventData.org_id,
                 is_private: !eventData.public_gallery,
             },
@@ -54,7 +56,7 @@ function NewEventPage(props: ResponseData) {
             microsite: {
                 logo: eventData.logo,
                 background: eventData.background,
-                color: eventData.color ? `${_.startsWith(eventData.color, '#') ? "" : "#"}${eventData.color}` : '',
+                color: toHexCode(eventData.color),
                 data_capture: eventData.data_capture,
                 fields: (!_.isEmpty(eventData.fields) && _.first(eventData.fields) != '') ? _.map(_.split(eventData.fields, ','), (f) => f.trim()) : [],
                 data_capture_title: eventData.data_capture_title,
@@ -63,10 +65,10 @@ function NewEventPage(props: ResponseData) {
                 explicit_opt_in: eventData.explicit_opt_in,
                 terms_privacy: eventData.terms_privacy,
             },
-            filter: {
+            ...(eventData.filter && { filter: {
                 id: eventData.filter
-            },
-            watermarks: transformWatermarks(eventData.watermarks),
+            }}),
+            ...(eventData.watermarks && { watermarks: transformWatermarks(eventData.watermarks)}),
             delivery: eventData.qr_delivery ? "qr_gallery" : "qr"
         }
 
@@ -99,10 +101,10 @@ function NewEventPage(props: ResponseData) {
                     returnLink={view == 'default' ? { slug: '/dashboard', name: 'dashboard' } : undefined}
                     returnAction={view !== 'default' ? { onClick: () => setView('default'), name: 'new event' } : undefined}
                 >
-                    {status == 'ready' && <h2>ready for changes</h2>}
-                    {status == 'valid' &&
-                        <button className='tracking-tight' onClick={submitForm}>
-                            <h2 className={'text-primary'}>create</h2>
+                    {(status == 'ready' || (status == 'valid' && _.isEmpty(eventData?.name))) && <h2>ready for changes</h2>}
+                    {(status == 'valid' && !_.isEmpty(eventData?.name)) &&
+                        <button className='tracking-tight btn btn-primary rounded-full' onClick={submitForm}>
+                            <h2>create</h2>
                         </button>
                     }
                     {status == 'error' && <h2 className='text-red-500'>oops! error...</h2>}

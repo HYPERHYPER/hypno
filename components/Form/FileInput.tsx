@@ -1,16 +1,16 @@
 import { getFilename } from '@/helpers/text';
 import axios from 'axios';
-import { useState, useRef, SyntheticEvent, useEffect, useCallback } from 'react';
+import { useState, useRef, SyntheticEvent, useEffect } from 'react';
 import { ThreeDots } from 'react-loader-spinner';
 import Plus from 'public/pop/plus.svg';
 import Minus from 'public/pop/minus.svg';
-
 
 interface UploaderProps {
   orgId: string;
   inputId?: string;
   onInputChange?: (value: string) => void;
   value?: string;
+  disabled?: boolean;
 }
 
 export default function FileInput(props: UploaderProps) {
@@ -105,24 +105,30 @@ export default function FileInput(props: UploaderProps) {
         id={props.inputId}
         hidden
         onChange={onFileChange}
+        disabled={props.disabled}
       />
-      {uploadStatus == 'uploading' ? (
-        <div className="cursor-pointer h-10 w-10 rounded-full bg-white/20 text-black flex items-center justify-center">
-          <ThreeDots
-            height="20"
-            width="20"
-            radius="4"
-            color="black"
-            ariaLabel="three-dots-loading"
-            visible={true}
-          />
+      {props.disabled ? (
+        <div className="cursor-not-allowed h-10 w-10 rounded-full bg-white/10 text-black flex items-center justify-center">
+          <Plus />
         </div>
-      ) : (
-        props.value ?
-          <label onClick={resetInput} className="cursor-pointer h-10 w-10 rounded-full bg-white/20 text-black flex items-center justify-center"><Minus /></label>
-          :
-          <label htmlFor={props.inputId} className="cursor-pointer h-10 w-10 rounded-full bg-white/20 text-black flex items-center justify-center"><Plus /></label>
-      )}
+      ) :
+        uploadStatus == 'uploading' ? (
+          <div className="cursor-pointer h-10 w-10 rounded-full bg-white/20 text-black flex items-center justify-center">
+            <ThreeDots
+              height="20"
+              width="20"
+              radius="4"
+              color="black"
+              ariaLabel="three-dots-loading"
+              visible={true}
+            />
+          </div>
+        ) : (
+          props.value ?
+            <label onClick={resetInput} className="cursor-pointer h-10 w-10 rounded-full bg-white/20 text-black flex items-center justify-center"><Minus /></label>
+            :
+            <label htmlFor={props.inputId} className="cursor-pointer h-10 w-10 rounded-full bg-white/20 text-black flex items-center justify-center"><Plus /></label>
+        )}
     </div>
   )
 }

@@ -93,7 +93,7 @@ async function authenticateUser(email: string, password: string) {
   } else if (!response.ok) {
     throw new Error('Something went wrong, please try again later');
   }
-  console.log(response)
+
   let data;
   try {
     data = await response.json();

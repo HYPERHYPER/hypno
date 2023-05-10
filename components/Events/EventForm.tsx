@@ -1,20 +1,21 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import _, { debounce } from 'lodash';
 import { useForm } from 'react-hook-form';
-import S3Uploader from '@/components/S3Uploader';
 import { ThreeDots } from 'react-loader-spinner';
 import AiPlayground from '@/components/AiPlayground/AiPlayground';
-import { getFilename, getNestedFormField, replaceLinks } from '@/helpers/text';
+import { replaceLinks } from '@/helpers/text';
 import { AxiosResponse } from 'axios';
 import FormControl from '../Form/FormControl';
-import Plus from 'public/pop/plus.svg'
 import Modal from '../Modal';
 import FileInput from '../Form/FileInput';
 import useUserStore from '@/store/userStore';
+import { toHexCode } from '@/helpers/color';
+import { EventMicrosite } from '@/types/event';
+import useDeepCompareEffect from "use-deep-compare-effect";
 
 interface FormData {
     event?: any;
-    onSubmit?: ((payload: any) => Promise<AxiosResponse<any, any>>);
+    onSubmit?: ((payload: any) => Promise<AxiosResponse<any, any>> | Promise<AxiosResponse<any, any>[]>);
     view: 'default' | 'legal' | 'data';
     changeView: (view: 'default' | 'legal' | 'data') => void;
     updateStatus?: (stauts: string) => void;
@@ -29,35 +30,84 @@ const AspectRatioWatermark = (ar: string): ('watermarks.9:16' | 'watermarks.2:3'
     return Object(`watermarks.${ar}`);
 }
 
+const isShowingQrCode = (event_ipad_screens: any) => _.size(event_ipad_screens) === 3;
+const getFilter = (event_filter_watermarks: any) => Object(_.first(event_filter_watermarks))?.filter_id;
+
+const isCustomGallery = (metadata: EventMicrosite) => {
+    const { logo, color, background, enable_legal, data_capture } = metadata;
+    const customGalleryConfig = {
+        logo, color, background, enable_legal, data_capture
+    }
+    return _.some(customGalleryConfig, _.identity);
+}
+
+const getWatermarkFromArray = (event_filter_watermarks: any, ar: string) => {
+    return _.find(event_filter_watermarks, (wm) => wm.name == ar);
+}
+
+const checkWatermarkChange = (prevWatermarks: any, currentWatermarks: any) => {
+    for (const key in currentWatermarks) {
+        if (currentWatermarks[key] !== prevWatermarks[key]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+const toExpectedValue = (key: string, value: string) => {
+    switch (key) {
+        case 'color': return toHexCode(value);
+        case 'fields': return (!_.isEmpty(value) && _.first(value) != '') ? _.map(_.split(value, ','), (f) => f.trim()) : [];
+        case 'qr_delivery': return value ? 'qr_gallery' : 'qr'
+        default: return value;
+    }
+}
+
+const getChangedFields = (prevValues: any, currentValues: any) => {
+    let fieldsArr: any[] = [];
+    _.forEach(Object.keys(currentValues), (key) => {
+        if (key !== 'watermarks') {
+            if (!_.isEqual(currentValues[key], prevValues[key])) {
+                fieldsArr.push({ [key]: toExpectedValue(key, currentValues[key]) });
+            }
+        }
+    })
+    return fieldsArr;
+}
+
+const getWatermarkIdByName = (watermarksArr: any, name: string) => {
+    const watermark = _.find(watermarksArr, { name });
+    return watermark ? watermark.watermark_id : null;
+};
+
 const EventForm = (props: FormData) => {
     const { onSubmit, event, view, changeView, updateData, updateStatus } = props;
-    console.log(event)
     const user = useUserStore.useUser();
     const {
         register,
         handleSubmit,
-        formState: { errors, isDirty, isSubmitSuccessful, isValid, isSubmitting },
+        formState: { errors, isDirty, isSubmitSuccessful, isValid, isSubmitting, dirtyFields, defaultValues },
         watch,
         setValue,
         reset
     } = useForm({
         defaultValues: {
-            event_name: event?.name || '',
+            name: event?.name || '',
             org_id: event?.client_id || user.organization_id,
             // gallery_title: event?.metadata?.gallery_title || '',
             // gallery_subtitle: event?.metadata?.gallery_subtitle || '',
-            filter: 1,
+            filter: getFilter(event?.event_filter_watermarks) || 1,
             watermarks: {
-                '9:16': "",
-                '2:3': "",
-                '3:4': "",
-                '1:1': "",
-                '4:3': "",
-                '3:2': "",
-                '16:9': "",
+                '9:16': getWatermarkFromArray(event?.event_filter_watermarks, '9:16')?.watermark_id || "",
+                '2:3': getWatermarkFromArray(event?.event_filter_watermarks, '2:3')?.watermark_id || "",
+                '3:4': getWatermarkFromArray(event?.event_filter_watermarks, '3:4')?.watermark_id || "",
+                '1:1': getWatermarkFromArray(event?.event_filter_watermarks, '1:1')?.watermark_id || "",
+                '4:3': getWatermarkFromArray(event?.event_filter_watermarks, '4:3')?.watermark_id || "",
+                '3:2': getWatermarkFromArray(event?.event_filter_watermarks, '3:2')?.watermark_id || "",
+                '16:9': getWatermarkFromArray(event?.event_filter_watermarks, '16:9')?.watermark_id || "",
             },
-            qr_delivery: event ? (event?.delivery == "qr_gallery") : true,
-            custom_gallery: false,
+            qr_delivery: event ? (isShowingQrCode(event.event_ipad_screens)) : true,
+            custom_gallery: event ? isCustomGallery(event.metadata) : false,
             logo: event?.metadata?.logo || '',
             background: event?.metadata?.background || '',
             color: event?.metadata?.color || '',
@@ -75,6 +125,8 @@ const EventForm = (props: FormData) => {
     });
 
     const config = watch();
+    const watchedWatermarks = watch('watermarks');
+
     // TODO: hiding email delivery for now
     // useEffect(() => {
     //     if (config.email_delivery) {
@@ -82,8 +134,7 @@ const EventForm = (props: FormData) => {
     //         setValue('fields', ['Email'])
     //     }
     // }, [config.email_delivery])
-
-    const submitForm = async (data: any) => {
+    const submitForm = (data: any) => {
         updateStatus && updateStatus('saving');
         if (!_.isEmpty(errors)) {
             console.log("submitForm errors", { errors });
@@ -91,47 +142,50 @@ const EventForm = (props: FormData) => {
         }
 
         console.log("submitForm", { data });
-        const terms_and_conditions = data.terms_and_conditions;
-        delete data['terms_and_conditions']
-
-        /* Update metadata field of event */
-        let eventMetadata = props.event.metadata || {};
-        eventMetadata = {
-            ...props.event.metadata,
-            ...data,
-            color: `${_.startsWith(config.color, '#') ? "" : "#"}${config.color}`,
-            fields: (!_.isEmpty(data.fields) && _.first(data.fields) != '') ? _.map(_.split(data.fields, ','), (f) => f.trim()) : [],
+        let dirtyFields = getChangedFields(defaultValues, data) || [];
+        const dirtyWatermarks = getChangedFields(defaultValues?.watermarks, data.watermarks)
+        if (!_.isEmpty(dirtyWatermarks)) {
+            _.forEach(dirtyWatermarks, (wm) => {
+                for (const key in wm) {
+                    const watermark_id = getWatermarkIdByName(event?.event_filter_watermarks, key)
+                    dirtyFields.push({ 'watermark': { url: wm[key], id: watermark_id } });
+                }
+            });
         }
 
-        const payload = {
-            metadata: { ...eventMetadata }, terms_and_conditions
-        }
-        // onSubmit && onSubmit(payload).then((e) => {
-        //     console.log(e)
-        //     updateStatus && updateStatus('success');
-        //     reset(...data)
-        // }).catch((e) => {
-        //     console.log(e)
-        // });
+        onSubmit && onSubmit(dirtyFields).then((res) => {
+            console.log('res', res)
+            updateStatus && updateStatus('success');
+            reset({ ...data })
+        }).catch((e) => {
+            console.log('error', e)
+            updateStatus && updateStatus('error');
+        });
     }
 
     const debouncedSave = useCallback(
         debounce(() => {
-            // console.log("Saving");
             if (event && onSubmit) {
-                handleSubmit(onSubmit)();
+                handleSubmit(submitForm)();
                 return;
             }
-            updateData && updateData(config)
         }, 1000),
-        [config] // fix for edit
+        []
     );
 
-    useEffect(() => {
-        if (isDirty) {
+    useDeepCompareEffect(() => {
+        if (isDirty || checkWatermarkChange(defaultValues?.watermarks, watchedWatermarks)) {
             debouncedSave();
         }
-    }, [config]);
+    }, [config, isDirty]);
+
+    useEffect(() => {
+        if (isDirty && updateData) {
+            // Updates data for new event form
+            updateData(config);
+            reset(config);
+        }
+    }, [isDirty]);
 
     useEffect(() => {
         if (updateStatus) {
@@ -153,7 +207,7 @@ const EventForm = (props: FormData) => {
                         <FormControl label='title'>
                             <input
                                 className='input pro flex-1'
-                                {...register('event_name')} />
+                                {...register('name')} />
                         </FormControl>
 
                         <FormControl label='organization'>
@@ -190,7 +244,7 @@ const EventForm = (props: FormData) => {
                         <Modal id='filters-modal' title='filters'>
                             <div className='list pro'>
                                 {_.map(FILTERS, (f, i) => (
-                                    <div className='item cursor-pointer' key={i} onClick={() => setValue('filter', i + 1)}>
+                                    <div className='item cursor-pointer' key={i} onClick={() => setValue('filter', i + 1, { shouldDirty: true })}>
                                         <span className={`transition ${config.filter == i + 1 ? 'text-white' : 'text-white/20'}`}>{f}</span>
                                         {f == 'custom' && (
                                             <FileInput
@@ -213,7 +267,7 @@ const EventForm = (props: FormData) => {
                                     : (
                                         <div className='text-xl sm:text-4xl text-primary flex flex-row gap-2'>
                                             {Object.entries(config.watermarks).map(([ar, value]) => {
-                                                if (!_.isEmpty(value)) {
+                                                if (value !== "") {
                                                     return <span key={ar}>{ar}</span>;
                                                 }
                                             })}
@@ -221,7 +275,11 @@ const EventForm = (props: FormData) => {
                                     )}
                             </Modal.Trigger>
                         </FormControl>
-                        <Modal id='graphics-modal' title='graphics'>
+                        <Modal
+                            id='graphics-modal'
+                            title='graphics'
+                            menu={<a href='https://www.figma.com/community/file/1224061680361096696/hypno-pro-graphics' target='_blank' rel="noreferrer"><h2 className='text-primary'>template</h2></a>}
+                        >
                             <div className='list pro'>
                                 {_.map(ASPECT_RATIOS, (ar, i) => (
                                     <div className='item' key={i}>
@@ -229,7 +287,7 @@ const EventForm = (props: FormData) => {
                                         <FileInput
                                             orgId={user.organization.id}
                                             inputId={ar}
-                                            onInputChange={(value: string) => setValue(AspectRatioWatermark(ar), value)}
+                                            onInputChange={(value: string) => setValue(AspectRatioWatermark(ar), value, { shouldDirty: true })}
                                             value={_.get(config.watermarks, ar)}
                                         />
                                     </div>
@@ -278,8 +336,9 @@ const EventForm = (props: FormData) => {
                                 <FileInput
                                     orgId={user.organization.id}
                                     inputId='logo'
-                                    onInputChange={(value: string) => setValue('logo', value)}
+                                    onInputChange={(value: string) => setValue('logo', value, { shouldDirty: true })}
                                     value={config.logo}
+                                    disabled={!config.custom_gallery}
                                 />
                             </FormControl>
 
@@ -287,8 +346,9 @@ const EventForm = (props: FormData) => {
                                 <FileInput
                                     orgId={user.organization.id}
                                     inputId='background'
-                                    onInputChange={(value: string) => setValue('background', value)}
+                                    onInputChange={(value: string) => setValue('background', value, { shouldDirty: true })}
                                     value={config.background}
+                                    disabled={!config.custom_gallery}
                                 />
                             </FormControl>
 
@@ -296,6 +356,7 @@ const EventForm = (props: FormData) => {
                                 <input
                                     className='input pro'
                                     placeholder='# hex code'
+                                    disabled={!config.custom_gallery}
                                     {...register('color')} />
                                 <span className="h-10 w-10 rounded-full border-4 border-white/20" style={{ backgroundColor: `${_.startsWith(config.color, '#') ? "" : "#"}${config.color}` }}></span>
                             </FormControl>
@@ -305,15 +366,14 @@ const EventForm = (props: FormData) => {
                             </FormControl>
 
                             <FormControl label='data'>
-                                {config.data_capture && <button className="tracking-tight text-xl sm:text-4xl text-primary mr-5" onClick={() => changeView('data')}>custom</button>}
-                                <input type="checkbox" className="toggle pro toggle-lg" {...register('data_capture')} />
+                                {config.data_capture && config.custom_gallery && <button className="tracking-tight text-xl sm:text-4xl text-primary mr-5" onClick={() => changeView('data')}>custom</button>}
+                                <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('data_capture')} />
                             </FormControl>
 
                             <FormControl label='legal'>
-                                {config.enable_legal && <button className="tracking-tight text-xl sm:text-4xl text-primary mr-5" onClick={() => changeView('legal')}>custom</button>}
-                                <input type="checkbox" className="toggle pro toggle-lg" {...register('enable_legal')} />
+                                {config.enable_legal && config.custom_gallery && <button className="tracking-tight text-xl sm:text-4xl text-primary mr-5" onClick={() => changeView('legal')}>custom</button>}
+                                <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('enable_legal')} />
                             </FormControl>
-
 
                             {/* <div className='form-control'>
                         <label className='label'>
@@ -366,7 +426,7 @@ const EventForm = (props: FormData) => {
                         <>
                             <div className='border-t-2 border-white/20'>
                                 <FormControl dir='col' label='terms/privacy' altLabel='this appears in your web gallery during delivery; format links like <link|https://domain.com>'>
-                                    <button className='ml-4 text-primary text-xl mt-3 tracking-tight' onClick={(e) => { e.preventDefault(); setValue('terms_privacy', DEFAULT_TERMS) }}>reset</button>
+                                    <button className='ml-4 text-primary text-xl mt-3 tracking-tight' onClick={(e) => { e.preventDefault(); setValue('terms_privacy', DEFAULT_TERMS, { shouldDirty: true }) }}>reset</button>
                                     <textarea className='flex-1 textarea pro left w-full leading-[1.1rem]' rows={5} {...register('terms_privacy')} />
                                 </FormControl>
                             </div>

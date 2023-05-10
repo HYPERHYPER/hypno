@@ -1,12 +1,11 @@
 import axios from 'axios';
 import type { GetServerSideProps } from 'next';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Head from 'next/head';
 import _ from 'lodash';
 import nookies, { parseCookies } from 'nookies'
 import EventForm from '@/components/Events/EventForm';
 import GlobalLayout from '@/components/GlobalLayout';
-import DotsX from 'public/pop/dots-x.svg';
 import withAuth from '@/components/hoc/withAuth';
 
 interface ResponseData {
@@ -24,34 +23,71 @@ const EditEventPage = (props: ResponseData) => {
     const [view, setView] = useState<'default' | 'data' | 'legal'>('default');
     const [status, setStatus] = useState<'saving' | 'ready' | 'dirty' | 'success' | string>('ready');
 
-    const submitForm = (payload: any) => {
-        // setSavedChangesStatus('saving');
-        // if (!_.isEmpty(errors)) {
-        //     console.log("submitForm errors", { errors });
-        //     return;
-        // }
+    // Provided array of changed fields [{field_name: value}]
+    const submitForm = (changedFieldsArr: any) => {
+        let payloadArr: any = [];
+        let event: any = {};
+        const eventKeys = ['name', 'is_private']
+        let microsite: any = {};
+        const micrositeKeys = ['logo', 'background', 'color', 'data_capture', 'fields', 'data_capture_title', 'data_capture_subtitle', 'enable_legal', 'explicit_opt_in', 'terms_privacy', 'email_delivery', 'ai_generation'];
+        let filter: any = {};
+        let delivery: string = '';
 
-        // console.log("submitForm", { data });
-        // const terms_and_conditions = data.terms_and_conditions;
-        // delete data['terms_and_conditions']
-
-        // /* Update metadata field of event */
-        // let eventMetadata = props.event.metadata || {};
-        // eventMetadata = {
-        //     ...props.event.metadata,
-        //     ...data,
-        //     color: `${_.startsWith(config.color, '#') ? "" : "#"}${config.color}`,
-        //     fields: (!_.isEmpty(data.fields) && _.first(data.fields) != '') ? _.map(_.split(data.fields, ','), (f) => f.trim()) : [],
-        // }
-
-        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${id}.json`;
-        const token = parseCookies().hypno_token;
-        return axios.put(url, payload, {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token,
-            },
+        // Build event payload - any field that's not watermark
+        // Build watermark payload in seperate reqs by watermark_id
+        _.forEach(changedFieldsArr, (field: any) => {
+            for (const key in field) {
+                console.log('key', key)
+                if (key == 'qr_delivery') {
+                    delivery = field[key];
+                }
+                if (key == 'filter') {
+                    filter = {id: field[key]}
+                }
+                if (_.includes(micrositeKeys, key)) {
+                    console.log('hereeee', key)
+                    microsite[key] = field[key]
+                }
+                if (_.includes(eventKeys, key)) {
+                    event[key] = field[key]
+                }
+                if (key == 'watermark') {
+                    payloadArr.push(field);
+                }
+            }
         })
+
+        const eventPayload = {
+            ...(!_.isEmpty(event) && { event }),
+            ...(!_.isEmpty(microsite)&& { microsite }),
+            ...(!_.isEmpty(filter) && { filter }),
+            ...(delivery && { delivery }),
+        }
+        if (!_.isEmpty(eventPayload)) {
+            payloadArr.push(eventPayload);
+        }
+
+        const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${id}`;
+        const token = parseCookies().hypno_token;
+
+        // Create an array of promises for graphics (watermark) update + all other event config updates
+        const promises = payloadArr?.map((payload: any) => {
+            const isWatermarkPayload = !_.isEmpty(payload.watermark);
+            let url = isWatermarkPayload ? `${eventUrl}/watermarks/${payload.watermark.id}` : eventUrl;
+            if (isWatermarkPayload) {
+                delete payload.watermark.id
+            }
+
+            return axios.put(url, payload, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + token,
+                },
+            });
+        });
+
+        // Use Promise.all to wait for all promises to resolve
+        return Promise.all(promises);
     }
 
     return (
@@ -62,10 +98,10 @@ const EditEventPage = (props: ResponseData) => {
 
             <GlobalLayout>
                 <GlobalLayout.Header
-                title={view == 'default' ? 'edit' : view}
-                returnLink={view == 'default' ? { slug: `/e/${id}`, name: name } : undefined}
-                returnAction={view !== 'default' ? { onClick: () => setView('default'), name: name } : undefined}
-               >
+                    title={view == 'default' ? 'edit' : view}
+                    returnLink={view == 'default' ? { slug: `/e/${id}`, name: name } : undefined}
+                    returnAction={view !== 'default' ? { onClick: () => setView('default'), name: name } : undefined}
+                >
                     {status == 'ready' && <h2>ready for changes</h2>}
                     {status == 'saving' && <h2 className='text-white'>saving...</h2>}
                     {status == 'dirty' && <h2>unsaved changes</h2>}
@@ -101,9 +137,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     // }
 
     // Fetch event config
-    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${eventId}.json`;
+    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}?include_overlays=true&include_ipad_screens=true`;
     const token = accessToken;
-    let data : any = {};
+    let data: any = {};
     await axios.get(url, {
         headers: {
             'Content-Type': 'application/json',
@@ -112,7 +148,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }).then(async (res) => {
         if (res.status === 200) {
             data = await res.data;
-            const orgUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${res.data.event.organization_id}`;
+            const orgUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${res.data.event.client_id}`;
             const orgRes = await axios.get(orgUrl, {
                 headers: {
                     'Content-Type': 'application/json',

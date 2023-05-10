@@ -1,18 +1,19 @@
 import Head from 'next/head'
 import _ from 'lodash';
-import useUserStore from '@/store/userStore';
-import { GlobalNav } from '@/components/GlobalNav';
 import GlobalLayout from '@/components/GlobalLayout';
-import Link from 'next/link';
-import axios from 'axios';
-import { GetServerSideProps } from 'next';
-import nookies from 'nookies'
-import Modal from '@/components/Modal';
-import FormControl from '@/components/Form/FormControl';
 import withAuth from '@/components/hoc/withAuth';
+import useUserStore from '@/store/userStore';
+import { useRouter } from 'next/router';
 
-export default withAuth(NotFoundPage, 'optional');
-function NotFoundPage() {
+export default function NotFoundPage() {
+    const isLoggedIn = useUserStore.useIsLoggedIn();
+    const router = useRouter();
+
+    // Check if we are on the client-side
+    if (typeof window !== 'undefined' && !isLoggedIn) {
+        router.replace('/login');
+    }
+
     return (
         <>
             <Head>

@@ -10,6 +10,7 @@ interface ModalProps {
     children?: ReactNode;
     title?: string;
     onDone?: () => void;
+    menu?: ReactNode;
 }
 
 const TriggerModal = ({ id, children }: TriggerModalProps) => {
@@ -18,7 +19,7 @@ const TriggerModal = ({ id, children }: TriggerModalProps) => {
     )
 }
 
-export default function Modal({ title, id, children, onDone }: ModalProps) {
+export default function Modal({ title, id, children, onDone, menu }: ModalProps) {
     return (
         <>
             <input type="checkbox" id={id} className="modal-toggle" />
@@ -27,7 +28,10 @@ export default function Modal({ title, id, children, onDone }: ModalProps) {
                     <div className="flex justify-between">
                         <div className="space-y-4">
                             <h1 className="text-white">{title}</h1>
-                            <h2 className="text-primary"><label htmlFor={id} className="cursor-pointer">cancel</label></h2>
+                            <div className="flex flex-row gap-4">
+                                <h2 className="text-primary"><label htmlFor={id} className="cursor-pointer">cancel</label></h2>
+                                {menu}
+                            </div>
                         </div>
                         <label htmlFor={id} className="h-[30px] sm:h-[60px] w-[30px] sm:w-[60px] flex items-center  cursor-pointer">
                             <div className="bg-white/40 w-[30px] sm:w-[60px] h-1 rounded-sm" />

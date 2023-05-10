@@ -12,6 +12,8 @@ export type EventMicrosite = {
     email_delivery?: boolean;
     ai_generation?: any;
 } | any;
+type EventMicrositeKey = keyof EventMicrosite;
+const EventMicrositeKeys: EventMicrositeKey[] = ['logo', 'background', 'color', 'data_capture', 'fields', 'data_capture_title', 'data_capture_subtitle', 'enable_legal', 'explicit_opt_in', 'terms_privacy', 'email_delivery', 'ai_generation'];
 
 export type EventConfig = {
     id?: number;
@@ -22,5 +24,17 @@ export type EventConfig = {
     is_private?: boolean;
     delivery?: string; // "qr_gallery" to show qr code to microsite, "qr" to disable
     metadata?: EventMicrosite | null;
+}
+
+export type EventPayload = {
+    event?: {
+        id?: number;
+        name?: string;
+        client_id?: number;
+    };
+    microsite?: EventMicrosite;
+    filter?: { id: number };
+    watermarks?: Array<{title: string, url: string}>
+    delivery?: string; // "qr_gallery" to show qr code to microsite, "qr" to disable
 }
 
