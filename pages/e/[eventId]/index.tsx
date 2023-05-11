@@ -102,7 +102,7 @@ function EventPage(props: ResponseData) {
                                             priority={Number(i) < 10}
                                             src={p.posterframe}
                                             fill
-                                            alt={p.event_name + p.id}
+                                            alt={p.event_id + p.id}
                                             placeholder={p.blurDataURL ? 'blur' : 'empty'}
                                             blurDataURL={p.blurDataURL || undefined}
                                         />
