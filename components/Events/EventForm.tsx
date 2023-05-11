@@ -12,6 +12,7 @@ import useUserStore from '@/store/userStore';
 import { toHexCode } from '@/helpers/color';
 import { EventMicrosite } from '@/types/event';
 import useDeepCompareEffect from "use-deep-compare-effect";
+import clsx from 'clsx';
 
 interface FormData {
     event?: any;
@@ -31,7 +32,7 @@ const AspectRatioWatermark = (ar: string): ('watermarks.9:16' | 'watermarks.2:3'
 }
 
 const isShowingQrCode = (event_ipad_screens: any) => _.size(event_ipad_screens) === 3;
-const getFilter = (event_filter_watermarks: any) => Object(_.first(event_filter_watermarks))?.filter_id;
+const getFilter = (event_filter_watermarks: any) => Object(_.first(event_filter_watermarks))?.filter?.id;
 
 const isCustomGallery = (metadata: EventMicrosite) => {
     const { logo, color, background, enable_legal, data_capture } = metadata;
@@ -42,7 +43,7 @@ const isCustomGallery = (metadata: EventMicrosite) => {
 }
 
 const getWatermarkFromArray = (event_filter_watermarks: any, ar: string) => {
-    return _.find(event_filter_watermarks, (wm) => wm.name == ar);
+    return _.find(event_filter_watermarks, (wm) => wm.name == ar)?.watermark;
 }
 
 const checkWatermarkChange = (prevWatermarks: any, currentWatermarks: any) => {
@@ -76,13 +77,14 @@ const getChangedFields = (prevValues: any, currentValues: any) => {
 }
 
 const getWatermarkIdByName = (watermarksArr: any, name: string) => {
-    const watermark = _.find(watermarksArr, { name });
-    return watermark ? watermark.watermark_id : null;
+    const watermark = _.find(watermarksArr, { name })?.watermark;
+    return watermark ? watermark.id : null;
 };
 
 const EventForm = (props: FormData) => {
     const { onSubmit, event, view, changeView, updateData, updateStatus } = props;
     const user = useUserStore.useUser();
+
     const {
         register,
         handleSubmit,
@@ -98,13 +100,13 @@ const EventForm = (props: FormData) => {
             // gallery_subtitle: event?.metadata?.gallery_subtitle || '',
             filter: getFilter(event?.event_filter_watermarks) || 1,
             watermarks: {
-                '9:16': getWatermarkFromArray(event?.event_filter_watermarks, '9:16')?.watermark_id || "",
-                '2:3': getWatermarkFromArray(event?.event_filter_watermarks, '2:3')?.watermark_id || "",
-                '3:4': getWatermarkFromArray(event?.event_filter_watermarks, '3:4')?.watermark_id || "",
-                '1:1': getWatermarkFromArray(event?.event_filter_watermarks, '1:1')?.watermark_id || "",
-                '4:3': getWatermarkFromArray(event?.event_filter_watermarks, '4:3')?.watermark_id || "",
-                '3:2': getWatermarkFromArray(event?.event_filter_watermarks, '3:2')?.watermark_id || "",
-                '16:9': getWatermarkFromArray(event?.event_filter_watermarks, '16:9')?.watermark_id || "",
+                '9:16': getWatermarkFromArray(event?.event_filter_watermarks, '9:16')?.url || "",
+                '2:3': getWatermarkFromArray(event?.event_filter_watermarks, '2:3')?.url || "",
+                '3:4': getWatermarkFromArray(event?.event_filter_watermarks, '3:4')?.url || "",
+                '1:1': getWatermarkFromArray(event?.event_filter_watermarks, '1:1')?.url || "",
+                '4:3': getWatermarkFromArray(event?.event_filter_watermarks, '4:3')?.url || "",
+                '3:2': getWatermarkFromArray(event?.event_filter_watermarks, '3:2')?.url || "",
+                '16:9': getWatermarkFromArray(event?.event_filter_watermarks, '16:9')?.url || "",
             },
             qr_delivery: event ? (isShowingQrCode(event.event_ipad_screens)) : true,
             custom_gallery: event ? isCustomGallery(event.metadata) : false,
@@ -135,7 +137,6 @@ const EventForm = (props: FormData) => {
     //     }
     // }, [config.email_delivery])
     const submitForm = (data: any) => {
-        updateStatus && updateStatus('saving');
         if (!_.isEmpty(errors)) {
             console.log("submitForm errors", { errors });
             return;
@@ -175,6 +176,7 @@ const EventForm = (props: FormData) => {
 
     useDeepCompareEffect(() => {
         if (isDirty || checkWatermarkChange(defaultValues?.watermarks, watchedWatermarks)) {
+            updateStatus && updateStatus('saving');
             debouncedSave();
         }
     }, [config, isDirty]);
@@ -354,11 +356,11 @@ const EventForm = (props: FormData) => {
 
                             <FormControl label='color'>
                                 <input
-                                    className='input pro'
+                                    className='input pro disabled:text-white/20 transition-colors'
                                     placeholder='# hex code'
                                     disabled={!config.custom_gallery}
                                     {...register('color')} />
-                                <span className="h-10 w-10 rounded-full border-4 border-white/20" style={{ backgroundColor: `${_.startsWith(config.color, '#') ? "" : "#"}${config.color}` }}></span>
+                                <span className={clsx("h-10 w-10 rounded-full border-4 border-white/20", !config.custom_gallery && 'opacity-50')} style={{ backgroundColor: `${_.startsWith(config.color, '#') ? "" : "#"}${config.color}` }}></span>
                             </FormControl>
 
                             <FormControl label='public'>

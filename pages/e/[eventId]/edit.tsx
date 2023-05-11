@@ -48,7 +48,6 @@ const EditEventPage = (props: ResponseData) => {
         // Build watermark payload in seperate reqs by watermark_id
         _.forEach(changedFieldsArr, (field: any) => {
             for (const key in field) {
-                console.log('key', key)
                 if (key == 'qr_delivery') {
                     delivery = field[key];
                 }
@@ -67,6 +66,9 @@ const EditEventPage = (props: ResponseData) => {
                 if (key == 'custom_gallery') {
                     custom_gallery = field[key];
                 }
+                if (key == 'public_gallery') {
+                    event.is_private = !field[key];
+                }
             }
         })
 
@@ -79,7 +81,7 @@ const EditEventPage = (props: ResponseData) => {
                 data_capture: false,
             }
         }
-        
+
         const eventPayload = {
             ...(!_.isEmpty(event) && { event }),
             ...(!_.isEmpty(microsite) && { microsite }),
