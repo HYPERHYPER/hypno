@@ -1,4 +1,4 @@
-const LoadingAsset = () => <div className='relative rounded-box animate-pulse bg-white/20 w-full aspect-[2/3]' />
+const LoadingAsset = () => <div className='relative rounded-box animate-pulse odd:bg-white/20 even:bg-white/25 w-full aspect-[2/3]' />
 const LoadingGrid = ({count} : {count: number}) => {
     const components = [];
     for (let i = 0; i < count; i++) {
