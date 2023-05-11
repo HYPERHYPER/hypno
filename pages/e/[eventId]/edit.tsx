@@ -131,6 +131,7 @@ const EditEventPage = (props: ResponseData) => {
                     {status == 'saving' && <h2 className='text-white'>saving...</h2>}
                     {status == 'dirty' && <h2>unsaved changes</h2>}
                     {status == 'success' && <h2 className='text-primary'>changes saved!</h2>}
+                    {status == 'error' && <h2 className='text-red-500'>error</h2>}
                 </GlobalLayout.Header>
                 <GlobalLayout.Content>
                     <EventForm
