@@ -13,6 +13,7 @@ import { toHexCode } from '@/helpers/color';
 import { EventMicrosite } from '@/types/event';
 import useDeepCompareEffect from "use-deep-compare-effect";
 import clsx from 'clsx';
+import { isCustomGallery } from '@/helpers/event';
 
 interface FormData {
     event?: any;
@@ -33,14 +34,6 @@ const AspectRatioWatermark = (ar: string): ('watermarks.9:16' | 'watermarks.2:3'
 
 const isShowingQrCode = (event_ipad_screens: any) => _.size(event_ipad_screens) === 3;
 const getFilter = (event_filter_watermarks: any) => Object(_.first(event_filter_watermarks))?.filter?.id;
-
-const isCustomGallery = (metadata: EventMicrosite) => {
-    const { logo, color, background, enable_legal, data_capture } = metadata;
-    const customGalleryConfig = {
-        logo, color, background, enable_legal, data_capture
-    }
-    return _.some(customGalleryConfig, _.identity);
-}
 
 const getWatermarkFromArray = (event_filter_watermarks: any, ar: string) => {
     return _.find(event_filter_watermarks, (wm) => wm.name == ar)?.watermark;

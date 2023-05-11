@@ -7,20 +7,12 @@ import nookies, { parseCookies } from 'nookies'
 import EventForm from '@/components/Events/EventForm';
 import GlobalLayout from '@/components/GlobalLayout';
 import withAuth from '@/components/hoc/withAuth';
-import { EventMicrosite } from '@/types/event';
+import { isCustomGallery } from '@/helpers/event';
 
 interface ResponseData {
     status: number;
     message: string;
     event: any;
-}
-
-const isCustomGallery = (metadata: EventMicrosite) => {
-    const { logo, color, background, enable_legal, data_capture } = metadata;
-    const customGalleryConfig = {
-        logo, color, background, enable_legal, data_capture
-    }
-    return _.some(customGalleryConfig, _.identity);
 }
 
 const EditEventPage = (props: ResponseData) => {
