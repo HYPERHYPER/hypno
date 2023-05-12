@@ -29,7 +29,7 @@ export default function Modal({ title, id, children, onDone, menu }: ModalProps)
                         <div className="space-y-4">
                             <h1 className="text-white">{title}</h1>
                             <div className="flex flex-row gap-4">
-                                <h2 className="text-primary"><label htmlFor={id} className="cursor-pointer">cancel</label></h2>
+                                {/* <h2 className="text-primary"><label htmlFor={id} className="cursor-pointer">cancel</label></h2> */}
                                 {menu}
                             </div>
                         </div>

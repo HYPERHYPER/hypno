@@ -294,7 +294,7 @@ const EventForm = (props: FormData) => {
                             <div className='text-xl sm:text-4xl text-white/20'>coming soon</div>
                         </FormControl>
 
-                        <FormControl label='show qr code'>
+                        <FormControl label='show delivery code'>
                             <input type="checkbox" className="toggle pro toggle-lg" {...register('qr_delivery')} />
                         </FormControl>
                     </div >
@@ -361,12 +361,12 @@ const EventForm = (props: FormData) => {
                             </FormControl>
 
                             <FormControl label='data'>
-                                {config.data_capture && config.custom_gallery && <button className="tracking-tight text-xl sm:text-4xl text-primary mr-5" onClick={() => changeView('data')}>custom</button>}
+                                {config.data_capture && config.custom_gallery && <Modal.Trigger id='data-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
                                 <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('data_capture')} />
                             </FormControl>
 
                             <FormControl label='legal'>
-                                {config.enable_legal && config.custom_gallery && <button className="tracking-tight text-xl sm:text-4xl text-primary mr-5" onClick={() => changeView('legal')}>custom</button>}
+                                {config.enable_legal && config.custom_gallery && <Modal.Trigger id='legal-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5" >custom</div></Modal.Trigger>}
                                 <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('enable_legal')} />
                             </FormControl>
 
@@ -386,53 +386,49 @@ const EventForm = (props: FormData) => {
                     )
                 }
 
-                {
-                    view == 'data' && (
-                        <div className='border-t-2 border-white/20'>
-                            <FormControl label='fields' altLabel='separate multiple fields with commas'>
-                                <input
-                                    className='input pro flex-1'
-                                    placeholder='name, email, phone'
-                                    disabled={!config.data_capture}
-                                    {...register('fields')} />
-                            </FormControl>
 
-                            <FormControl label='headline' altLabel='this appears on your web gallery during delivery (optional)'>
-                                <input
-                                    className='input pro flex-1'
-                                    placeholder='want your content?'
-                                    disabled={!config.data_capture}
-                                    {...register('data_capture_title')} />
-                            </FormControl>
+                <Modal title='data' id='data-modal'>
+                    <div className='border-t-2 border-white/20'>
+                        <FormControl label='fields' altLabel='separate multiple fields with commas'>
+                            <input
+                                className='input pro flex-1'
+                                placeholder='name, email, phone'
+                                disabled={!config.data_capture}
+                                {...register('fields')} />
+                        </FormControl>
 
-                            <FormControl label='blurb' altLabel='this appears on your web gallery during delivery (optional)'>
-                                <input
-                                    className='input pro flex-1'
-                                    placeholder='enter your info to continue'
-                                    disabled={!config.data_capture}
-                                    {...register('data_capture_subtitle')} />
-                            </FormControl>
-                        </div>
-                    )
-                }
+                        <FormControl label='headline' altLabel='this appears on your web gallery during delivery (optional)'>
+                            <input
+                                className='input pro flex-1'
+                                placeholder='want your content?'
+                                disabled={!config.data_capture}
+                                {...register('data_capture_title')} />
+                        </FormControl>
 
-                {
-                    view == 'legal' && (
-                        <>
-                            <div className='border-t-2 border-white/20'>
-                                <FormControl dir='col' label='terms/privacy' altLabel='this appears in your web gallery during delivery; format links like <link|https://domain.com>'>
-                                    <button className='ml-4 text-primary text-xl mt-3 tracking-tight' onClick={(e) => { e.preventDefault(); setValue('terms_privacy', DEFAULT_TERMS, { shouldDirty: true }) }}>reset</button>
-                                    <textarea className='flex-1 textarea pro left w-full leading-[1.1rem]' rows={5} {...register('terms_privacy')} />
-                                </FormControl>
-                            </div>
-                            <div className=''>
-                                <FormControl label='explicit opt-in' altLabel='this shows a checkbox'>
-                                    <input type="checkbox" className="toggle pro toggle-lg" {...register('explicit_opt_in')} />
-                                </FormControl>
-                            </div>
-                        </>
-                    )
-                }
+                        <FormControl label='blurb' altLabel='this appears on your web gallery during delivery (optional)'>
+                            <input
+                                className='input pro flex-1'
+                                placeholder='enter your info to continue'
+                                disabled={!config.data_capture}
+                                {...register('data_capture_subtitle')} />
+                        </FormControl>
+                    </div>
+                </Modal>
+
+                <Modal title='legal' id='legal-modal'>
+                    <div className='border-t-2 border-white/20'>
+                        <FormControl dir='col' label='terms/privacy' altLabel='this appears in your web gallery during delivery; format links like <link|https://domain.com>'>
+                            <button className='ml-4 text-primary text-xl mt-3 tracking-tight' onClick={(e) => { e.preventDefault(); setValue('terms_privacy', DEFAULT_TERMS, { shouldDirty: true }) }}>reset</button>
+                            <textarea className='flex-1 textarea pro left w-full leading-[1.1rem]' rows={5} {...register('terms_privacy')} />
+                        </FormControl>
+                    </div>
+                    <div className=''>
+                        <FormControl label='explicit opt-in' altLabel='this shows a checkbox'>
+                            <input type="checkbox" className="toggle pro toggle-lg" {...register('explicit_opt_in')} />
+                        </FormControl>
+                    </div>
+                </Modal>
+
 
                 {/* <div className='flex-1 pb-5'>
                         <div className='space-y-5 w-1/2 mr-[30px]'>
