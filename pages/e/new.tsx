@@ -50,7 +50,7 @@ function NewEventPage(props: ResponseData) {
             event: {
                 name: eventData.name,
                 client_id: eventData.org_id,
-                is_private: !eventData.public_gallery,
+                is_private: eventData.is_private,
             },
             ...(eventData.custom_gallery && { custom_gallery: { logo_image: "" }}),
             microsite: {

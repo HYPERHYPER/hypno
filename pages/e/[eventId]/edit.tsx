@@ -58,9 +58,6 @@ const EditEventPage = (props: ResponseData) => {
                 if (key == 'custom_gallery') {
                     custom_gallery = field[key];
                 }
-                if (key == 'public_gallery') {
-                    event.is_private = !field[key];
-                }
             }
         })
 

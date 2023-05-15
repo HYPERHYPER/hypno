@@ -106,7 +106,7 @@ const EventForm = (props: FormData) => {
             logo: event?.metadata?.logo || '',
             background: event?.metadata?.background || '',
             color: event?.metadata?.color || '',
-            public_gallery: !event?.is_private || false,
+            is_private: event?.is_private || false,
             data_capture: event?.metadata?.data_capture || false,
             fields: event?.metadata?.fields || [],
             data_capture_title: event?.metadata?.data_capture_title || '',
@@ -327,7 +327,7 @@ const EventForm = (props: FormData) => {
                                         {...register('gallery_subtitle')} />
                                 </div> */}
 
-                            <FormControl label='logo'>
+                            <FormControl label='logo' nested={true}>
                                 <FileInput
                                     orgId={user.organization.id}
                                     inputId='logo'
@@ -337,7 +337,7 @@ const EventForm = (props: FormData) => {
                                 />
                             </FormControl>
 
-                            <FormControl label='background'>
+                            <FormControl label='background' nested={true}>
                                 <FileInput
                                     orgId={user.organization.id}
                                     inputId='background'
@@ -347,7 +347,7 @@ const EventForm = (props: FormData) => {
                                 />
                             </FormControl>
 
-                            <FormControl label='color'>
+                            <FormControl label='color' nested={true}>
                                 <input
                                     className='input pro disabled:text-white/20 transition-colors'
                                     placeholder='# hex code'
@@ -356,16 +356,16 @@ const EventForm = (props: FormData) => {
                                 <span className={clsx("h-10 w-10 rounded-full border-4 border-white/20", !config.custom_gallery && 'opacity-50')} style={{ backgroundColor: `${_.startsWith(config.color, '#') ? "" : "#"}${config.color}` }}></span>
                             </FormControl>
 
-                            <FormControl label='public'>
-                                <input type="checkbox" className="toggle pro toggle-lg" {...register('public_gallery')} />
+                            <FormControl label='private' nested={true}>
+                                <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('is_private')} />
                             </FormControl>
 
-                            <FormControl label='data'>
+                            <FormControl label='data' nested={true}>
                                 {config.data_capture && config.custom_gallery && <Modal.Trigger id='data-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
                                 <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('data_capture')} />
                             </FormControl>
 
-                            <FormControl label='legal'>
+                            <FormControl label='legal' nested={true}>
                                 {config.enable_legal && config.custom_gallery && <Modal.Trigger id='legal-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5" >custom</div></Modal.Trigger>}
                                 <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('enable_legal')} />
                             </FormControl>
@@ -389,9 +389,9 @@ const EventForm = (props: FormData) => {
 
                 <Modal title='data' id='data-modal'>
                     <div className='border-t-2 border-white/20'>
-                        <FormControl label='fields' altLabel='separate multiple fields with commas'>
+                        <FormControl label='fields' altLabel='separate multiple fields with commas' dir='col'>
                             <input
-                                className='input pro flex-1'
+                                className='input pro left w-full'
                                 placeholder='name, email, phone'
                                 disabled={!config.data_capture}
                                 {...register('fields')} />
