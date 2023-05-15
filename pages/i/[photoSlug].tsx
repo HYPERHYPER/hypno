@@ -136,15 +136,15 @@ const DetailGallery = (props: ResponseData) => {
                 <meta name="og:video:type" content='video/mp4' />
             </Head>
 
-            {/* <GlobalLayout>
+            <GlobalLayout>
                 <GlobalLayout.Content>
                     <DetailView asset={photo} config={{ aiGeneration }} imageProps={imageProps} />
                 </GlobalLayout.Content>
-            </GlobalLayout> */}
+            </GlobalLayout>
 
-            <CustomGallery event={event}>
+            {/* <CustomGallery event={event}>
                 <DetailView asset={photo} config={{ aiGeneration }} imageProps={imageProps} />
-            </CustomGallery>
+            </CustomGallery> */}
         </>
     );
 };

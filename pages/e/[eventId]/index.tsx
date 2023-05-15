@@ -15,13 +15,16 @@ import Share from 'assets/icons/share.svg'
 import Save from 'assets/icons/save.svg'
 import Play from 'assets/icons/play.svg'
 import { getPlaiceholder } from 'plaiceholder';
-import { useEffect, useState } from 'react';
+import useSWRInfinite from 'swr/infinite';
+import { fetchWithToken } from '@/lib/fetchWithToken';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { LoadingGrid } from '@/components/Gallery/LoadingAsset';
 
 type PhotosResponse = {
     photos: any;
     meta: {
         total_count: number,
-        next_page?: number,
+        next_page?: string,
         per_page?: number,
     }
 }
@@ -61,6 +64,22 @@ function EventPage(props: ResponseData) {
     const { event, photos } = props;
     const { name, id } = event;
 
+    const token = useUserStore.useToken();
+
+    const getKey = (pageIndex: number, previousPageData: any) => {
+        // if (previousPageData && previousPageData?.meta.next_page) return null; // reached the end
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${id}/photos?per_page=${photos.meta.per_page}`;
+        if (pageIndex === 0) return [url, token.access_token];
+        return [`${previousPageData.meta.next_page}`, token.access_token];
+    }
+
+    const { data, size, setSize, error, isValidating } = useSWRInfinite(getKey,
+        ([url, token]) => fetchWithToken(url, token), {
+        fallbackData: [{ photos }],
+    });
+
+    const paginatedPhotos = !_.isEmpty(_.first(data).photos) ? _.map(data, (v) => v.photos).flat() : [];
+    const hasMorePhotos = photos?.meta.total_count != paginatedPhotos?.length;
     return (
         <>
             <Head>
@@ -75,65 +94,75 @@ function EventPage(props: ResponseData) {
                     right={
                         <div className='avatar placeholder'>
                             <div className="rounded-xl bg-white text-white w-[120px]">
-                                <img src={`https://pro.hypno.com/api/v1/events/${event.id}/short_qr_code.png`} alt='QR Code' />
+                                <img src={`https://pro.hypno.com/api/v1/events/${id}/short_qr_code.png`} alt='QR Code' />
                             </div>
                         </div>
                     }
                 >
                     <h2>{photos.meta.total_count} posts</h2>
-                    <Link href={`/e/${id}`}><h2 className='text-white'>all</h2></Link>
+                    {/* <Link href={`/e/${id}`}><h2 className='text-white'>all</h2></Link> */}
                     {/* <Link href=''><h2 className='text-primary'>favorites</h2></Link> */}
                     {/* <Link href=''><h2 className='text-primary'>data</h2></Link> */}
                     <Link href={`/e/${id}/edit`}><h2 className='text-primary'>edit</h2></Link>
                 </GlobalLayout.Header>
                 <GlobalLayout.Content>
                     <div className='divider' />
-                    <div className='grid grid-cols-2 sm:grid-cols-3 gap-5 lg:grid-cols-4 lg:gap-10 xl:grid-cols-5 3xl:grid-cols-6'>
-                        {_.map(photos.photos, (p, i) => (
-                            <div key={i} className='rounded-box'>
-                                <div className='group relative rounded-box bg-white/10 w-full aspect-[2/3] overflow-hidden'>
-                                    <div className='absolute inset-0 hover:scale-110 transition rounded-box'>
-                                        {/* <div
+                    <InfiniteScroll
+                        next={() => setSize((prev) => prev + 1)}
+                        hasMore={hasMorePhotos}
+                        dataLength={paginatedPhotos?.length}
+                        loader={<></>}
+                    >
+                        <div className='grid grid-cols-2 sm:grid-cols-3 gap-5 lg:grid-cols-4 lg:gap-10 xl:grid-cols-5 3xl:grid-cols-6'>
+                            {_.map(paginatedPhotos, (p, i) => (
+                                <div key={i} className='rounded-box'>
+                                    <div className='group relative rounded-box bg-white/10 w-full aspect-[2/3] overflow-hidden'>
+                                        <Link href={`/i/${p.slug}`} className='absolute inset-0 hover:scale-110 transition rounded-box'>
+                                            {/* <div
                                             className='absolute top-0 left-0 w-full h-full rounded-box'
                                             style={{ backgroundImage: `url(${p.gif ? p.posterframe : p.jpeg_thumb_url})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}
                                         /> */}
-                                        <Image
-                                            className='absolute top-0 left-0 w-full h-full rounded-box object-cover'
-                                            priority={Number(i) < 10}
-                                            src={p.posterframe}
-                                            fill
-                                            alt={p.event_id + p.id}
-                                            placeholder={p.blurDataURL ? 'blur' : 'empty'}
-                                            blurDataURL={p.blurDataURL || undefined}
-                                        />
-                                        {p.gif &&
-                                            <div
-                                                className='absolute top-0 left-0 w-full h-full animate-jpeg-strip'
-                                                style={{ backgroundImage: `url(${p.jpeg_url})`, backgroundSize: '100% 500%' }}
+                                            {p.posterframe && <Image
+                                                className='absolute top-0 left-0 w-full h-full rounded-box object-cover'
+                                                priority={Number(i) < 10}
+                                                src={p.posterframe}
+                                                fill
+                                                alt={p.event_id + p.id || ''}
+                                                placeholder={p.blurDataURL ? 'blur' : 'empty'}
+                                                blurDataURL={p.blurDataURL || undefined}
+                                                sizes="(min-width: 1280px) 20%, (min-width: 1024px) 25%, (min-width: 768px) 33.33%, 50vw"
                                             />
-                                        }
-                                    </div>
-                                    <div
-                                        style={{ background: '-webkit-linear-gradient(top, rgba(0,0,0,0.65), rgba(0,0,0,0))' }}
-                                        className='opacity-0 group-hover:opacity-100 transition-opacity absolute top-0 left-0 w-full h-full z-10 p-5 rounded-box'>
-                                        <div className='flex flex-row justify-end text-white'>
-                                            {/* <button><Trash /></button> */}
-                                            {/* <button><Hide /></button> */}
-                                            {/* <button><Favorite /></button> */}
-                                            {/* <a href={p.download_url}><Save /></a> */}
-                                            <Link href={`/i/${p.slug}`}><Share /></Link>
-                                        </div>
-
-                                        {p.gif && (
-                                            <div className='absolute top-0 left-0 flex items-center justify-center h-full w-full'>
-                                                <button><Play /></button>
+                                            }
+                                            {p.gif &&
+                                                <div
+                                                    className='absolute top-0 left-0 w-full h-full animate-jpeg-strip'
+                                                    style={{ backgroundImage: `url(${p.jpeg_url})`, backgroundSize: '100% 500%' }}
+                                                />
+                                            }
+                                        </Link>
+                                        <div
+                                            style={{ background: '-webkit-linear-gradient(top, rgba(0,0,0,0.65), rgba(0,0,0,0))' }}
+                                            className='pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity absolute top-0 left-0 w-full h-full z-10 p-5 rounded-box'>
+                                            <div className='pointer-events-auto flex flex-row justify-end text-white'>
+                                                {/* <button><Trash /></button> */}
+                                                {/* <button><Hide /></button> */}
+                                                {/* <button><Favorite /></button> */}
+                                                {/* <a href={p.download_url}><Save /></a> */}
+                                                <Link href={`/pro/${p.event_id}?i=${p.id}`}><Share /></Link>
                                             </div>
-                                        )}
+
+                                            {p.gif && (
+                                                <div className='absolute top-0 left-0 flex items-center justify-center h-full w-full'>
+                                                    <button><Play /></button>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                            {(isValidating && hasMorePhotos) && <LoadingGrid count={_.min([photos.meta.per_page || 0, photos.meta.total_count || 0]) || 0} />}
+                        </div>
+                    </InfiniteScroll>
                 </GlobalLayout.Content>
             </GlobalLayout>
         </>
