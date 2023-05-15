@@ -69,6 +69,11 @@ const nextConfig = {
           source: '/selects',
           destination: process.env.NEXT_PUBLIC_SELECTS_URL,
           basePath: false,
+        },
+        {
+          source: '/brand',
+          destination: process.env.NEXT_PUBLIC_BRAND_URL,
+          basePath: false,
         }
       ]
     }
