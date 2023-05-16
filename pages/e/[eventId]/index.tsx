@@ -19,6 +19,9 @@ import useSWRInfinite from 'swr/infinite';
 import { fetchWithToken } from '@/lib/fetchWithToken';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { LoadingGrid } from '@/components/Gallery/LoadingAsset';
+import { useRouter } from 'next/router';
+import ScanQRModal from '@/components/Events/ScanQRModal';
+import Modal from '@/components/Modal';
 
 type PhotosResponse = {
     photos: any;
@@ -61,6 +64,7 @@ interface ResponseData {
 // }
 
 function EventPage(props: ResponseData) {
+    const { query } = useRouter();
     const { event, photos } = props;
     const { name, id } = event;
 
@@ -68,7 +72,7 @@ function EventPage(props: ResponseData) {
 
     const getKey = (pageIndex: number, previousPageData: any) => {
         // if (previousPageData && previousPageData?.meta.next_page) return null; // reached the end
-        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${id}/photos?per_page=${photos.meta.per_page}`;
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${query.eventId}/photos?per_page=${photos.meta.per_page}`;
         if (pageIndex === 0) return [url, token.access_token];
         return [`${previousPageData.meta.next_page}`, token.access_token];
     }
@@ -80,6 +84,7 @@ function EventPage(props: ResponseData) {
 
     const paginatedPhotos = !_.isEmpty(_.first(data).photos) ? _.map(data, (v) => v.photos).flat() : [];
     const hasMorePhotos = photos?.meta.total_count != paginatedPhotos?.length;
+
     return (
         <>
             <Head>
@@ -92,11 +97,13 @@ function EventPage(props: ResponseData) {
                 <GlobalLayout.Header
                     title={name}
                     right={
-                        <div className='avatar placeholder'>
-                            <div className="rounded-xl bg-white text-white w-[120px]">
-                                <img src={`https://pro.hypno.com/api/v1/events/${id}/short_qr_code.png`} alt='QR Code' />
+                        <Modal.Trigger id='scan-qr-modal'>
+                            <div className='avatar placeholder'>
+                                <div className="rounded-xl bg-white text-white w-[120px]">
+                                    <img src={`https://pro.hypno.com/api/v1/events/${id}/short_qr_code.png`} alt='QR Code' />
+                                </div>
                             </div>
-                        </div>
+                        </Modal.Trigger>
                     }
                 >
                     <h2>{photos.meta.total_count} posts</h2>
@@ -105,6 +112,9 @@ function EventPage(props: ResponseData) {
                     {/* <Link href=''><h2 className='text-primary'>data</h2></Link> */}
                     <Link href={`/e/${id}/edit`}><h2 className='text-primary'>edit</h2></Link>
                 </GlobalLayout.Header>
+
+                <ScanQRModal eventId={id} eventName={name} modalId='scan-qr-modal' />
+
                 <GlobalLayout.Content>
                     <div className='divider' />
                     <InfiniteScroll
@@ -114,52 +124,57 @@ function EventPage(props: ResponseData) {
                         loader={<></>}
                     >
                         <div className='grid grid-cols-2 sm:grid-cols-3 gap-5 lg:grid-cols-4 lg:gap-10 xl:grid-cols-5 3xl:grid-cols-6'>
-                            {_.map(paginatedPhotos, (p, i) => (
-                                <div key={i} className='rounded-box'>
-                                    <div className='group relative rounded-box bg-white/10 w-full aspect-[2/3] overflow-hidden'>
-                                        <Link href={`/i/${p.slug}`} className='absolute inset-0 hover:scale-110 transition rounded-box'>
-                                            {/* <div
+                            {_.map(paginatedPhotos, (p, i) => {
+                                if (p.slug) {
+                                    return (
+                                        <div key={i} className='rounded-box'>
+                                            <div className='group relative rounded-box bg-white/10 w-full aspect-[2/3] overflow-hidden'>
+                                                <Link href={`/i/${p.slug}`} className='absolute inset-0 hover:scale-110 transition rounded-box'>
+                                                    {/* <div
                                             className='absolute top-0 left-0 w-full h-full rounded-box'
                                             style={{ backgroundImage: `url(${p.gif ? p.posterframe : p.jpeg_thumb_url})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}
                                         /> */}
-                                            {p.posterframe && <Image
-                                                className='absolute top-0 left-0 w-full h-full rounded-box object-cover'
-                                                priority={Number(i) < 10}
-                                                src={p.posterframe}
-                                                fill
-                                                alt={p.event_id + p.id || ''}
-                                                placeholder={p.blurDataURL ? 'blur' : 'empty'}
-                                                blurDataURL={p.blurDataURL || undefined}
-                                                sizes="(min-width: 1280px) 20%, (min-width: 1024px) 25%, (min-width: 768px) 33.33%, 50vw"
-                                            />
-                                            }
-                                            {p.gif &&
+                                                    {p.posterframe && <Image
+                                                        className='absolute top-0 left-0 w-full h-full rounded-box object-cover'
+                                                        priority={Number(i) < 10}
+                                                        src={p.posterframe}
+                                                        fill
+                                                        alt={p.event_id + p.id || ''}
+                                                        placeholder={p.blurDataURL ? 'blur' : 'empty'}
+                                                        blurDataURL={p.blurDataURL || undefined}
+                                                        sizes="(min-width: 1280px) 20%, (min-width: 1024px) 25%, (min-width: 768px) 33.33%, 50vw"
+                                                    />
+                                                    }
+                                                    {p.gif &&
+                                                        <div
+                                                            className='absolute top-0 left-0 w-full h-full animate-jpeg-strip'
+                                                            style={{ backgroundImage: `url(${p.jpeg_url})`, backgroundSize: '100% 500%' }}
+                                                        />
+                                                    }
+                                                </Link>
                                                 <div
-                                                    className='absolute top-0 left-0 w-full h-full animate-jpeg-strip'
-                                                    style={{ backgroundImage: `url(${p.jpeg_url})`, backgroundSize: '100% 500%' }}
-                                                />
-                                            }
-                                        </Link>
-                                        <div
-                                            style={{ background: '-webkit-linear-gradient(top, rgba(0,0,0,0.65), rgba(0,0,0,0))' }}
-                                            className='pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity absolute top-0 left-0 w-full h-full z-10 p-5 rounded-box'>
-                                            <div className='pointer-events-auto flex flex-row justify-end text-white'>
-                                                {/* <button><Trash /></button> */}
-                                                {/* <button><Hide /></button> */}
-                                                {/* <button><Favorite /></button> */}
-                                                {/* <a href={p.download_url}><Save /></a> */}
-                                                <Link href={`/pro/${p.event_id}?i=${p.id}`}><Share /></Link>
-                                            </div>
+                                                    style={{ background: '-webkit-linear-gradient(top, rgba(0,0,0,0.65), rgba(0,0,0,0))' }}
+                                                    className='pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity absolute top-0 left-0 w-full h-full z-10 p-5 rounded-box'>
+                                                    <div className='pointer-events-auto flex flex-row justify-end text-white'>
+                                                        {/* <button><Trash /></button> */}
+                                                        {/* <button><Hide /></button> */}
+                                                        {/* <button><Favorite /></button> */}
+                                                        {/* <a href={p.download_url}><Save /></a> */}
+                                                        <Link href={`/pro/${p.event_id}?i=${p.id}`}><Share /></Link>
+                                                    </div>
 
-                                            {p.gif && (
-                                                <div className='absolute top-0 left-0 flex items-center justify-center h-full w-full'>
-                                                    <button><Play /></button>
+                                                    {p.gif && (
+                                                        <div className='absolute top-0 left-0 flex items-center justify-center h-full w-full'>
+                                                            <button><Play /></button>
+                                                        </div>
+                                                    )}
                                                 </div>
-                                            )}
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                            ))}
+                                    )
+                                }
+                            }
+                            )}
                             {(isValidating && hasMorePhotos) && <LoadingGrid count={_.min([photos.meta.per_page || 0, photos.meta.total_count || 0]) || 0} />}
                         </div>
                     </InfiniteScroll>
@@ -173,8 +188,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const { eventId } = context.query;
 
     // Fetch event config + event photos
-    const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}`;
-    const photosUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}/photos`;
+    const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}`;
+    const photosUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}/photos`;
     const token = nookies.get(context).hypno_token;
     let eventData: any = {};
     let photosData: any = {};
@@ -195,7 +210,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     ])
 
     if (eventRes.status === 200) {
-        eventData = await eventRes.data;
+        eventData = eventRes.data;
     }
 
     if (photosRes.status === 200) {
