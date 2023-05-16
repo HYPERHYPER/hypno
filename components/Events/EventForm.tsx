@@ -74,6 +74,10 @@ const getWatermarkIdByName = (watermarksArr: any, name: string) => {
     return watermark ? watermark.id : null;
 };
 
+const isPrivate = (is_private: number) => {
+    return is_private == 2;
+}
+
 const EventForm = (props: FormData) => {
     const { onSubmit, event, view, changeView, updateData, updateStatus } = props;
     const user = useUserStore.useUser();
@@ -106,7 +110,7 @@ const EventForm = (props: FormData) => {
             logo: event?.metadata?.logo || '',
             background: event?.metadata?.background || '',
             color: event?.metadata?.color || '',
-            is_private: event?.is_private || false,
+            is_private: event ? isPrivate(event.is_private) : false,
             data_capture: event?.metadata?.data_capture || false,
             fields: event?.metadata?.fields || [],
             data_capture_title: event?.metadata?.data_capture_title || '',
