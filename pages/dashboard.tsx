@@ -27,13 +27,13 @@ interface ResponseData {
 
 export default withAuth(DashboardPage, 'protected');
 function DashboardPage(props: ResponseData) {
-    const { events: initialEvents, meta } = props;
-    const user = useUserStore.useUser();
+    // const { events: initialEvents, meta } = props;
+    // const user = useUserStore.useUser();
     const token = useUserStore.useToken();
 
     const getKey = (pageIndex: number, previousPageData: any) => {
         if (previousPageData && pageIndex == previousPageData.pages) return null; // reached the end
-        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events?include_last_photo=true&per_page=${meta.per_page}`;
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events?include_last_photo=true&per_page=10`;
         if (pageIndex === 0) return [url, token.access_token];
         const pageIdx = previousPageData.meta.next_page;
         return [`${url}&page=${pageIdx}`, token.access_token];
@@ -41,7 +41,7 @@ function DashboardPage(props: ResponseData) {
 
     const { data, size, setSize, error, isValidating } = useSWRInfinite(getKey,
         ([url, token]) => fetchWithToken(url, token), {
-        fallbackData: [{ events: initialEvents, meta }],
+        fallbackData: [{ events: [] }],
     });
 
     const paginatedEvents = _.map(data, (v) => v.events).flat();
@@ -67,7 +67,7 @@ function DashboardPage(props: ResponseData) {
                     <div className='divider mt-0 h-1' />
                     <InfiniteScroll
                         next={() => setSize(_.last(data).meta.next_page)}
-                        hasMore={size != meta.total_pages}
+                        hasMore={size != (_.first(data)?.meta?.total_pages || 0)}
                         dataLength={paginatedEvents?.length}
                         loader={<></>}
                     >
@@ -87,7 +87,7 @@ function DashboardPage(props: ResponseData) {
                                     </div>
                                 </Link>
                             )) :
-                                <Link href='/e/new'>
+                                !isValidating && <Link href='/e/new'>
                                     <div className='relative rounded-box bg-white/10 w-full aspect-[2/3]'>
                                         <div className='absolute bottom-0 left-0 pb-6 px-6'>
                                             <h2 className='lowercase'>make your first event!</h2>
@@ -95,7 +95,7 @@ function DashboardPage(props: ResponseData) {
                                     </div>
                                 </Link>
                             }
-                            {isValidating && <LoadingGrid count={meta.per_page || 0} />}
+                            {isValidating && <LoadingGrid count={10} />}
                         </div>
                     </InfiniteScroll>
                 </GlobalLayout.Content>
@@ -106,7 +106,7 @@ function DashboardPage(props: ResponseData) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     // Fetch events
-    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events?include_last_photo=true&per_page=20`;
+    // const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events?include_last_photo=true&per_page=20`;
     const token = nookies.get(context).hypno_token;
     if (!token) {
         return {
@@ -118,28 +118,29 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
 
     let data = {};
-    await axios.get(url, {
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + token,
-        },
-    }).then(async (res) => {
-        if (res.status === 200) {
-            data = res.data;
-        }
-    }).catch((e) => {
-        console.log(e);
-    })
+    // LOAD INITIAL DATA USING USESWR FOR RESPONSIVE NAVIGATION
+    // await axios.get(url, {
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         Authorization: 'Bearer ' + token,
+    //     },
+    // }).then(async (res) => {
+    //     if (res.status === 200) {
+    //         data = res.data;
+    //     }
+    // }).catch((e) => {
+    //     console.log(e);
+    // })
 
-    if (_.isEmpty(data)) {
-        return {
-            notFound: true,
-        }
-    }
+    // if (_.isEmpty(data)) {
+    //     return {
+    //         notFound: true,
+    //     }
+    // }
 
     return {
         props: {
-            ...data,
+            // ...data,
         }
     };
 };
