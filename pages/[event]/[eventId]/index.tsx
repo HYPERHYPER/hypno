@@ -276,9 +276,9 @@ const SubGallery = (props: ResponseData) => {
                                 : (
                                     gallery.email_delivery ? (
                                         <div className='fixed hero top-0 left-0 h-screen p-10'>
-                                            <div className='hero-content max-w-[24rem] sm:max-w-2xl flex flex-row gap-4 items-center bg-white/10 backdrop-blur-[50px] p-8'>
+                                            <div className='hero-content max-w-[24rem] sm:max-w-2xl flex flex-col bg-white/10 backdrop-blur-lg gap-4 items-center justify-center p-8'>
                                                 <span className='flex-1'><Letter /></span>
-                                                <p className='text-white'>Thank you! <br /> Your content will be delivered to your email shortly.</p>
+                                                <h2 className='text-white text-center'>Thank you! <br /> Your content will be delivered to your email shortly.</h2>
                                             </div>
                                         </div>
                                     ) : (
@@ -298,7 +298,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     // Load theme interface based on event
     const isDefault = String(event) === 'pro';
-    const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${eventId}.json`;
+    const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}`;
     const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
     let eventRes = await axios.get(eventUrl, {
         headers: {
@@ -343,11 +343,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         });
     }
 
-    if (deliverySlug && !eventData.metadata.email_delivery) {
-        return {
-            notFound: true
-        }
-    }
+    // if (deliverySlug && !eventData.metadata.email_delivery) {
+    //     return {
+    //         notFound: true
+    //     }
+    // }
     return {
         props: {
             ...photosData,
@@ -357,7 +357,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 id: eventData.id,
                 party_slug: eventData.party_slug,
                 is_private: eventData.is_private,
-                metadata: eventData.metadata,
+                metadata: {
+                    ...eventData.metadata,
+                    ...(deliverySlug && { email_delivery: true })
+                }
             }
         }
     }
