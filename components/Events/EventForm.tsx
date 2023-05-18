@@ -1,19 +1,19 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import _, { debounce } from 'lodash';
 import { useForm } from 'react-hook-form';
 import { ThreeDots } from 'react-loader-spinner';
 import AiPlayground from '@/components/AiPlayground/AiPlayground';
 import { replaceLinks } from '@/helpers/text';
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import FormControl from '../Form/FormControl';
 import Modal from '../Modal';
 import FileInput from '../Form/FileInput';
 import useUserStore from '@/store/userStore';
 import { toHexCode } from '@/helpers/color';
-import { EventMicrosite } from '@/types/event';
 import useDeepCompareEffect from "use-deep-compare-effect";
 import clsx from 'clsx';
 import { isCustomGallery } from '@/helpers/event';
+import { parseCookies } from 'nookies';
 
 interface FormData {
     event?: any;
@@ -81,7 +81,6 @@ const isPrivate = (is_private: number) => {
 const EventForm = (props: FormData) => {
     const { onSubmit, event, view, changeView, updateData, updateStatus } = props;
     const user = useUserStore.useUser();
-
     const {
         register,
         handleSubmit,
@@ -125,6 +124,26 @@ const EventForm = (props: FormData) => {
 
     const config = watch();
     const watchedWatermarks = watch('watermarks');
+
+    const [organizations, setOrganizations] = useState<any>([]);
+    useEffect(() => {
+        const fetchOrganizations = async () => {
+            try {
+                const token = parseCookies().hypno_token;
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: 'Bearer ' + token,
+                    }
+                });
+                setOrganizations(response.data.organizations);
+            } catch (error) {
+                console.error('Error fetching organizations:', error);
+            }
+        };
+
+        fetchOrganizations();
+    }, []);
 
     // TODO: hiding email delivery for now
     // useEffect(() => {
@@ -214,7 +233,7 @@ const EventForm = (props: FormData) => {
                                 <div className='lowercase text-xl sm:text-4xl'>{event.organization.name}</div>
                                 : (
                                     <select className='select min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl'>
-                                        <option value={user.organization.id}>{user.organization.name}</option>
+                                        {_.map(organizations, ((o) => <option key={o.id} value={o.id}>{o.name}</option>))}
                                     </select>
                                 )}
                         </FormControl>
