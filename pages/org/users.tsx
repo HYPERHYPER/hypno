@@ -6,11 +6,55 @@ import GlobalLayout from '@/components/GlobalLayout';
 import Modal from '@/components/Modal';
 import NewUserModal from '@/components/Users/NewUserModal';
 import Minus from 'public/pop/minus.svg';
+import { GetServerSideProps } from 'next';
+import nookies from 'nookies';
+import axios from 'axios';
+import useSWRInfinite from 'swr/infinite';
+import { fetchWithToken } from '@/lib/fetchWithToken';
+import InfiniteScroll from 'react-infinite-scroll-component';
+
+type OrgUser = {
+    username?: string;
+    email?: string;
+    id?: number;
+    organization_id?: number;
+    first_name?: string;
+    last_name?: string;
+}
+
+interface ResponseData {
+    users: OrgUser[];
+    meta: {
+        current_page: number;
+        next_page: number;
+        per_page: number;
+        prev_page: number;
+        total_count: number;
+        total_pages: number;
+    };
+}
 
 export default withAuth(OrganizationUsersPage, 'protected');
-function OrganizationUsersPage() {
+function OrganizationUsersPage(props: ResponseData) {
+    const { users: initialUsers, meta } = props;
     const user = useUserStore.useUser();
 
+    const token = useUserStore.useToken();
+
+    const getKey = (pageIndex: number, previousPageData: any) => {
+        if (previousPageData && pageIndex == previousPageData.pages) return null; // reached the end
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/users?per_page=${meta.per_page}`;
+        if (pageIndex === 0) return [url, token.access_token];
+        const pageIdx = previousPageData.meta.next_page;
+        return [`${url}&page=${pageIdx}`, token.access_token];
+    }
+
+    const { data, size, setSize, error, isValidating } = useSWRInfinite(getKey,
+        ([url, token]) => fetchWithToken(url, token), {
+        fallbackData: [{ users: initialUsers, meta }],
+    });
+
+    const paginatedUsers = _.map(data, (v) => v.users).flat();
     return (
         <>
             <Head>
@@ -22,39 +66,70 @@ function OrganizationUsersPage() {
             <GlobalLayout>
                 <GlobalLayout.Header
                     title='users'
-                    returnLink={{ slug: '/org', name: 'organization'}}
+                    returnLink={{ slug: '/org', name: 'organization' }}
                 >
+                    <h2>{meta.total_count} users</h2>
                     <Modal.Trigger id='new-user-modal'><h2 className='text-primary cursor-pointer'>new user</h2></Modal.Trigger>
                 </GlobalLayout.Header>
 
                 <NewUserModal />
 
                 <GlobalLayout.Content>
-                    <div className='list pro'>
-                        <Item />
-                        <Item />
-                        <Item />
-                        <Item />
-                        <Item />
-                    </div>
+                    <InfiniteScroll
+                        next={() => setSize(_.last(data).meta.next_page)}
+                        hasMore={size != (_.first(data)?.meta?.total_pages || 0)}
+                        dataLength={paginatedUsers?.length}
+                        loader={<></>}
+                    >
+                        <div className='list pro'>
+                            {_.map(paginatedUsers, (u) => <Item key={u.id} user={u} />)}
+                        </div>
+                    </InfiniteScroll>
                 </GlobalLayout.Content>
             </GlobalLayout>
         </>
     )
 }
 
-const Item = ({ name }: { name?: string }) => {
+const Item = ({ user }: { user: OrgUser }) => {
+    const { username, first_name, last_name } = user;
     return (
         <div className='item'>
-            <div className='space-x-3'>
-                <span className='text-white text-4xl'>username</span>
-                <span className='text-white/40 text-4xl'>name</span>
-                <span className='text-white/40 text-xl'>device</span>
+            <div className='space-x-3 tracking-tight lowercase flex'>
+                {username && <span className='text-white text-xl sm:text-4xl'>{username}</span>}
+                <span className='text-white/40 text-xl sm:text-4xl'>{first_name} {last_name}</span>
+                {/* <span className='text-white/40 text-xl'>device</span> */}
             </div>
-            <div className='flex gap-5 text-primary lowercase'>
-                <span>role</span>
-                <span className='bg-white/20 h-10 w-10 flex items-center justify-center rounded-full text-black'><Minus /></span>
+            <div className='flex items-center gap-3 sm:gap-5 text-primary lowercase'>
+                {/* <span>role</span> */}
+                {/* <span className='bg-white/20 h-6 w-6 sm:h-10 sm:w-10 flex items-center justify-center rounded-full text-black'><Minus /></span> */}
             </div>
         </div>
     )
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    // Fetch organization users
+    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/users?per_page=30`;
+    const token = nookies.get(context).hypno_token;
+    let data: any = {};
+
+    await axios.get(url, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + token,
+        },
+    }).then(async (res) => {
+        if (res.status === 200) {
+            data = res.data;
+        }
+    }).catch((e) => {
+        console.log(e);
+    })
+
+    return {
+        props: {
+            ...data,
+        }
+    };
+};

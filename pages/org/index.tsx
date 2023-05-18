@@ -12,7 +12,7 @@ import nookies, { parseCookies } from 'nookies';
 import { useRef } from 'react';
 
 interface ResponseData {
-    organization: any;
+    user_count: number;
 }
 
 export default withAuth(OrganizationSettingsPage, 'protected');
@@ -65,7 +65,7 @@ function OrganizationSettingsPage(props: ResponseData) {
                     <div className='list pro'>
                         <Modal.Trigger id='org-name-modal'><Item name='org name' value={organization.name} /></Modal.Trigger>
                         <Item name='org events' value={'#'} />
-                        <Item name='org users' value={'#'} href='/org/users' />
+                        <Item name='org users' value={String(props.user_count)} href='/org/users' />
                         <Item name='next payment' value={user.organization_id} />
                         <Item name='payment method' value={'update'} />
                         <Item name='subscription' value={'enterprise'} />
@@ -101,36 +101,29 @@ const Item = ({ name, value, href }: { name: string, value: string, href?: strin
     )
 }
 
-// export const getServerSideProps: GetServerSideProps = async (context) => {
-//     // Fetch organization
-//     const token = nookies.get(context).hypno_token;
-//     const orgId = nookies.get(context).hypno.state.user.organization_id;
-//     const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${orgId}`;
-//     let data = {};
-//     await axios.get(url, {
-//         headers: {
-//             'Content-Type': 'application/json',
-//             Authorization: 'Bearer ' + token,
-//         },
-//     }).then(async (res) => {
-//         if (res.status === 200) {
-//             console.log(res.data)
-//             data = await res.data;
-//         }
-//     }).catch((e) => {
-//         console.log(e);
-//     })
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    // Fetch organization users
+    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/users?per_page=1`;
+    const token = nookies.get(context).hypno_token;
+    let data: any = {};
 
-//     if (_.isEmpty(data)) {
-//         return {
-//             notFound: true,
-//         }
-//     }
+    await axios.get(url, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + token,
+        },
+    }).then(async (res) => {
+        if (res.status === 200) {
+            data = res.data;
+        }
+    }).catch((e) => {
+        console.log(e);
+    })
 
-//     return {
-//         props: {
-//             ...data,
-//         }
-//     };
-// };
+    return {
+        props: {
+            user_count: data?.meta?.total_count,
+        }
+    };
+};
 
