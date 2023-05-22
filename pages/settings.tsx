@@ -6,18 +6,24 @@ import GlobalLayout from '@/components/GlobalLayout';
 import Link from 'next/link';
 import Modal from '@/components/Modal';
 import FormControl from '@/components/Form/FormControl';
-import { parseCookies } from 'nookies';
+import nookies, { parseCookies } from 'nookies';
 import axios from 'axios';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import clsx from 'clsx';
 
 export default withAuth(SettingsPage, 'protected');
 function SettingsPage() {
     const user = useUserStore.useUser();
     const logout = useUserStore.useLogout();
+    const updateUser = useUserStore.useUpdateUser();
+
+    const [isSaving, setIsSaving] = useState<boolean>(false);
 
     const usernameRef = useRef<HTMLInputElement>(null);
-    const updateUser = async (field: string, value?: string) => {
+    const firstNameRef = useRef<HTMLInputElement>(null);
+    const lastNameRef = useRef<HTMLInputElement>(null);
+
+    const handleUpdateUser = async (field: string, value?: string) => {
         // setSavedChangesStatus('saving');
         // if (!_.isEmpty(errors)) {
         //     console.log("submitForm errors", { errors });
@@ -27,20 +33,24 @@ function SettingsPage() {
         /* Update user payload */
         let payload = {
             user: {
-                email: field == 'email' ? value : user.email,
-                first_name: field == 'first_name' ? value : user.first_name,
-                last_name: field == 'last_name' ? value : user.last_name,
-                username: field == 'username' ? value : user.username,
+                [field]: value
             }
         }
 
-        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/complete_pro_registration`;
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/users/${user.id}`;
         const token = parseCookies().hypno_token;
-        const res = await axios.put(url, payload, {
+        await axios.put(url, payload, {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: 'Bearer ' + token,
             },
+        }).then((res) => {
+            console.log(res);
+            updateUser({
+                [field]: value,
+            });
+        }).catch((e) => {
+            console.log(e);
         })
     }
 
@@ -68,6 +78,7 @@ function SettingsPage() {
                 <GlobalLayout.Content>
                     <div className='list pro'>
                         <Item name='username' value={user.username || '+'} modalId='username-modal' />
+                        <Item name='name' value={`${user.first_name} ${user.last_name}` || ''} modalId='name-modal' />
                         <Item name='email' value={user.email} />
                         <Item name='password' value={'•••••••'} />
                         <Item name='organization' value={user.organization.name} href='/org' />
@@ -75,10 +86,21 @@ function SettingsPage() {
                     </div>
                 </GlobalLayout.Content>
 
-                <Modal id='username-modal' title='edit username' onDone={() => updateUser('username', usernameRef.current?.value)}>
+                <Modal id='username-modal' title='edit username' onDone={() => handleUpdateUser('username', usernameRef.current?.value)}>
                     <div className='list pro'>
                         <FormControl label='username'>
                             <input ref={usernameRef} className='input pro' defaultValue={user.username} />
+                        </FormControl>
+                    </div>
+                </Modal>
+
+                <Modal id='name-modal' title='edit name' onDone={() => { handleUpdateUser('first_name', firstNameRef.current?.value); handleUpdateUser('last_name', lastNameRef.current?.value)}}>
+                    <div className='list pro'>
+                        <FormControl label='first name'>
+                            <input ref={firstNameRef} className='input pro' defaultValue={user.first_name} />
+                        </FormControl>
+                        <FormControl label='last name'>
+                            <input ref={lastNameRef} className='input pro' defaultValue={user.last_name} />
                         </FormControl>
                     </div>
                 </Modal>

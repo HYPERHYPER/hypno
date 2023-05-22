@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware'
 import nookies, { destroyCookie, setCookie } from 'nookies'
 
-interface UserState {
+type UserState = {
   user: any;
   token: any;
   error: string;
@@ -15,7 +15,11 @@ interface UserState {
   stopLoading: () => void;
 }
 
-const useUserStoreBase = create<UserState>()(
+type UserAction = {
+  updateUser: (updatedUser: UserState['user']) => void
+}
+
+const useUserStoreBase = create<UserState & UserAction>()(
   persist(
     (set, get) => ({
       user: null,
@@ -23,6 +27,7 @@ const useUserStoreBase = create<UserState>()(
       error: '',
       isLoggedIn: false,
       isLoading: true,
+      updateUser: (updatedUser) => set(() => ({ user: { ...get().user, ...updatedUser } })),
       login: async (email, password) => {
         try {
           // call your authentication API and set the user state
