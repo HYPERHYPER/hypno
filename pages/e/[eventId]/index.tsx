@@ -71,7 +71,7 @@ function EventPage(props: ResponseData) {
     const token = useUserStore.useToken();
 
     const getKey = (pageIndex: number, previousPageData: any) => {
-        // if (previousPageData && previousPageData?.meta.next_page) return null; // reached the end
+        if (previousPageData && !previousPageData?.meta.next_page) return null; // reached the end
         const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${query.eventId}/photos?per_page=${photos.meta.per_page}`;
         if (pageIndex === 0) return [url, token.access_token];
         return [`${previousPageData.meta.next_page}`, token.access_token];
@@ -194,36 +194,40 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     let eventData: any = {};
     let photosData: any = {};
 
-    const [eventRes, photosRes] = await Promise.all([
-        axios.get(eventUrl, {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token,
-            }
-        }),
-        axios.get(photosUrl, {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token,
-            }
-        })
-    ])
-
-    if (eventRes.status === 200) {
-        eventData = eventRes.data;
-    }
-
-    if (photosRes.status === 200) {
-        const photos = await Promise.all(
-            photosRes.data.photos.map(async (photo: any) => {
-                const placeholder = await getPlaiceholder(photo.posterframe);
-                return {
-                    ...photo,
-                    blurDataURL: placeholder.base64,
-                };
+    try {
+        const [eventRes, photosRes] = await Promise.all([
+            axios.get(eventUrl, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + token,
+                }
+            }),
+            axios.get(photosUrl, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + token,
+                }
             })
-        );
-        photosData = { ...photosRes.data, photos };
+        ])
+
+        if (eventRes.status === 200) {
+            eventData = eventRes.data;
+        }
+
+        if (photosRes.status === 200) {
+            const photos = await Promise.all(
+                photosRes.data.photos.map(async (photo: any) => {
+                    const placeholder = await getPlaiceholder(photo.posterframe);
+                    return {
+                        ...photo,
+                        blurDataURL: placeholder.base64,
+                    };
+                })
+            );
+            photosData = { ...photosRes.data, photos };
+        }
+    } catch (e) {
+        console.log(e);
     }
 
     if (_.isEmpty(eventData)) {
