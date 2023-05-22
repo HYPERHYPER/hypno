@@ -122,6 +122,7 @@ function EventPage(props: ResponseData) {
                         hasMore={hasMorePhotos}
                         dataLength={paginatedPhotos?.length}
                         loader={<></>}
+                        scrollThreshold={0.45}
                     >
                         <div className='grid grid-cols-2 sm:grid-cols-3 gap-5 lg:grid-cols-4 lg:gap-10 xl:grid-cols-5 3xl:grid-cols-6'>
                             {_.map(paginatedPhotos, (p, i) => {
