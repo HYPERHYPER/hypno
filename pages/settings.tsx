@@ -1,15 +1,25 @@
 import Head from 'next/head'
-import _ from 'lodash';
+import _, { debounce } from 'lodash';
 import useUserStore from '@/store/userStore';
 import withAuth from '@/components/hoc/withAuth';
 import GlobalLayout from '@/components/GlobalLayout';
 import Link from 'next/link';
 import Modal from '@/components/Modal';
 import FormControl from '@/components/Form/FormControl';
-import nookies, { parseCookies } from 'nookies';
+import { parseCookies } from 'nookies';
 import axios from 'axios';
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import clsx from 'clsx';
+import { useForm } from 'react-hook-form';
+
+const statusText = (status: 'ready' | 'error' | 'saving' | 'success') => (
+    <>
+        {status == 'ready' && <h2 className='text-white/40'>ready for changes</h2>}
+        {status == 'error' && <h2 className='text-red-500'>oops! error...</h2>}
+        {status == 'success' && <h2 className='text-primary'>success!</h2>}
+        {status == 'saving' && <h2 className='text-white'>saving...</h2>}
+    </>
+)
 
 export default withAuth(SettingsPage, 'protected');
 function SettingsPage() {
@@ -17,23 +27,29 @@ function SettingsPage() {
     const logout = useUserStore.useLogout();
     const updateUser = useUserStore.useUpdateUser();
 
-    const [isSaving, setIsSaving] = useState<boolean>(false);
+    const [saveStatus, setSaveStatus] = useState<'ready' | 'error' | 'saving' | 'success'>('ready');
+    const {
+        register,
+        handleSubmit,
+        formState: { isDirty },
+        reset
+    } = useForm({
+        defaultValues: {
+            first_name: user.first_name || '',
+            last_name: user.last_name || '',
+            username: user.username || '',
+        }
+    });
 
-    const usernameRef = useRef<HTMLInputElement>(null);
-    const firstNameRef = useRef<HTMLInputElement>(null);
-    const lastNameRef = useRef<HTMLInputElement>(null);
-
-    const handleUpdateUser = async (field: string, value?: string) => {
-        // setSavedChangesStatus('saving');
+    const handleUpdateUser = async (data: any) => {
         // if (!_.isEmpty(errors)) {
         //     console.log("submitForm errors", { errors });
         //     return;
         // }
-
         /* Update user payload */
         let payload = {
             user: {
-                [field]: value
+                ...data
             }
         }
 
@@ -45,14 +61,34 @@ function SettingsPage() {
                 Authorization: 'Bearer ' + token,
             },
         }).then((res) => {
-            console.log(res);
+            setSaveStatus('success')
+            setTimeout(() => {
+                setSaveStatus('ready')
+            }, 3000)
             updateUser({
-                [field]: value,
+                ...data
             });
+            reset(data);
         }).catch((e) => {
             console.log(e);
+            setSaveStatus('error')
         })
     }
+
+    const debouncedSave = useCallback(
+        debounce(() => {
+            handleSubmit(handleUpdateUser)();
+            return;
+        }, 1000),
+        []
+    );
+
+    useEffect(() => {
+        if (isDirty) {
+            setSaveStatus('saving');
+            debouncedSave();
+        }
+    }, [isDirty]);
 
     return (
         <>
@@ -86,21 +122,27 @@ function SettingsPage() {
                     </div>
                 </GlobalLayout.Content>
 
-                <Modal id='username-modal' title='edit username' onDone={() => handleUpdateUser('username', usernameRef.current?.value)}>
+                <Modal
+                    id='username-modal'
+                    title='edit username'
+                    menu={statusText(saveStatus)}>
                     <div className='list pro'>
                         <FormControl label='username'>
-                            <input ref={usernameRef} className='input pro' defaultValue={user.username} />
+                            <input {...register('username', { required: true })} className='input pro' />
                         </FormControl>
                     </div>
                 </Modal>
 
-                <Modal id='name-modal' title='edit name' onDone={() => { handleUpdateUser('first_name', firstNameRef.current?.value); handleUpdateUser('last_name', lastNameRef.current?.value)}}>
+                <Modal
+                    id='name-modal'
+                    title='edit name'
+                    menu={statusText(saveStatus)}>
                     <div className='list pro'>
                         <FormControl label='first name'>
-                            <input ref={firstNameRef} className='input pro' defaultValue={user.first_name} />
+                            <input {...register('first_name')} className='input pro' />
                         </FormControl>
                         <FormControl label='last name'>
-                            <input ref={lastNameRef} className='input pro' defaultValue={user.last_name} />
+                            <input {...register('last_name')} className='input pro' />
                         </FormControl>
                     </div>
                 </Modal>
