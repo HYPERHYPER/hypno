@@ -14,6 +14,7 @@ import useDeepCompareEffect from "use-deep-compare-effect";
 import clsx from 'clsx';
 import { isCustomGallery } from '@/helpers/event';
 import { parseCookies } from 'nookies';
+import { ChromePicker } from 'react-color';
 
 interface FormData {
     event?: any;
@@ -376,7 +377,18 @@ const EventForm = (props: FormData) => {
                                     placeholder='# hex code'
                                     disabled={!config.custom_gallery}
                                     {...register('color')} />
-                                <span className={clsx("h-10 w-10 rounded-full border-4 border-white/20", !config.custom_gallery && 'opacity-50')} style={{ backgroundColor: `${_.startsWith(config.color, '#') ? "" : "#"}${config.color}` }}></span>
+                                <div className="dropdown dropdown-top dropdown-end">
+                                    <label
+                                        className='w-full'
+                                        tabIndex={config.custom_gallery ? 0 : undefined}>
+                                        <span className={clsx("inline-flex h-10 w-10 rounded-full border-4 border-white/20", !config.custom_gallery && 'opacity-50')} style={{ backgroundColor: `${_.startsWith(config.color, '#') ? "" : "#"}${config.color}` }}/>
+                                    </label>
+                                    <div
+                                        tabIndex={config.custom_gallery ? 0 : undefined}
+                                        className='dropdown-content shadow mb-2 p-2 rounded-full'>
+                                        <ChromePicker color={config.color || '#000000'} onChange={(color: any, e: any) => { e.preventDefault(); setValue('color', color.hex)}} disableAlpha={true} />
+                                    </div>
+                                </div>
                             </FormControl>
 
                             <FormControl label='private' nested={true}>
