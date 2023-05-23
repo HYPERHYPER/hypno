@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import _ from 'lodash';
+import _, { debounce } from 'lodash';
 import useUserStore from '@/store/userStore';
 import withAuth from '@/components/hoc/withAuth';
 import GlobalLayout from '@/components/GlobalLayout';
@@ -9,7 +9,17 @@ import FormControl from '@/components/Form/FormControl';
 import { GetServerSideProps } from 'next';
 import axios from 'axios';
 import nookies, { parseCookies } from 'nookies';
-import { useRef } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+
+const statusText = (status: 'ready' | 'error' | 'saving' | 'success') => (
+    <>
+        {status == 'ready' && <h2 className='text-white/40'>ready for changes</h2>}
+        {status == 'error' && <h2 className='text-red-500'>oops! error...</h2>}
+        {status == 'success' && <h2 className='text-primary'>success!</h2>}
+        {status == 'saving' && <h2 className='text-white'>saving...</h2>}
+    </>
+)
 
 interface ResponseData {
     user_count: number;
@@ -18,34 +28,75 @@ interface ResponseData {
 export default withAuth(OrganizationSettingsPage, 'protected');
 function OrganizationSettingsPage(props: ResponseData) {
     const user = useUserStore.useUser();
+    const updateUser = useUserStore.useUpdateUser();
     const { organization } = user;
 
-    const orgNameRef = useRef<HTMLInputElement>(null);
-    const updateOrganizationName = async (value?: string) => {
-        // setSavedChangesStatus('saving');
-        // if (!_.isEmpty(errors)) {
-        //     console.log("submitForm errors", { errors });
-        //     return;
-        // }
+    const [saveStatus, setSaveStatus] = useState<'ready' | 'error' | 'saving' | 'success'>('ready');
+    const {
+        register,
+        handleSubmit,
+        formState: { isDirty, errors },
+        reset
+    } = useForm({
+        defaultValues: {
+            name: organization.name || '',
+        }
+    });
+
+    const updateOrganizationName = async (data: any) => {
+        if (!_.isEmpty(errors)) {
+            console.log("submitForm errors", { errors });
+            setSaveStatus('error');
+            return;
+        }
 
         /* Update user payload */
         let payload = {
             organization: {
-                name: value,
+                ...data
             }
         }
 
         const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${organization.id}`;
         const token = parseCookies().hypno_token;
-        const res = await axios.put(url, payload, {
+        await axios.put(url, payload, {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: 'Bearer ' + token,
             },
+        }).then((res) => {
+            setSaveStatus('success')
+            setTimeout(() => {
+                setSaveStatus('ready')
+            }, 3000)
+            updateUser({
+                organization: {
+                    ...data
+                }
+            });
+            reset(data);
+        }).catch((e) => {
+            console.log(e);
+            setSaveStatus('error')
         })
-
-        console.log(res.data);
     }
+
+    const debouncedSave = useCallback(
+        debounce(() => {
+            handleSubmit(updateOrganizationName)();
+            return;
+        }, 1000),
+        []
+    );
+
+    useEffect(() => {
+        if (isDirty) {
+            setSaveStatus('saving');
+            debouncedSave();
+        }
+    }, [isDirty]);
+
+
     return (
         <>
             <Head>
@@ -64,24 +115,25 @@ function OrganizationSettingsPage(props: ResponseData) {
                 <GlobalLayout.Content>
                     <div className='list pro'>
                         <Modal.Trigger id='org-name-modal'><Item name='org name' value={organization.name} /></Modal.Trigger>
-                        <Item name='org events' value={'#'} />
+                        {/* <Item name='org events' value={'#'} /> */}
                         <Item name='org users' value={String(props.user_count)} href='/org/users' />
-                        <Item name='next payment' value={user.organization_id} />
-                        <Item name='payment method' value={'update'} />
-                        <Item name='subscription' value={'enterprise'} />
+                        {/* <Item name='next payment' value={user.organization_id} /> */}
+                        {/* <Item name='payment method' value={'update'} /> */}
+                        {/* <Item name='subscription' value={'enterprise'} /> */}
                     </div>
                 </GlobalLayout.Content>
 
                 <Modal 
                     id='org-name-modal' 
                     title='edit org name' 
-                    onDone={() => updateOrganizationName(orgNameRef.current?.value)}>
+                    menu={statusText(saveStatus)}
+                    >
                     <div className='list pro'>
                         <FormControl label='name'>
                             <input 
-                                ref={orgNameRef}
+                                {...register('name', { required: true })}
                                 className='flex-1 input pro lowercase' 
-                                defaultValue={organization.name} />
+                            />
                         </FormControl>
                     </div>
                 </Modal>

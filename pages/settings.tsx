@@ -31,7 +31,7 @@ function SettingsPage() {
     const {
         register,
         handleSubmit,
-        formState: { isDirty },
+        formState: { isDirty, errors },
         reset
     } = useForm({
         defaultValues: {
@@ -42,10 +42,12 @@ function SettingsPage() {
     });
 
     const handleUpdateUser = async (data: any) => {
-        // if (!_.isEmpty(errors)) {
-        //     console.log("submitForm errors", { errors });
-        //     return;
-        // }
+        if (!_.isEmpty(errors)) {
+            console.log("submitForm errors", { errors });
+            setSaveStatus('error');
+            return;
+        }
+
         /* Update user payload */
         let payload = {
             user: {
