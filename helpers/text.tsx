@@ -55,3 +55,15 @@ export const getFilename = (url: string): any => {
 export const getNestedFormField = (baseKey: string, subKey: string): string => {
     return `${baseKey}.${subKey}`;
 }
+
+export const getS3Filename = (userId: string, type: 'watermark' | 'logo' | 'background' | 'filter', fileName: string, dimensions?: string): string => {
+    if (!fileName) return "";
+    let filenameWithDimensions = fileName.replaceAll(" ", "-");
+    // if (dimensions) {
+    //     const aspectRatio = dimensions.replace(':','x');
+    //     const fileExtension = _.last(fileName.split('.'));
+    //     const fileNameWithoutExtension = fileExtension ? filenameWithDimensions.slice(0, -fileExtension.length - 1) : filenameWithDimensions;
+    //     filenameWithDimensions = `${fileNameWithoutExtension}_${aspectRatio}.${fileExtension}`;
+    // }
+    return `${userId}/${type}/${filenameWithDimensions}`;
+};

@@ -270,7 +270,7 @@ const EventForm = (props: FormData) => {
                                                 inputId='custom-filter'
                                                 onInputChange={() => null}
                                                 value=''
-                                                orgId={user.organization.id}
+                                                uploadCategory='filter'
                                             />
                                         )}
                                         {(f != 'custom' && config.filter == i + 1) && <div className='badge badge-primary' />}
@@ -304,10 +304,11 @@ const EventForm = (props: FormData) => {
                                     <div className='item' key={i}>
                                         <span className={`transition ${_.get(config.watermarks, ar) ? 'text-white' : 'text-white/20'}`}>{ar}</span>
                                         <FileInput
-                                            orgId={user.organization.id}
                                             inputId={ar}
                                             onInputChange={(value: string) => setValue(AspectRatioWatermark(ar), value, { shouldDirty: true })}
                                             value={_.get(config.watermarks, ar)}
+                                            validateAspectRatio={ar}
+                                            uploadCategory='watermark'
                                         />
                                     </div>
                                 ))}
@@ -353,21 +354,21 @@ const EventForm = (props: FormData) => {
 
                             <FormControl label='logo' nested={true}>
                                 <FileInput
-                                    orgId={user.organization.id}
                                     inputId='logo'
                                     onInputChange={(value: string) => setValue('logo', value, { shouldDirty: true })}
                                     value={config.logo}
                                     disabled={!config.custom_gallery}
+                                    uploadCategory='logo'
                                 />
                             </FormControl>
 
                             <FormControl label='background' nested={true}>
                                 <FileInput
-                                    orgId={user.organization.id}
                                     inputId='background'
                                     onInputChange={(value: string) => setValue('background', value, { shouldDirty: true })}
                                     value={config.background}
                                     disabled={!config.custom_gallery}
+                                    uploadCategory='background'
                                 />
                             </FormControl>
 

@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 /**
  * It takes a width and height and returns a percentage value that represents the height as a
  * percentage of the width
@@ -39,4 +41,26 @@ export async function base64ToArrayBuffer(base64: string) {
         bytes[i] = binary_string.charCodeAt(i);
     }
     return bytes.buffer;
+}
+
+type AspectRatio = `${number}:${number}`;
+/**
+ * The function checks if the aspect ratio of an image matches a given target aspect ratio with a
+ * tolerance value.
+ * @param {number} imageWidth - The width of an image in pixels.
+ * @param {number} imageHeight - The height of the image in pixels.
+ * @param {any} aspectRatio - The `aspectRatio` parameter is an object with two properties: `width` and
+ * `height`. It represents the desired aspect ratio of an image. For example, an aspect ratio of 16:9
+ * would be represented as `{ width: 16, height: 9 }`.
+ * @returns a boolean value indicating whether the actual aspect ratio of an image (determined by
+ * dividing its width by its height) is within a certain tolerance of a target aspect ratio (specified
+ * as an object with "width" and "height" properties).
+ */
+export function isValidAspectRatio(imageWidth: number, imageHeight: number, aspectRatio?: AspectRatio) {
+    if (!aspectRatio) return true;
+    const parsedAspectRatio = _.split(aspectRatio, ':');
+    const tolerance = 0.01; // Tolerance value to account for rounding errors
+    const actualAspectRatio = imageWidth / imageHeight;
+    const targetAspectRatio = Number(parsedAspectRatio[0]) / Number(parsedAspectRatio[1]);
+    return Math.abs(actualAspectRatio - targetAspectRatio) <= tolerance;
 }

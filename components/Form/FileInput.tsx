@@ -1,19 +1,25 @@
-import { getFilename } from '@/helpers/text';
+import { getFilename, getS3Filename } from '@/helpers/text';
 import axios from 'axios';
 import { useState, useRef, SyntheticEvent, useEffect } from 'react';
 import { ThreeDots } from 'react-loader-spinner';
 import Plus from 'public/pop/plus.svg';
 import Minus from 'public/pop/minus.svg';
+import { isValidAspectRatio } from '@/helpers/image';
+import useUserStore from '@/store/userStore';
+
+type AspectRatio = `${number}:${number}`;
 
 interface UploaderProps {
-  orgId: string;
-  inputId?: string;
+  inputId: string;
   onInputChange?: (value: string) => void;
   value?: string;
   disabled?: boolean;
+  validateAspectRatio?: AspectRatio;
+  uploadCategory: 'watermark' | 'logo' | 'background' | 'filter';
 }
 
 export default function FileInput(props: UploaderProps) {
+  const user = useUserStore.useUser();
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<ArrayBuffer | string>('');
   const [contentType, setContentType] = useState('');
@@ -41,11 +47,32 @@ export default function FileInput(props: UploaderProps) {
       //   return alert("Image is loo large.");
       // }
       if (e.target?.result) {
-        setFile(e.target.result);
-        setContentType((e.target.result as string).split(':')[1].split(';')[0]);
-        setUploadStatus('ready');
-      }
-    };
+
+        // Create a new image element to check the aspect ratio
+        const img = new Image();
+        img.onload = () => {
+          const width = img.width;
+          const height = img.height;
+
+          if (props.validateAspectRatio) {
+            const desiredAspectRatio = props.validateAspectRatio;
+
+            if (!isValidAspectRatio(width, height, desiredAspectRatio)) {
+              setUploadStatus('error');
+              setNewFilename('error');
+              alert("Invalid aspect ratio. Please choose an image with a different aspect ratio.");
+              resetInput(null);
+              return;
+            }
+          };
+
+          setFile(e.target?.result as ArrayBuffer);
+          setContentType((e.target?.result as string).split(':')[1].split(';')[0]);
+          setUploadStatus('ready');
+        }
+        img.src = e.target.result as string;
+      };
+    }
     reader.readAsDataURL(file);
   };
 
@@ -53,7 +80,7 @@ export default function FileInput(props: UploaderProps) {
     setUploadStatus('uploading')
     const url = process.env.NEXT_PUBLIC_AWS_ENDPOINT as string;
     const resp = await axios.get(url, {
-      params: { fileName: props.orgId + '/' + newFilename, contentType },
+      params: { fileName: getS3Filename(user.id, props.uploadCategory, newFilename, props.validateAspectRatio), contentType },
     });
 
     let binary = Buffer.from((file as string).split(',')[1], 'base64');
@@ -83,9 +110,10 @@ export default function FileInput(props: UploaderProps) {
   };
 
   const resetInput = (e: any) => {
-    e.preventDefault();
+    e?.preventDefault();
     setAssetLocation('');
     props.onInputChange && props.onInputChange('');
+    setFile('');
     if (fileRef.current) {
       fileRef.current.value = '';
     }
