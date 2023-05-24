@@ -11,15 +11,7 @@ import axios from 'axios';
 import nookies, { parseCookies } from 'nookies';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-
-const statusText = (status: 'ready' | 'error' | 'saving' | 'success') => (
-    <>
-        {status == 'ready' && <h2 className='text-white/40'>ready for changes</h2>}
-        {status == 'error' && <h2 className='text-red-500'>oops! error...</h2>}
-        {status == 'success' && <h2 className='text-primary'>success!</h2>}
-        {status == 'saving' && <h2 className='text-white'>saving...</h2>}
-    </>
-)
+import { AutosaveStatusText, SaveStatus } from '@/components/Form/AutosaveStatusText';
 
 interface ResponseData {
     user_count: number;
@@ -31,7 +23,7 @@ function OrganizationSettingsPage(props: ResponseData) {
     const updateUser = useUserStore.useUpdateUser();
     const { organization } = user;
 
-    const [saveStatus, setSaveStatus] = useState<'ready' | 'error' | 'saving' | 'success'>('ready');
+    const [saveStatus, setSaveStatus] = useState<SaveStatus>('ready');
     const {
         register,
         handleSubmit,
@@ -126,7 +118,7 @@ function OrganizationSettingsPage(props: ResponseData) {
                 <Modal 
                     id='org-name-modal' 
                     title='edit org name' 
-                    menu={statusText(saveStatus)}
+                    menu={AutosaveStatusText(saveStatus)}
                     >
                     <div className='list pro'>
                         <FormControl label='name'>

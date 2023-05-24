@@ -10,7 +10,7 @@ export default function useContentHeight({footer}:{footer?: boolean}) {
       const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
       const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
       const safeAreaInsetBottom = (hasWindow && window.safeAreaInsets) ? window.safeAreaInsets.bottom : 0;
-      const spacer = vw > 635 ? 0.33*vh : 2*(vw * 0.22);
+      const spacer = vw > 635 ? 0.33*vh : 2*(vw * 0.35);
       setHeight(vh - (footer ? spacer : 0) - safeAreaInsetBottom);
     };
     updateHeight();
