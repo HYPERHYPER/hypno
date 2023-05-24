@@ -15,14 +15,16 @@ import clsx from 'clsx';
 import { isCustomGallery } from '@/helpers/event';
 import { parseCookies } from 'nookies';
 import { ChromePicker } from 'react-color';
+import { AutosaveStatusText, SaveStatus } from '../Form/AutosaveStatusText';
 
 interface FormData {
     event?: any;
     onSubmit?: ((payload: any) => Promise<AxiosResponse<any, any>> | Promise<AxiosResponse<any, any>[]>);
     view: 'default' | 'legal' | 'data';
     changeView: (view: 'default' | 'legal' | 'data') => void;
-    updateStatus?: (stauts: string) => void;
+    updateStatus?: (stauts: SaveStatus) => void;
     updateData?: (data: any) => void;
+    status?: SaveStatus;
 }
 
 const DEFAULT_TERMS = `by tapping to get your content, you accept the <terms of use|https://hypno.com/app/terms> and <privacy policy|https://hypno.com/privacy> provided by hypno and our related partners and services.`
@@ -80,7 +82,7 @@ const isPrivate = (is_private: number) => {
 }
 
 const EventForm = (props: FormData) => {
-    const { onSubmit, event, view, changeView, updateData, updateStatus } = props;
+    const { onSubmit, event, view, changeView, updateData, updateStatus, status } = props;
     const user = useUserStore.useUser();
     const {
         register,
@@ -260,7 +262,7 @@ const EventForm = (props: FormData) => {
                                 </div>
                             </Modal.Trigger>
                         </FormControl>
-                        <Modal id='filters-modal' title='filters'>
+                        <Modal id='filters-modal' title='filters' menu={status && AutosaveStatusText(status)}>
                             <div className='list pro'>
                                 {_.map(FILTERS, (f, i) => (
                                     <div className='item cursor-pointer' key={i} onClick={() => setValue('filter', i + 1, { shouldDirty: true })}>
@@ -271,6 +273,7 @@ const EventForm = (props: FormData) => {
                                                 onInputChange={() => null}
                                                 value=''
                                                 uploadCategory='filter'
+                                                validateAspectRatio='1:1'
                                             />
                                         )}
                                         {(f != 'custom' && config.filter == i + 1) && <div className='badge badge-primary' />}
@@ -297,7 +300,12 @@ const EventForm = (props: FormData) => {
                         <Modal
                             id='graphics-modal'
                             title='graphics'
-                            menu={<a href='https://www.figma.com/community/file/1224061680361096696/hypno-pro-graphics' target='_blank' rel="noreferrer"><h2 className='text-primary'>template</h2></a>}
+                            menu={
+                                <>
+                                    <a href='https://www.figma.com/community/file/1224061680361096696/hypno-pro-graphics' target='_blank' rel="noreferrer"><h2 className='text-primary'>template</h2></a>
+                                    {status && AutosaveStatusText(status)}
+                                </>
+                            }
                         >
                             <div className='list pro'>
                                 {_.map(ASPECT_RATIOS, (ar, i) => (
@@ -382,12 +390,12 @@ const EventForm = (props: FormData) => {
                                     <label
                                         className='w-full'
                                         tabIndex={config.custom_gallery ? 0 : undefined}>
-                                        <span className={clsx("inline-flex h-10 w-10 rounded-full border-4 border-white/20", !config.custom_gallery && 'opacity-50')} style={{ backgroundColor: `${_.startsWith(config.color, '#') ? "" : "#"}${config.color}` }}/>
+                                        <span className={clsx("inline-flex h-10 w-10 rounded-full border-4 border-white/20 cursor-pointer", !config.custom_gallery && 'opacity-50 cursor-not-allowed')} style={{ backgroundColor: `${_.startsWith(config.color, '#') ? "" : "#"}${config.color}` }} />
                                     </label>
                                     <div
                                         tabIndex={config.custom_gallery ? 0 : undefined}
                                         className='dropdown-content shadow mb-2 p-2 rounded-full'>
-                                        <ChromePicker color={config.color || '#000000'} onChange={(color: any, e: any) => { e.preventDefault(); setValue('color', color.hex)}} disableAlpha={true} />
+                                        <ChromePicker color={config.color || '#000000'} onChange={(color: any, e: any) => { e.preventDefault(); setValue('color', color.hex) }} disableAlpha={true} />
                                     </div>
                                 </div>
                             </FormControl>
@@ -423,7 +431,7 @@ const EventForm = (props: FormData) => {
                 }
 
 
-                <Modal title='data' id='data-modal'>
+                <Modal title='data' id='data-modal' menu={status && AutosaveStatusText(status)}>
                     <div className='border-t-2 border-white/20'>
                         <FormControl label='fields' altLabel='separate multiple fields with commas' dir='col'>
                             <input
@@ -451,7 +459,7 @@ const EventForm = (props: FormData) => {
                     </div>
                 </Modal>
 
-                <Modal title='legal' id='legal-modal'>
+                <Modal title='legal' id='legal-modal' menu={status && AutosaveStatusText(status)}>
                     <div className='border-t-2 border-white/20'>
                         <FormControl dir='col' label='terms/privacy' altLabel='this appears in your web gallery during delivery; format links like <link|https://domain.com>'>
                             <button className='ml-4 text-primary text-xl mt-3 tracking-tight' onClick={(e) => { e.preventDefault(); setValue('terms_privacy', DEFAULT_TERMS, { shouldDirty: true }) }}>reset</button>

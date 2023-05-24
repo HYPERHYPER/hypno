@@ -11,15 +11,7 @@ import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { useForm } from 'react-hook-form';
-
-const statusText = (status: 'ready' | 'error' | 'saving' | 'success') => (
-    <>
-        {status == 'ready' && <h2 className='text-white/40'>ready for changes</h2>}
-        {status == 'error' && <h2 className='text-red-500'>oops! error...</h2>}
-        {status == 'success' && <h2 className='text-primary'>success!</h2>}
-        {status == 'saving' && <h2 className='text-white'>saving...</h2>}
-    </>
-)
+import { AutosaveStatusText, SaveStatus } from '@/components/Form/AutosaveStatusText';
 
 export default withAuth(SettingsPage, 'protected');
 function SettingsPage() {
@@ -27,7 +19,7 @@ function SettingsPage() {
     const logout = useUserStore.useLogout();
     const updateUser = useUserStore.useUpdateUser();
 
-    const [saveStatus, setSaveStatus] = useState<'ready' | 'error' | 'saving' | 'success'>('ready');
+    const [saveStatus, setSaveStatus] = useState<SaveStatus>('ready');
     const {
         register,
         handleSubmit,
@@ -127,7 +119,7 @@ function SettingsPage() {
                 <Modal
                     id='username-modal'
                     title='edit username'
-                    menu={statusText(saveStatus)}>
+                    menu={AutosaveStatusText(saveStatus)}>
                     <div className='list pro'>
                         <FormControl label='username'>
                             <input {...register('username', { required: true })} className='input pro' />
@@ -138,7 +130,7 @@ function SettingsPage() {
                 <Modal
                     id='name-modal'
                     title='edit name'
-                    menu={statusText(saveStatus)}>
+                    menu={AutosaveStatusText(saveStatus)}>
                     <div className='list pro'>
                         <FormControl label='first name'>
                             <input {...register('first_name')} className='input pro' />

@@ -8,6 +8,7 @@ import EventForm from '@/components/Events/EventForm';
 import GlobalLayout from '@/components/GlobalLayout';
 import withAuth from '@/components/hoc/withAuth';
 import { isCustomGallery } from '@/helpers/event';
+import { AutosaveStatusText, SaveStatus } from '@/components/Form/AutosaveStatusText';
 
 interface ResponseData {
     status: number;
@@ -23,7 +24,7 @@ const EditEventPage = (props: ResponseData) => {
     } } = props;
 
     const [view, setView] = useState<'default' | 'data' | 'legal'>('default');
-    const [status, setStatus] = useState<'saving' | 'ready' | 'dirty' | 'success' | string>('ready');
+    const [status, setStatus] = useState<SaveStatus>('ready');
 
     // Provided array of changed fields [{field_name: value}]
     const submitForm = (changedFieldsArr: any) => {
@@ -116,11 +117,7 @@ const EditEventPage = (props: ResponseData) => {
                     returnLink={view == 'default' ? { slug: `/e/${id}`, name: name } : undefined}
                     returnAction={view !== 'default' ? { onClick: () => setView('default'), name: name } : undefined}
                 >
-                    {status == 'ready' && <h2>ready for changes</h2>}
-                    {status == 'saving' && <h2 className='text-white'>saving...</h2>}
-                    {status == 'dirty' && <h2>unsaved changes</h2>}
-                    {status == 'success' && <h2 className='text-primary'>changes saved!</h2>}
-                    {status == 'error' && <h2 className='text-red-500'>error</h2>}
+                    {AutosaveStatusText(status)}
                 </GlobalLayout.Header>
                 <GlobalLayout.Content>
                     <EventForm
@@ -129,6 +126,7 @@ const EditEventPage = (props: ResponseData) => {
                         event={props.event}
                         onSubmit={submitForm}
                         updateStatus={(status) => setStatus(status)}
+                        status={status}
                     />
                 </GlobalLayout.Content>
             </GlobalLayout>
