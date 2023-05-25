@@ -9,14 +9,14 @@ type UserState = {
   error: string;
   isLoading: boolean;
   isLoggedIn: boolean;
-  login: (email: string, password: string) => void;
-  logout: () => void;
-  signup: (firstName: string, lastName: string, organizationName: string, email: string, password: string) => void;
-  stopLoading: () => void;
 }
 
 type UserAction = {
   updateUser: (updatedUser: UserState['user']) => void
+  login: (email: string, password: string) => void;
+  logout: () => void;
+  signup: (firstName: string, lastName: string, organizationName: string, email: string, password: string) => void;
+  stopLoading: () => void;
 }
 
 const useUserStoreBase = create<UserState & UserAction>()(
