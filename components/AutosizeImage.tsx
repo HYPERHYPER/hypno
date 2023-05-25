@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 
 /**
@@ -18,9 +18,22 @@ export default function AutosizeImage({
     width?: number;
     height?: number;
     priority?: boolean;
+    sizes?: string;
 }) {
     const [paddingTop, setPaddingTop] = useState<string>("0");
+    const [blurDataURL, setBlurDataURL] = useState<string>('');
 
+    useEffect(() => {
+        const getBlurDataUrl = async () => {
+            const res = await fetch(`/api/image?url=${src}`);
+            const placeholderData = await res.json();
+            setBlurDataURL(placeholderData.base64);
+        }
+
+        if (!src) return;
+        getBlurDataUrl();
+    }, [])
+    
     return (
         <div className='relative border-0' style={{ paddingTop }}>
             <Image
@@ -33,6 +46,8 @@ export default function AutosizeImage({
                     setPaddingTop(`calc(100% / (${naturalWidth} / ${naturalHeight})`);
                     onLoadingComplete && onLoadingComplete();
                 }}
+                placeholder={blurDataURL ? 'blur' : 'empty'}
+                blurDataURL={blurDataURL || undefined}
                 {...rest}
             />
         </div>

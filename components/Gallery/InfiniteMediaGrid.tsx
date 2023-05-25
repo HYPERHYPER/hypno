@@ -40,15 +40,15 @@ interface InfiniteMediaGridProps {
     next: () => void;
     data?: any[];
     assets: AssetData[];
+    hasMore: boolean;
 }
-export default function InfiniteMediaGrid({ next, data, assets }: InfiniteMediaGridProps) {
-    const hasReachedEnd = data && data[data.length - 1]?.count <= data[0]?.returned;
-
+export default function InfiniteMediaGrid({ next, data, assets, hasMore }: InfiniteMediaGridProps) {
     return (
         <InfiniteScroll
             next={next}
-            hasMore={!hasReachedEnd}
-            loader={<div className='w-full flex justify-center h-[100px] mb-8'><Spinner /></div>}
+            hasMore={hasMore}
+            loader={<></>}
+            scrollThreshold={0.45}            
             endMessage={<div></div>}
             dataLength={assets?.length}
         >
@@ -63,18 +63,19 @@ export const MediaGrid = ({ assets }: { assets: AssetData[] }) => {
             <ResponsiveMasonry columnsCountBreakPoints={{ 375: 3, 750: 2, 900: 3, 1200: 4 }}>
                 <Masonry gutter={'10px'} >
                     {assets.map((p, i) => (
-                        <Link key={p.id} href={`/i/${p.slug}`}>
+                        <Link key={i} href={`/i/${p.slug}`}>
                             <div className='w-full block relative bg-white/10 backdrop-blur-[50px] overflow-hidden' style={{ aspectRatio: getAspectRatio(p.width, p.height) }} >
                                 <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
                                     <Spinner />
                                 </div>
                                 <div className='hover:scale-110 transition'>
                                     <AutosizeImage
-                                        src={p.gif ? p.posterframe : p.jpeg_thumb_url}
-                                        alt={p.event_name + p.id}
+                                        src={p.posterframe}
+                                        alt={`${p.event_id}-${p.id}`}
                                         width={p.width}
                                         height={p.height}
                                         priority={i < 11}
+                                        sizes="(max-width: 600px) 100vw, 50vw"
                                     />
                                     {p.gif &&
                                         <div
