@@ -108,7 +108,7 @@ const SubGallery = (props: ResponseData) => {
     const formData = watch();
 
     const submitDataCapture = async (data: any) => {
-        const userAcceptedTerms = gallery.explicit_opt_in ? acceptTermsRef?.current?.checked : true;
+        const userAcceptedTerms = (gallery.enable_legal && gallery.explicit_opt_in) ? acceptTermsRef?.current?.checked : true;
         if (!_.isEmpty(errors) || !userAcceptedTerms) {
             console.log("submitDataCapture errors", { errors });
             console.log("acceptTerms", acceptTermsRef?.current?.checked);
