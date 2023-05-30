@@ -112,7 +112,7 @@ function SettingsPage() {
                         <Item name='email' value={user.email} />
                         <Item name='password' value={'•••••••'} />
                         <Item name='organization' value={user.organization.name} href='/org' />
-                        <Item name='upgrade' value={'unlock custom graphics, effects and more!'} />
+                        {/* <Item name='upgrade' value={'unlock custom graphics, effects and more!'} /> */}
                     </div>
                 </GlobalLayout.Content>
 

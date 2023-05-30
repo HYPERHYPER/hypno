@@ -114,7 +114,7 @@ const EventForm = (props: FormData) => {
             custom_gallery: event ? isCustomGallery(event.metadata) : false,
             logo: event?.metadata?.logo || '',
             background: event?.metadata?.background || '',
-            color: event?.metadata?.color || '',
+            color: event?.metadata?.color || '#000000',
             is_private: event ? isPrivate(event.is_private) : false,
             data_capture: event?.metadata?.data_capture || false,
             fields: event?.metadata?.fields || [],
@@ -373,7 +373,7 @@ const EventForm = (props: FormData) => {
                                         {...register('gallery_subtitle')} />
                                 </div> */}
 
-                            <FormControl label='logo' nested={true}>
+                            <FormControl label='logo' nested={true} disabled={!config.custom_gallery}>
                                 <FileInput
                                     inputId='logo'
                                     onInputChange={(value: string) => setValue('logo', value, { shouldDirty: true })}
@@ -383,7 +383,7 @@ const EventForm = (props: FormData) => {
                                 />
                             </FormControl>
 
-                            <FormControl label='background' nested={true}>
+                            <FormControl label='background' nested={true} disabled={!config.custom_gallery}>
                                 <FileInput
                                     inputId='background'
                                     onInputChange={(value: string) => setValue('background', value, { shouldDirty: true })}
@@ -393,7 +393,7 @@ const EventForm = (props: FormData) => {
                                 />
                             </FormControl>
 
-                            <FormControl label='color' nested={true}>
+                            <FormControl label='color' nested={true} disabled={!config.custom_gallery}>
                                 <input
                                     className='input pro disabled:text-white/20 transition-colors'
                                     placeholder='# hex code'
@@ -413,16 +413,21 @@ const EventForm = (props: FormData) => {
                                 </div>
                             </FormControl>
 
-                            <FormControl label='private' nested={true}>
+                            <FormControl label='magic button' nested={true} disabled={!config.custom_gallery}>
+                                {config.enable_magic_button && config.custom_gallery && <Modal.Trigger id='magic-button-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
+                                <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('enable_magic_button')} />
+                            </FormControl>
+
+                            <FormControl label='private' nested={true} disabled={!config.custom_gallery}>
                                 <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('is_private')} />
                             </FormControl>
 
-                            <FormControl label='data' nested={true}>
+                            <FormControl label='data' nested={true} disabled={!config.custom_gallery}>
                                 {config.data_capture && config.custom_gallery && <Modal.Trigger id='data-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
                                 <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('data_capture')} />
                             </FormControl>
 
-                            <FormControl label='legal' nested={true}>
+                            <FormControl label='legal' nested={true} disabled={!config.custom_gallery}>
                                 {config.enable_legal && config.custom_gallery && <Modal.Trigger id='legal-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5" >custom</div></Modal.Trigger>}
                                 <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('enable_legal')} />
                             </FormControl>
