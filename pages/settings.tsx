@@ -150,7 +150,7 @@ const Item = ({ name, value, href, modalId }: { name: string, value: string, hre
         <div className='item'>
             <span className='text-white/40'>{name}</span>
             <label htmlFor={modalId} className={clsx('text-primary lowercase', modalId && 'cursor-pointer')}>
-                {href ? <Link href={href}>{value}</Link> : value}
+                {href ? <Link href={href}>{value} →</Link> : value}
             </label>
         </div>
     )

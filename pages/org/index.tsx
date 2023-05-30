@@ -139,7 +139,7 @@ const Item = ({ name, value, href }: { name: string, value: string, href?: strin
         <div className='item'>
             <span className='text-white/40'>{name}</span>
             <span className='text-primary lowercase'>
-                {href ? <Link href={href}>{value}</Link> : value}
+                {href ? <Link href={href}>{value} →</Link> : value}
             </span>
         </div>
     )
