@@ -16,6 +16,9 @@ import { isCustomGallery } from '@/helpers/event';
 import { parseCookies } from 'nookies';
 import { ChromePicker } from 'react-color';
 import { AutosaveStatusText, SaveStatus } from '../Form/AutosaveStatusText';
+import useFilters from '@/hooks/useFilters';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import Spinner from '../Spinner';
 
 interface FormData {
     event?: any;
@@ -28,7 +31,7 @@ interface FormData {
 }
 
 const DEFAULT_TERMS = `by tapping to get your content, you accept the <terms of use|https://hypno.com/app/terms> and <privacy policy|https://hypno.com/privacy> provided by hypno and our related partners and services.`
-const FILTERS = ['raw', 'daze', 'moon', 'custom']
+const FILTERS = [{name: 'raw', id: 59}, {name: 'daze', id: 60}, {name: 'nite', id: 61}]
 type AspectRatio = `${number}:${number}`;
 const ASPECT_RATIOS: AspectRatio[] = ["9:16", "2:3", "3:4", "1:1", "4:3", "3:2", "16:9"];
 const AspectRatioWatermark = (ar: string): ('watermarks.9:16' | 'watermarks.2:3' | 'watermarks.3:4' | 'watermarks.1:1' | 'watermarks.4:3' | 'watermarks.3:2' | 'watermarks.16:9') => {
@@ -94,10 +97,10 @@ const EventForm = (props: FormData) => {
     } = useForm({
         defaultValues: {
             name: event?.name || '',
-            org_id: event?.client_id || user.organization_id,
+            org_id: event?.client_id || user?.organization.id,
             // gallery_title: event?.metadata?.gallery_title || '',
             // gallery_subtitle: event?.metadata?.gallery_subtitle || '',
-            filter: getFilter(event?.event_filter_watermarks) || 1,
+            filter: getFilter(event?.event_filter_watermarks) || 59, // raw == 59
             watermarks: {
                 '9:16': getWatermarkFromArray(event?.event_filter_watermarks, '9:16')?.url || "",
                 '2:3': getWatermarkFromArray(event?.event_filter_watermarks, '2:3')?.url || "",
@@ -128,7 +131,7 @@ const EventForm = (props: FormData) => {
     const config = watch();
     const watchedWatermarks = watch('watermarks');
 
-    const [organizations, setOrganizations] = useState<any>([]);
+    const [organizations, setOrganizations] = useState<{id: number, name: string}[]>([]);
     useEffect(() => {
         const fetchOrganizations = async () => {
             try {
@@ -140,6 +143,8 @@ const EventForm = (props: FormData) => {
                     }
                 });
                 setOrganizations(response.data.organizations);
+                //@ts-ignore
+                setValue('org_id', _.first(response.data.organizations).id)
             } catch (error) {
                 console.error('Error fetching organizations:', error);
             }
@@ -148,6 +153,7 @@ const EventForm = (props: FormData) => {
         fetchOrganizations();
     }, []);
 
+    const { filters, loadMore: loadMoreFilters, meta: filterMeta } = useFilters(20);
     // TODO: hiding email delivery for now
     // useEffect(() => {
     //     if (config.email_delivery) {
@@ -257,29 +263,36 @@ const EventForm = (props: FormData) => {
                             <Modal.Trigger id='filters-modal'>
                                 <div className='flex flex-row gap-3 text-xl sm:text-4xl'>
                                     {_.map(FILTERS, (f, i) => (
-                                        <span key={i} className={`transition ${config.filter == i + 1 ? 'text-primary' : 'text-primary/40'}`}>{f}</span>
+                                        <span key={i} className={`transition ${config.filter == f.id ? 'text-primary' : 'text-primary/40'}`}>{f.name}</span>
                                     ))}
+                                    {!_.find(FILTERS, (f) => f.id == config.filter) &&  <span key={config.filter} className={'text-primary'}>{_.find(filters, (f) => f.id == config.filter)?.name || ''}</span>}
                                 </div>
                             </Modal.Trigger>
                         </FormControl>
                         <Modal id='filters-modal' title='filters' menu={status && AutosaveStatusText(status)}>
-                            <div className='list pro'>
-                                {_.map(FILTERS, (f, i) => (
-                                    <div className='item cursor-pointer' key={i} onClick={() => setValue('filter', i + 1, { shouldDirty: true })}>
-                                        <span className={`transition ${config.filter == i + 1 ? 'text-white' : 'text-white/20'}`}>{f}</span>
-                                        {f == 'custom' && (
-                                            <FileInput
-                                                inputId='custom-filter'
-                                                onInputChange={() => null}
-                                                value=''
-                                                uploadCategory='filter'
-                                                validateAspectRatio='1:1'
-                                            />
-                                        )}
+                            <InfiniteScroll next={loadMoreFilters} dataLength={filters.length} loader={<div className='w-full flex justify-center my-6'><Spinner /></div>} hasMore={filterMeta ? filterMeta?.total_count > filters.length : true}>
+                                <div className='list pro'>
+                                    {/* TODO: CUSTOM FILTERS */}
+                                    {/* <div className='item cursor-pointer' key={'custom-filter'} onClick={() => setValue('filter', 'custom', { shouldDirty: true })}>
+                                        <span className={`transition ${config.filter == 'custom' ? 'text-white' : 'text-white/20'}`}>custom</span>
+                                        <FileInput
+                                            inputId='custom-filter'
+                                            onInputChange={() => null}
+                                            value=''
+                                            uploadCategory='filter'
+                                            validateAspectRatio='1:1'
+                                        />
                                         {(f != 'custom' && config.filter == i + 1) && <div className='badge badge-primary' />}
-                                    </div>
-                                ))}
-                            </div>
+                                    </div> */}
+                                    {_.map(filters, (f, i) => (
+                                        <div className='item cursor-pointer' key={i} onClick={() => setValue('filter', f.id, { shouldDirty: true })}>
+                                            <span className={`transition ${config.filter == f.id ? 'text-white' : 'text-white/20'}`}>{f.name}</span>
+                                            {(config.filter == f.id) && <div className='badge badge-primary' />}
+                                        </div>
+                                    ))}
+
+                                </div>
+                            </InfiniteScroll>
                         </Modal>
 
                         <FormControl label='graphics'>
@@ -435,7 +448,7 @@ const EventForm = (props: FormData) => {
                     <div className='border-t-2 border-white/20'>
                         <FormControl label='fields' altLabel='separate multiple fields with commas' dir='col'>
                             <input
-                                className='input pro left w-full'
+                                className='input pro left'
                                 placeholder='name, email, phone'
                                 disabled={!config.data_capture}
                                 {...register('fields')} />
@@ -443,7 +456,7 @@ const EventForm = (props: FormData) => {
 
                         <FormControl label='headline' altLabel='this appears on your web gallery during delivery (optional)'>
                             <input
-                                className='input pro flex-1'
+                                className='input pro left flex-1'
                                 placeholder='want your content?'
                                 disabled={!config.data_capture}
                                 {...register('data_capture_title')} />
@@ -451,7 +464,7 @@ const EventForm = (props: FormData) => {
 
                         <FormControl label='blurb' altLabel='this appears on your web gallery during delivery (optional)'>
                             <input
-                                className='input pro flex-1'
+                                className='input pro left flex-1'
                                 placeholder='enter your info to continue'
                                 disabled={!config.data_capture}
                                 {...register('data_capture_subtitle')} />
