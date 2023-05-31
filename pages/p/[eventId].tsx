@@ -96,9 +96,9 @@ const PublicGallery = (props: ResponseData) => {
                     <InfiniteMediaGrid
                         next={() => setSize(size + 1)}
                         hasMore={hasMorePhotos}
-
                         assets={paginatedPhotos}
                         data={data}
+                        detailBaseUrl={`/i/`}
                     />
                 </section>
             </CustomGallery>

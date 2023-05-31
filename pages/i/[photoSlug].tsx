@@ -4,11 +4,10 @@ import Head from 'next/head';
 import _ from 'lodash';
 import Spinner from '@/components/Spinner';
 import GalleryNavBar from '@/components/Gallery/GalleryNavBar';
-import { Footer } from '@/components/Footer';
-import DetailView from '@/components/Gallery/DetailView';
 import { getPlaiceholder } from 'plaiceholder';
 import { CustomGallery } from '@/components/Gallery/CustomGallery';
 import GlobalLayout from '@/components/GlobalLayout';
+import CenteredDetailView from '@/components/Gallery/CenteredDetailView';
 
 type ImageData = {
     id: number;
@@ -138,7 +137,7 @@ const DetailGallery = (props: ResponseData) => {
 
             <GlobalLayout>
                 <GlobalLayout.Content>
-                    <DetailView asset={photo} config={{ aiGeneration }} imageProps={imageProps} />
+                    <CenteredDetailView asset={photo} config={{ aiGeneration }} imageProps={imageProps} />
                 </GlobalLayout.Content>
             </GlobalLayout>
 

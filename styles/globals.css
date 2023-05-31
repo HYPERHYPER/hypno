@@ -102,7 +102,7 @@
   }
 
   .btn-gallery.locked {
-    @apply fixed bottom-0 left-0 w-full sm:static
+    @apply fixed bottom-0 left-0 w-full sm:static drop-shadow-[0_-5px_10px_rgba(0,0,0,0.2)] sm:drop-shadow-none
   }
 
   .divider {

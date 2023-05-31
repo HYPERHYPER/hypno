@@ -2,12 +2,13 @@ import { useStableDiffusion } from "@/hooks/useStableDiffusion";
 import Spinner from "../Spinner";
 import { ThreeDots } from "react-loader-spinner";
 import Image from 'next/image';
-import { useCallback, useRef, useState } from "react";
-import clsx from "clsx";
+import useContentHeight from "@/hooks/useContentHeight";
+import { getAspectRatio } from "@/helpers/image";
 import VideoAsset from "./VideoAsset";
 
 export default function DetailView({ asset, config, imageProps }: any) {
     const footer = Boolean(config.aiGeneration?.enabled || asset.mp4_url);
+    const height = useContentHeight({ footer: true });
 
     const { output, generateImgToImg, generateTextInpainting, isLoading: isLoadingGeneration } = useStableDiffusion();
     const handleRemix = async (e: any) => {
@@ -29,19 +30,21 @@ export default function DetailView({ asset, config, imageProps }: any) {
         }
     }
 
+    const aspectRatio = getAspectRatio(asset.metadata.aspect_ratio.split(":")[0], asset.metadata.aspect_ratio.split(":")[1]);
     return (
         <>
             <div
-                className={clsx(`max-w-none sm:max-w-lg sm:mx-auto px-[25px]`, footer ? 'mb-[72px]': 'mb-6')}>
-                <div className='relative backdrop-blur-[50px]'>
+                style={{ height }}
+                className={`absolute top-1/2 left-0 right-0 -translate-y-1/2 sm:mx-auto h-[${height}] px-[25px] md:px-[90px] flex flex-1 flex-col justify-center items-center`}>
+                <div style={{ aspectRatio }} className='relative backdrop-blur-[50px]'>
                     <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
                         <Spinner />
                     </div>
 
                     {asset.mp4_url ? (
-                        <VideoAsset src={asset.mp4_url} poster={asset.posterframe} />
+                        <VideoAsset style={{ maxHeight: height }} src={asset.mp4_url} poster={asset.posterframe} />
                     ) : (
-                        <div className='block overflow-hidden'>
+                        <div className='block overflow-hidden' style={{ maxHeight: height }}>
                             <Image
                                 {...imageProps}
                                 priority
@@ -49,7 +52,8 @@ export default function DetailView({ asset, config, imageProps }: any) {
                                 src={asset.url}
                                 alt={asset.event_name + asset.id}
                                 placeholder={imageProps?.blurDataURL ? 'blur' : 'empty'}
-                                className={`w-full h-auto`} />
+                                style={{ maxHeight: height }}
+                                className={`max-h-[calc(100vh-22vw-22vw-env(safe-area-inset-bottom))] max-h-[${height}] w-auto`} />
                         </div>
                     )}
                 </div>

@@ -41,8 +41,9 @@ interface InfiniteMediaGridProps {
     data?: any[];
     assets: AssetData[];
     hasMore: boolean;
+    detailBaseUrl: string;
 }
-export default function InfiniteMediaGrid({ next, data, assets, hasMore }: InfiniteMediaGridProps) {
+export default function InfiniteMediaGrid({ next, data, assets, hasMore, detailBaseUrl }: InfiniteMediaGridProps) {
     return (
         <InfiniteScroll
             next={next}
@@ -52,18 +53,18 @@ export default function InfiniteMediaGrid({ next, data, assets, hasMore }: Infin
             endMessage={<div></div>}
             dataLength={assets?.length}
         >
-            <MediaGrid assets={assets} />
+            <MediaGrid assets={assets} detailBaseUrl={detailBaseUrl} />
         </InfiniteScroll>
     )
 }
 
-export const MediaGrid = ({ assets }: { assets: AssetData[] }) => {
+export const MediaGrid = ({ assets, detailBaseUrl }: { assets: AssetData[]; detailBaseUrl: string; }) => {
     return (
         <div className={`sm:mx-auto block h-full mb-[35px] xl:px-[90px]`}>
             <ResponsiveMasonry columnsCountBreakPoints={{ 375: 3, 750: 2, 900: 3, 1200: 4 }}>
                 <Masonry gutter={'10px'} >
                     {assets.map((p, i) => (
-                        <Link key={i} href={`/i/${p.slug}`}>
+                        <Link key={i} href={`${detailBaseUrl}${p.slug}`}>
                             <div className='w-full block relative bg-white/10 backdrop-blur-[50px] overflow-hidden' style={{ aspectRatio: getAspectRatio(p.width, p.height) }} >
                                 <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
                                     <Spinner />

@@ -59,6 +59,7 @@ const PublicGallery = (props: ResponseData) => {
                         assets={paginatedPhotos}
                         data={data}
                         hasMore={hasMorePhotos}
+                        detailBaseUrl={`/pro/${event.id}?i=`}
                     />
                 </section>
             </CustomGallery>

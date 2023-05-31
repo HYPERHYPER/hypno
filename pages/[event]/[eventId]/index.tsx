@@ -17,12 +17,13 @@ import Head from 'next/head';
 import _ from 'lodash';
 import { getPlaiceholder } from 'plaiceholder';
 import { CustomGallery } from '@/components/Gallery/CustomGallery';
-import Letter from '../../../public/pop/letter.svg';
 import useContentHeight from '@/hooks/useContentHeight';
 import { CountrySelect } from '@/components/DataCapture/CountrySelect';
 import { DateInput } from '@/components/DataCapture/DateInput';
 import { formatDate } from '@/helpers/date';
 import { EventConfig, EventMicrosite } from '@/types/event';
+import SingleAssetDeliveryConfirmation from '@/components/Microsite/SingleAssetDeliveryConfirmation';
+import DataCaptureForm from '@/components/Microsite/DataCaptureForm';
 
 type ImageData = {
     id: number;
@@ -72,7 +73,7 @@ const SubGallery = (props: ResponseData) => {
     const outerHeight = useContentHeight({ footer: false });
     const contentHeight = useContentHeight({ footer: true });
     const { event, photos: initialPhotos, count, photo, placeholder } = props;
-    const gallery : EventMicrosite = event.metadata;
+    const gallery: EventMicrosite = event.metadata;
     const { query: { category, eventId, event: galleryViewSlug } } = useRouter()
 
     const [photoUploadPending, setPhotoUploadPending] = useState<boolean>(true); // waiting for first photo to arrive
@@ -97,51 +98,7 @@ const SubGallery = (props: ResponseData) => {
 
     /* Setting up the data capture form for the gallery. */
     const [dataCapture, setDataCapture] = useState<boolean>(gallery.data_capture || gallery.email_delivery);
-    const fields = gallery.email_delivery ? [{id: 'email', name: 'email' }] : _.map(gallery.fields, (f) => ({ id: f.toLowerCase().replaceAll(" ", "_"), name: f }));
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        watch,
-    } = useForm();
-    let acceptTermsRef = useRef<HTMLInputElement>(null);
-    const formData = watch();
-
-    const submitDataCapture = async (data: any) => {
-        const userAcceptedTerms = (gallery.enable_legal && gallery.explicit_opt_in) ? acceptTermsRef?.current?.checked : true;
-        if (!_.isEmpty(errors) || !userAcceptedTerms) {
-            console.log("submitDataCapture errors", { errors });
-            console.log("acceptTerms", acceptTermsRef?.current?.checked);
-            return;
-        }
-
-        console.log("submitDataCapture", { data });
-
-        /* Save data capture to metadata field of first photo in category */
-        /* unless is just email delivery */
-        const photoSlug = gallery.email_delivery ? photo.slug : _.first(photos)?.slug;
-        let metadata = gallery.email_delivery ? photo.metadata : _.first(photos)?.metadata || {};
-
-        if (data.birthday) {
-            data.birthday = formatDate(data.birthday);
-        }
-        metadata = {
-            ...metadata,
-            ...data,
-        }
-
-        const url = gallery.email_delivery ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/deliver/${photoSlug}.json` : `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/${photoSlug}.json`;
-        const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-        const payload = gallery.email_delivery ? { email: data.email } : { metadata };
-        let resp = await axios.put(url, payload, {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token,
-            },
-        });
-
-        setDataCapture(false);
-    }
+    const fields = gallery.email_delivery ? [{ id: 'email', name: 'email' }] : _.map(gallery.fields, (f) => ({ id: f.toLowerCase().replaceAll(" ", "_"), name: f }));
 
     /* MINI GALLERY ?category= */
     // No photos uploaded: loading view
@@ -166,7 +123,7 @@ const SubGallery = (props: ResponseData) => {
                 <meta name="og:video:type" content='video/mp4' />
             </Head>
 
-            <CustomGallery event={event}>
+            <CustomGallery event={event} logoSize={dataCapture ? 'lg' : 'sm'}>
                 {isDetailView ? (
                     <DetailView asset={photo} config={{ aiGeneration: gallery.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
                 ) : (
@@ -182,59 +139,23 @@ const SubGallery = (props: ResponseData) => {
                             </div>
                         ) : (
                             dataCapture ? (
-                                <div
-                                    style={{ height: contentHeight }}
-                                    className={`h-[calc(100vh-85px-48px-30px-env(safe-area-inset-bottom))] overflow-auto flex items-center px-6`}>
-                                    <div className='sm:max-w-2xl py-2 sm:px-10 mx-auto'>
-                                        <div className='flex flex-col text-center'>
-                                            <div className='mb-4 sm:mb-8 text-lg leading-5 sm:text-3xl'>
-                                                <h2>{gallery.data_capture_title || 'want your photos?'}</h2>
-                                                <h2 className='text-white/50'>{gallery.data_capture_subtitle || 'add your info to continue...'}</h2>
-                                            </div>
-                                            <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
-                                                {fields?.map((v, i) => {
-                                                    if (v.id == 'country') {
-                                                        return <CountrySelect key={i} error={!_.isEmpty(errors[v.id])} placeholder={v.name} {...register(v.id, { required: true })} />
-                                                    }
-                                                    if (v.id == 'birthday') {
-                                                        return <DateInput key={i} hasvalue={!_.isEmpty(formData[v.id])} placeholder={v.name} error={!_.isEmpty(errors[v.id])} {...register(v.id, { required: true, valueAsDate: true })} />
-                                                    }
-                                                    return (
-                                                        <input
-                                                            className={`input data-capture ${errors[v.id] && 'error text-red-600'}`}
-                                                            placeholder={`${v.name}${errors[v.id] ? (errors[v.id]?.type === 'pattern' ? ' is not valid' : ' is required') : ''}`}
-                                                            key={i}
-                                                            {...register(v.id, {
-                                                                required: true,
-                                                                ...(v.id == 'email' && { pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ }),
-                                                                ...(v.id == 'age' && { pattern: /^[0-9]*$/ })
-                                                            })}
-                                                        />
-                                                    )
-                                                })}
-                                                {gallery.enable_legal && (
-                                                    <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
-                                                        {gallery.explicit_opt_in && <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} />}
-                                                        <p className='text-xs sm:text-xl text-white/50'>
-                                                            {replaceLinks(gallery.terms_privacy)}
-                                                        </p>
-                                                    </div>
-                                                )}
-                                                <input className='btn btn-primary btn-gallery locked sm:block' type='submit' value='continue →' style={gallery.color ? { backgroundColor: gallery.color, borderColor: gallery.color, color: toTextColor(gallery.color) } : {}} />
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
+                                <DataCaptureForm
+                                    title={gallery.data_capture_title}
+                                    subtitle={gallery.data_capture_subtitle}
+                                    fields={fields}
+                                    enable_legal={gallery.enable_legal}
+                                    explicit_opt_in={gallery.explicit_opt_in}
+                                    terms_privacy={gallery.terms_privacy}
+                                    email_delivery={gallery.email_delivery}
+                                    asset={{
+                                        slug: gallery.email_delivery ? photo.slug : _.first(photos)?.slug || '',
+                                        metadata: gallery.email_delivery ? photo.metadata : _.first(photos)?.metadata || {}
+                                    }}
+                                    color={gallery.color}
+                                    onSuccess={() => setDataCapture(false)}
+                                />
                             ) : (!singleAsset && _.size(photos) > 1) ? (
                                 <div className='sm:max-w-2xl md:max-w-6xl block mx-auto h-full flex-1 w-full px-6'>
-                                    {/* <div className='mb-4 flex flex-col justify-start items-start gap-3 sm:flex-row sm:justify-between sm:items-end'>
-                                        <div>
-                                            <h2>{event.gallery_title || 'Share and tag all over social.'}</h2>
-                                            <h2 className='text-gray-400 whitespace-pre-line'>{event.gallery_subtitle || '#hypno #pro #iphone'}</h2>
-                                        </div>
-                                        {event.public_gallery && <Link href={`/${galleryViewSlug}/${eventId}/${event.party_slug}`} className='btn btn-sm rounded-full'>View all</Link>}
-                                    </div> */}
-
                                     <FadeIn
                                         from="bottom" positionOffset={300} triggerOffset={0}>
                                         <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }} className='pb-8'>
@@ -275,12 +196,7 @@ const SubGallery = (props: ResponseData) => {
                             )
                                 : (
                                     gallery.email_delivery ? (
-                                        <div className='fixed hero top-0 left-0 h-screen p-10'>
-                                            <div className='hero-content max-w-[24rem] sm:max-w-2xl flex flex-col bg-white/10 backdrop-blur-lg gap-4 items-center justify-center p-8'>
-                                                <span className='flex-1'><Letter /></span>
-                                                <h2 className='text-white text-center'>Thank you! <br /> Your content will be delivered to your email shortly.</h2>
-                                            </div>
-                                        </div>
+                                        <SingleAssetDeliveryConfirmation />
                                     ) : (
                                         <DetailView asset={_.first(photos)} config={{ aiGeneration: gallery.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64, width: _.first(photos)?.width, height: _.first(photos)?.height }} />
                                     )
