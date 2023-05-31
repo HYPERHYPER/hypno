@@ -413,10 +413,10 @@ const EventForm = (props: FormData) => {
                                 </div>
                             </FormControl>
 
-                            <FormControl label='magic button' nested={true} disabled={!config.custom_gallery}>
+                            {/* <FormControl label='magic button' nested={true} disabled={!config.custom_gallery}>
                                 {config.enable_magic_button && config.custom_gallery && <Modal.Trigger id='magic-button-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
                                 <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('enable_magic_button')} />
-                            </FormControl>
+                            </FormControl> */}
 
                             <FormControl label='private' nested={true} disabled={!config.custom_gallery}>
                                 <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('is_private')} />
