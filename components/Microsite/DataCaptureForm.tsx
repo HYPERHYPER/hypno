@@ -7,6 +7,7 @@ import _ from 'lodash';
 import { formatDate } from "@/helpers/date";
 import axios from "axios";
 import { toTextColor } from "@/helpers/color";
+import useContentHeight from "@/hooks/useContentHeight";
 
 interface DataCaptureFormProps {
     title?: string;
@@ -47,6 +48,7 @@ export default function DataCaptureForm({
     } = useForm();
     let acceptTermsRef = useRef<HTMLInputElement>(null);
     const formData = watch();
+    const contentHeight = useContentHeight({ footer: true });
 
     const submitDataCapture = async (data: any) => {
         const userAcceptedTerms = (enable_legal && explicit_opt_in) ? acceptTermsRef?.current?.checked : true;
@@ -86,7 +88,7 @@ export default function DataCaptureForm({
 
     return (
     <div
-        // style={{ height: contentHeight }}
+        style={{ height: contentHeight }}
         className={`h-[calc(100vh-85px-48px-30px-env(safe-area-inset-bottom))] overflow-auto flex items-center px-6`}>
         <div className='sm:max-w-2xl py-2 sm:px-10 mx-auto'>
             <div className='flex flex-col text-center'>

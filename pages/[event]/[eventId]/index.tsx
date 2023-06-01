@@ -123,7 +123,7 @@ const SubGallery = (props: ResponseData) => {
                 <meta name="og:video:type" content='video/mp4' />
             </Head>
 
-            <CustomGallery event={event} logoSize={dataCapture ? 'lg' : 'sm'}>
+            <CustomGallery event={event}>
                 {isDetailView ? (
                     <DetailView asset={photo} config={{ aiGeneration: gallery.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
                 ) : (
