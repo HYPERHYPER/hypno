@@ -2,31 +2,32 @@ import { forwardRef, useState, InputHTMLAttributes } from "react";
 import _ from 'lodash';
 
 interface DateInputProps extends InputHTMLAttributes<HTMLInputElement> {
-    hasvalue?: boolean;
     placeholder?: string;
     error?: boolean;
 }
 
-export const DateInput = forwardRef<HTMLInputElement, DateInputProps>((props, ref) => {
+const isValidDate = (value: string) => !_.isEmpty(value) && value !== 'Invalid Date'
+
+export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(({value, ...rest}, ref) => {
     const [isFocused, setIsFocused] = useState<boolean>(false);
 
     return (
-        <div className="relative h-12 w-full">
+        <div className="relative h-12 sm:h-[4rem] w-full">
             <input
-                {...props}
-                placeholder={props.name}
+                {...rest}
+                placeholder={rest.name}
                 type='date'
                 ref={ref}
-                className={`input data-capture w-full absolute inset-0 ${props.error && 'error text-red-600'}`}
+                className={`input data-capture w-full absolute inset-0 ${rest.error && 'error text-red-600'}`}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
                 style={{ boxSizing: 'border-box' }}
             />
-            {!isFocused && !props.hasvalue &&
+            {!isFocused && !isValidDate(String(value)) &&
                 <div 
                     onClick={() => setIsFocused(true)}
                     style={{ boxSizing: 'border-box' }}
-                    className={`absolute inset-0 flex items-center w-full input data-capture border-none ${props.error && 'error text-red-600'}`}>{props.error ? `${props.placeholder} is required` : props.placeholder}</div>
+                    className={`absolute inset-0 flex items-center w-full input data-capture border-none ${rest.error && 'error text-red-600'}`}>{rest.error ? `${rest.placeholder} is required` : rest.placeholder}</div>
             }
         </div>
     )

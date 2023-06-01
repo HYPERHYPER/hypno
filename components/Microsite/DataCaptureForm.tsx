@@ -102,7 +102,7 @@ export default function DataCaptureForm({
                             return <CountrySelect key={i} error={!_.isEmpty(errors[v.id])} placeholder={v.name} {...register(v.id, { required: true })} />
                         }
                         if (v.id == 'birthday') {
-                            return <DateInput key={i} hasvalue={!_.isEmpty(formData[v.id])} placeholder={v.name} error={!_.isEmpty(errors[v.id])} {...register(v.id, { required: true, valueAsDate: true })} />
+                            return <DateInput key={i} value={formData[v.id]} placeholder={v.name} error={!_.isEmpty(errors[v.id])} {...register(v.id, { required: true, valueAsDate: true })} />
                         }
                         return (
                             <input

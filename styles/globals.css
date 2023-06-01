@@ -227,15 +227,6 @@ a {
   opacity: 0.5;
 }
 
-input[type="date"] {
-  width: 100%;
-  -webkit-appearance: none;
-}
-
-input[type="date"]::-webkit-date-and-time-value {
-    text-align: left;
-}
-
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
