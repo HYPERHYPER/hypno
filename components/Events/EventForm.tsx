@@ -453,7 +453,7 @@ const EventForm = (props: FormData) => {
                     <div className='border-t-2 border-white/20'>
                         <FormControl label='fields' altLabel='separate multiple fields with commas' dir='col'>
                             <input
-                                className='input pro left'
+                                className='input pro left w-full'
                                 placeholder='name, email, phone'
                                 disabled={!config.data_capture}
                                 {...register('fields')} />
@@ -461,7 +461,7 @@ const EventForm = (props: FormData) => {
 
                         <FormControl label='headline' altLabel='this appears on your web gallery during delivery (optional)'>
                             <input
-                                className='input pro left flex-1'
+                                className='input pro left flex-1 w-full'
                                 placeholder='want your content?'
                                 disabled={!config.data_capture}
                                 {...register('data_capture_title')} />
@@ -469,7 +469,7 @@ const EventForm = (props: FormData) => {
 
                         <FormControl label='blurb' altLabel='this appears on your web gallery during delivery (optional)'>
                             <input
-                                className='input pro left flex-1'
+                                className='input pro left flex-1 w-full'
                                 placeholder='enter your info to continue'
                                 disabled={!config.data_capture}
                                 {...register('data_capture_subtitle')} />
