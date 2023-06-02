@@ -210,6 +210,15 @@ a {
   -webkit-text-fill-color: #00FF99 !important;
 }
 
+input[type="date"] {
+  width: 100%;
+  -webkit-appearance: none;
+}
+
+input[type="date"]::-webkit-date-and-time-value {
+    text-align: left;
+}
+
 .toggle.pro {
   background-color: black;
   border-color: #333333;
