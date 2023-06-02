@@ -212,7 +212,6 @@ a {
 
 input[type="date"] {
   width: 100%;
-  -webkit-appearance: none;
 }
 
 input[type="date"]::-webkit-date-and-time-value {
