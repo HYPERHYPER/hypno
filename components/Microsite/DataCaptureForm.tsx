@@ -8,6 +8,7 @@ import { formatDate } from "@/helpers/date";
 import axios from "axios";
 import { toTextColor } from "@/helpers/color";
 import useContentHeight from "@/hooks/useContentHeight";
+import clsx from "clsx";
 
 interface DataCaptureFormProps {
     title?: string;
@@ -118,9 +119,9 @@ export default function DataCaptureForm({
                         )
                     })}
                     {enable_legal && (
-                        <div className='flex flex-row items-start gap-3 p-3 bg-black/10 backdrop-blur-[50px]'>
+                        <div className={clsx('flex flex-row gap-4 p-4 bg-black/10 backdrop-blur-[50px]', explicit_opt_in ? 'text-left justify-start items-center border-l-2 sm:border-l-4 border-white/20': 'items-start ')}>
                             {explicit_opt_in && <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} />}
-                            <p className='text-xs sm:text-xl text-white/50'>
+                            <p className='text-xs sm:text-lg text-white/50'>
                                 {replaceLinks(terms_privacy || '')}
                             </p>
                         </div>
