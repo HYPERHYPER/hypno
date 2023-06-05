@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="80px" height="80px" viewBox="0 0 80 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 42 (36781) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 5</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M33.1947028,12.3678357 L38.1507046,7.41183384 C38.9295693,6.63296912 38.9254988,5.37070966 38.1444503,4.58966108 C37.3579564,3.80316717 36.0998719,3.80581232 35.3222775,4.58340672 L30.3662757,9.53940854 L25.4102738,4.58340672 C24.6326794,3.80581232 23.374595,3.80316717 22.5881011,4.58966108 C21.8070525,5.37070966 21.802982,6.63296912 22.5818467,7.41183384 L27.5378485,12.3678357 L22.5818467,17.3238375 C21.802982,18.1027022 21.8070525,19.3649617 22.5881011,20.1460103 C23.374595,20.9325042 24.6326794,20.929859 25.4102738,20.1522646 L30.3662757,15.1962628 L35.3222775,20.1522646 C36.0998719,20.929859 37.3579564,20.9325042 38.1444503,20.1460103 C38.9254988,19.3649617 38.9295693,18.1027022 38.1507046,17.3238375 L33.1947028,12.3678357 Z" id="path-1"></path>
+        <mask id="mask-2" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="16.7325513" height="16.7356713" fill="white">
+            <use xlink:href="#path-1"></use>
+        </mask>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-5">
+            <circle id="Oval-2" fill-opacity="0.8" fill="#000000" cx="40" cy="40" r="40"></circle>
+            <g id="Group-4" transform="translate(21.000000, 28.000000)" stroke="#FFFFFF" stroke-width="2" fill="#FFFFFF">
+                <use id="Combined-Shape" mask="url(#mask-2)" xlink:href="#path-1"></use>
+                <path d="M6,7 L0,7 L0,17 L6,17 L13,24 L13,7.34788079e-16 L6,7 Z" id="Combined-Shape" stroke-linejoin="round"></path>
+            </g>
+        </g>
+    </g>
+</svg>
