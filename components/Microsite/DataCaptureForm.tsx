@@ -40,7 +40,7 @@ export default function DataCaptureForm({
     asset,
     color,
     onSuccess,
-} : DataCaptureFormProps) {
+}: DataCaptureFormProps) {
     const {
         register,
         handleSubmit,
@@ -88,48 +88,48 @@ export default function DataCaptureForm({
     }
 
     return (
-    <div
-        style={{ height: contentHeight }}
-        className={`h-[calc(100vh-85px-48px-30px-env(safe-area-inset-bottom))] overflow-auto flex items-center px-6`}>
-        <div className='sm:max-w-2xl py-2 sm:px-10 mx-auto'>
-            <div className='flex flex-col text-center'>
-                <div className='mb-4 sm:mb-8 text-lg leading-5 sm:text-3xl'>
-                    <h2>{title || 'want your photos?'}</h2>
-                    <h2 className='text-white/50'>{subtitle || 'add your info to continue...'}</h2>
+        <div
+            style={{ minHeight: contentHeight }}
+            className={`min-h-[calc(100vh-85px-48px-30px-env(safe-area-inset-bottom))] overflow-auto flex items-center px-6`}>
+            <div className='sm:max-w-2xl pt-9 sm:pt-[72px] pb-[72px] sm:px-10 mx-auto'>
+                <div className='flex flex-col text-center'>
+                    <div className='mb-4 sm:mb-8 text-lg leading-5 sm:text-3xl'>
+                        <h2>{title || 'want your photos?'}</h2>
+                        <h2 className='text-white/50'>{subtitle || 'add your info to continue...'}</h2>
+                    </div>
+                    <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
+                        {fields?.map((v, i) => {
+                            if (v.id == 'country') {
+                                return <CountrySelect key={i} error={!_.isEmpty(errors[v.id])} placeholder={v.name} {...register(v.id, { required: true })} />
+                            }
+                            if (v.id == 'birthday') {
+                                return <DateInput key={i} value={formData[v.id]} placeholder={v.name} error={!_.isEmpty(errors[v.id])} {...register(v.id, { required: true, valueAsDate: true })} />
+                            }
+                            return (
+                                <input
+                                    className={`input data-capture ${errors[v.id] && 'error text-red-600'}`}
+                                    placeholder={`${v.name}${errors[v.id] ? (errors[v.id]?.type === 'pattern' ? ' is not valid' : ' is required') : ''}`}
+                                    key={i}
+                                    {...register(v.id, {
+                                        required: true,
+                                        ...(v.id == 'email' && { pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ }),
+                                        ...(v.id == 'age' && { pattern: /^[0-9]*$/ })
+                                    })}
+                                />
+                            )
+                        })}
+                        {enable_legal && (
+                            <div className={clsx('flex flex-row gap-4 p-4 bg-black/10 backdrop-blur-[50px]', explicit_opt_in ? 'text-left justify-start items-center border-l-2 sm:border-l-4 border-white/20' : 'items-start ')}>
+                                {explicit_opt_in && <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} />}
+                                <p className='text-xs sm:text-lg text-white/50'>
+                                    {replaceLinks(terms_privacy || '')}
+                                </p>
+                            </div>
+                        )}
+                        <input className='btn btn-primary btn-gallery locked sm:block' type='submit' value='continue →' style={color ? { backgroundColor: color, borderColor: color, color: toTextColor(color) } : {}} />
+                    </form>
                 </div>
-                <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
-                    {fields?.map((v, i) => {
-                        if (v.id == 'country') {
-                            return <CountrySelect key={i} error={!_.isEmpty(errors[v.id])} placeholder={v.name} {...register(v.id, { required: true })} />
-                        }
-                        if (v.id == 'birthday') {
-                            return <DateInput key={i} value={formData[v.id]} placeholder={v.name} error={!_.isEmpty(errors[v.id])} {...register(v.id, { required: true, valueAsDate: true })} />
-                        }
-                        return (
-                            <input
-                                className={`input data-capture ${errors[v.id] && 'error text-red-600'}`}
-                                placeholder={`${v.name}${errors[v.id] ? (errors[v.id]?.type === 'pattern' ? ' is not valid' : ' is required') : ''}`}
-                                key={i}
-                                {...register(v.id, {
-                                    required: true,
-                                    ...(v.id == 'email' && { pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ }),
-                                    ...(v.id == 'age' && { pattern: /^[0-9]*$/ })
-                                })}
-                            />
-                        )
-                    })}
-                    {enable_legal && (
-                        <div className={clsx('flex flex-row gap-4 p-4 bg-black/10 backdrop-blur-[50px]', explicit_opt_in ? 'text-left justify-start items-center border-l-2 sm:border-l-4 border-white/20': 'items-start ')}>
-                            {explicit_opt_in && <input type="checkbox" className="checkbox checkbox-[#FFFFFF]" ref={acceptTermsRef} />}
-                            <p className='text-xs sm:text-lg text-white/50'>
-                                {replaceLinks(terms_privacy || '')}
-                            </p>
-                        </div>
-                    )}
-                    <input className='btn btn-primary btn-gallery locked sm:block' type='submit' value='continue →' style={color ? { backgroundColor: color, borderColor: color, color: toTextColor(color) } : {}} />
-                </form>
             </div>
         </div>
-    </div>
     )
 }
