@@ -26,7 +26,7 @@ const useUserStoreBase = create<UserState & UserAction>()(
       token: null,
       error: '',
       isLoggedIn: false,
-      isLoading: true,
+      isLoading: false,
       updateUser: (updatedUser) => set(() => ({ user: { ...get().user, ...updatedUser } })),
       login: async (email, password) => {
         try {
