@@ -39,7 +39,7 @@ function DashboardPage(props: ResponseData) {
         return [`${url}&page=${pageIdx}`, token.access_token];
     }
 
-    const { data, size, setSize, error, isValidating } = useSWRInfinite(getKey,
+    const { data, size, setSize, error, isValidating, isLoading } = useSWRInfinite(getKey,
         ([url, token]) => fetchWithToken(url, token), {
         fallbackData: [{ events: [] }],
     });
@@ -66,7 +66,7 @@ function DashboardPage(props: ResponseData) {
                 <GlobalLayout.Content>
                     <div className='divider mt-0 h-1' />
                     <InfiniteScroll
-                        next={() => setSize(_.last(data).meta.next_page)}
+                        next={() => setSize((prev) => _.last(data).meta?.next_page || prev+1 )}
                         hasMore={size != (_.first(data)?.meta?.total_pages || 0)}
                         dataLength={paginatedEvents?.length}
                         loader={<></>}
