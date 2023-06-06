@@ -459,7 +459,7 @@ const EventForm = (props: FormData) => {
                                 {...register('fields')} />
                         </FormControl>
 
-                        <FormControl label='headline' altLabel='this appears on your web gallery during delivery (optional)'>
+                        <FormControl label='headline' altLabel='this appears on your web gallery during delivery (optional)' dir='col'>
                             <input
                                 className='input pro left flex-1 w-full'
                                 placeholder='want your content?'
@@ -467,7 +467,7 @@ const EventForm = (props: FormData) => {
                                 {...register('data_capture_title')} />
                         </FormControl>
 
-                        <FormControl label='blurb' altLabel='this appears on your web gallery during delivery (optional)'>
+                        <FormControl label='blurb' altLabel='this appears on your web gallery during delivery (optional)' dir='col'>
                             <input
                                 className='input pro left flex-1 w-full'
                                 placeholder='enter your info to continue'
