@@ -73,6 +73,24 @@ export default function DetailView({ asset, config, imageProps }: any) {
                             )}
                         </div>
                     </div>
+
+                    <div className='hidden sm:block sm:mt-3 sm:text-center'>
+                        <a className='btn btn-primary btn-gallery locked sm:max-w-sm' href={asset.download_url}>download ↓</a>
+                        {(config?.aiGeneration && config.aiGeneration.enabled) && (
+                            <label htmlFor="my-modal" className='btn btn-info btn-gallery locked' onClick={handleRemix}>
+                                {isLoadingGeneration ?
+                                    <ThreeDots
+                                        height="10"
+                                        width="30"
+                                        radius="4"
+                                        color="#FFFFFF"
+                                        ariaLabel="three-dots-loading"
+                                        visible={true}
+                                    /> : 'remix ☢︎'}
+                            </label>
+                        )}
+                    </div>
+                </div>
             </div>
 
             <div className='block sm:hidden'>
