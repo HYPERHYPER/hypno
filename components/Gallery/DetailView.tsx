@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { useCallback, useRef, useState } from "react";
 import clsx from "clsx";
 import VideoAsset from "./VideoAsset";
+import useContentHeight from "@/hooks/useContentHeight";
+import _ from 'lodash';
 
 export default function DetailView({ asset, config, imageProps }: any) {
     // const footer = Boolean(config.aiGeneration?.enabled || asset.mp4_url);
@@ -31,47 +33,51 @@ export default function DetailView({ asset, config, imageProps }: any) {
         }
     }
 
+    const isPortrait = asset.height > asset.width;
+    const isVideo = !_.isEmpty(asset.mp4_url);
+    const height = useContentHeight({ footer });
+    const outerHeight = useContentHeight({ footer: false });
+
+    // portrait
+    // mobile
+    // desktop
+
+    // landscape
+    // fill width
+    // centered
+
     return (
         <>
             <div
-                className={clsx(`max-w-none sm:max-w-lg sm:mx-auto px-[25px]`, footer ? 'mb-[72px]': 'mb-6')}>
-                <div className='relative backdrop-blur-[50px]'>
-                    <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
-                        <Spinner />
-                    </div>
-
-                    {asset.mp4_url ? (
-                        <VideoAsset src={asset.mp4_url} poster={asset.posterframe} />
-                    ) : (
-                        <div className='block overflow-hidden'>
-                            <Image
-                                {...imageProps}
-                                priority
-                                fill={!imageProps.width}
-                                src={asset.url}
-                                alt={asset.event_name + asset.id}
-                                placeholder={imageProps?.blurDataURL ? 'blur' : 'empty'}
-                                className={`w-full h-auto`} />
+                style={{ minHeight: isPortrait ? Math.min(Number(outerHeight.split('px')[0]), assetHeight) + 'px' : height }}
+                className={clsx(`inline-flex px-[25px] items-center flex-col sm:mx-auto sm:w-full`, isPortrait && assetHeight < Number(outerHeight.split('px')[0]) ? 'justify-between' : 'justify-center', footer ? 'mb-[72px]' : '')}>
+                {/* className={clsx(`max-w-none sm:max-h-[80vh] sm:w-auto sm:flex sm:items-center sm:justify-center sm:mx-auto px-[25px]`, footer ? 'mb-[72px]': 'mb-6')}> */}
+                <div className={clsx(isPortrait && 'md:max-w-lg sm:mb-0', isPortrait && !isVideo && assetHeight > Number(outerHeight.split('px')[0]) && "mb-[72px]")}>
+                    <div className='relative backdrop-blur-[50px] w-fit'>
+                        <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
+                            <Spinner />
                         </div>
-                    )}
-                </div>
 
-                        <div className='hidden sm:block sm:mt-3 sm:text-center'>
-                            <a className='btn btn-primary btn-gallery locked sm:max-w-sm' href={asset.download_url}>download ↓</a>
-                            {(config?.aiGeneration && config.aiGeneration.enabled) && (
-                                <label htmlFor="my-modal" className='btn btn-info btn-gallery locked' onClick={handleRemix}>
-                                    {isLoadingGeneration ?
-                                        <ThreeDots
-                                            height="10"
-                                            width="30"
-                                            radius="4"
-                                            color="#FFFFFF"
-                                            ariaLabel="three-dots-loading"
-                                            visible={true}
-                                        /> : 'remix ☢︎'}
-                                </label>
-                            )}
-                        </div>
+                        {asset.mp4_url ? (
+                            <VideoAsset src={asset.mp4_url} poster={asset.posterframe} style={isPortrait ? { maxHeight: height } : {}}
+                            />
+                        ) : (
+                            <div className='block'>
+                                <Image
+                                    {...imageProps}
+                                    //@ts-ignore
+                                    onLoad={(e) => setAssetHeight(e.target.height)}
+                                    //@ts-ignore
+                                    onResize={(e) => setAssetHeight(e.target.height)}
+                                    priority
+                                    fill={!imageProps.width}
+                                    src={asset.url}
+                                    alt={asset.event_name + asset.id}
+                                    placeholder={imageProps?.blurDataURL ? 'blur' : 'empty'}
+                                    style={isPortrait && assetHeight > Number(outerHeight.split('px')[0]) ? { minHeight: height } : {}}
+                                    className={isPortrait ? `w-auto h-full` : `w-full h-auto sm:max-h-[70vh]`} />
+                            </div>
+                        )}
                     </div>
 
                     <div className='hidden sm:block sm:mt-3 sm:text-center'>
