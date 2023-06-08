@@ -2,15 +2,12 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 import type { GetServerSideProps } from 'next';
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
-import { useState, useEffect, useRef } from 'react';
-import { useForm } from 'react-hook-form';
-import { toTextColor } from '@/helpers/color';
+import { useState, useEffect } from 'react';
 import Spinner from '@/components/Spinner';
 import useSWR from 'swr';
 import { axiosGetWithToken } from '@/lib/fetchWithToken';
 import { FadeIn } from 'react-slide-fade-in';
 import AutosizeImage from '@/components/AutosizeImage';
-import { replaceLinks } from '@/helpers/text';
 import DetailView from '@/components/Gallery/DetailView';
 import Link from 'next/link';
 import Head from 'next/head';
@@ -18,9 +15,6 @@ import _ from 'lodash';
 import { getPlaiceholder } from 'plaiceholder';
 import { CustomGallery } from '@/components/Gallery/CustomGallery';
 import useContentHeight from '@/hooks/useContentHeight';
-import { CountrySelect } from '@/components/DataCapture/CountrySelect';
-import { DateInput } from '@/components/DataCapture/DateInput';
-import { formatDate } from '@/helpers/date';
 import { EventConfig, EventMicrosite } from '@/types/event';
 import SingleAssetDeliveryConfirmation from '@/components/Microsite/SingleAssetDeliveryConfirmation';
 import DataCaptureForm from '@/components/Microsite/DataCaptureForm';
@@ -125,7 +119,7 @@ const SubGallery = (props: ResponseData) => {
 
             <CustomGallery event={event}>
                 {isDetailView ? (
-                    <DetailView asset={photo} config={{ aiGeneration: gallery.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
+                    <DetailView asset={photo} config={{ aiGeneration: gallery.ai_generation, color: gallery.color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
                 ) : (
                     <div
                         style={{ height: outerHeight }}
@@ -198,7 +192,7 @@ const SubGallery = (props: ResponseData) => {
                                     gallery.email_delivery ? (
                                         <SingleAssetDeliveryConfirmation />
                                     ) : (
-                                        <DetailView asset={_.first(photos)} config={{ aiGeneration: gallery.ai_generation }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64, width: _.first(photos)?.width, height: _.first(photos)?.height }} />
+                                        <DetailView asset={_.first(photos)} config={{ aiGeneration: gallery.ai_generation, color: gallery.color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64, width: _.first(photos)?.width, height: _.first(photos)?.height }} />
                                     )
                                 ))
                         }

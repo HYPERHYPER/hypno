@@ -7,6 +7,7 @@ import clsx from "clsx";
 import VideoAsset from "./VideoAsset";
 import useContentHeight from "@/hooks/useContentHeight";
 import _ from 'lodash';
+import { toTextColor } from "@/helpers/color";
 
 export default function DetailView({ asset, config, imageProps }: any) {
     // const footer = Boolean(config.aiGeneration?.enabled || asset.mp4_url);
@@ -81,7 +82,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                     </div>
 
                     <div className='hidden sm:block sm:mt-3 sm:text-center'>
-                        <a className='btn btn-primary btn-gallery locked sm:max-w-sm' href={asset.download_url}>download ↓</a>
+                        <a className='btn btn-primary btn-gallery locked sm:max-w-sm' href={asset.download_url} style={config?.color ? { backgroundColor: config.color, borderColor: config.color, color: toTextColor(config.color) } : {}}>download ↓</a>
                         {(config?.aiGeneration && config.aiGeneration.enabled) && (
                             <label htmlFor="my-modal" className='btn btn-info btn-gallery locked' onClick={handleRemix}>
                                 {isLoadingGeneration ?
@@ -100,7 +101,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
             </div>
 
             <div className='block sm:hidden'>
-                <a className='btn btn-primary btn-gallery locked' href={asset.download_url}>download ↓</a>
+                <a className='btn btn-primary btn-gallery locked' href={asset.download_url} style={config?.color ? { backgroundColor: config.color, borderColor: config.color, color: toTextColor(config.color) } : {}}>download ↓</a>
             </div>
 
             <input type="checkbox" id="my-modal" className="modal-toggle" />
