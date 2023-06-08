@@ -25,14 +25,26 @@ function SettingsPage() {
         register,
         handleSubmit,
         formState: { isDirty, errors },
-        reset
+        reset,
+        setValue,
+        watch
     } = useForm({
         defaultValues: {
             first_name: user.first_name || '',
             last_name: user.last_name || '',
             username: user.username || '',
+            email: user.email || '',
         }
     });
+    const userConfig = watch();
+
+    const handleErrors = (data: any) => {
+        if (!_.isEmpty(errors)) {
+            console.log("submitForm errors", { errors });
+            setSaveStatus('error');
+            return;
+        }
+    }
 
     const handleUpdateUser = async (data: any) => {
         if (!_.isEmpty(errors)) {
@@ -72,7 +84,7 @@ function SettingsPage() {
 
     const debouncedSave = useCallback(
         debounce(() => {
-            handleSubmit(handleUpdateUser)();
+            handleSubmit(handleUpdateUser, handleErrors)();
             return;
         }, 1000),
         []
@@ -110,7 +122,7 @@ function SettingsPage() {
                     <div className='list pro'>
                         <Item name='username' value={user.username || '+'} modalId='username-modal' />
                         <Item name='name' value={`${user.first_name} ${user.last_name}` || ''} modalId='name-modal' />
-                        <Item name='email' value={user.email} />
+                        <Item name='email' value={user.email} modalId='email-modal' />
                         <Item name='password' value={'•••••••'} modalId='password-modal' />
                         <Item name='organization' value={user.organization.name} href='/org' />
                         {/* <Item name='upgrade' value={'unlock custom graphics, effects and more!'} /> */}
@@ -141,6 +153,27 @@ function SettingsPage() {
                         </FormControl>
                     </div>
                 </Modal>
+
+                <Modal
+                    id='email-modal'
+                    title='edit email'
+                    menu={AutosaveStatusText(saveStatus)}>
+                    <div className='list pro'>
+                        <FormControl label='email'>
+                            <input {...register('email', {
+                                required: true,
+                                validate: {
+                                    maxLength: (v: string) =>
+                                        v.length <= 50 || "exceeds character limit",
+                                    matchPattern: (v: string) =>
+                                        /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(v) ||
+                                        "not a valid email address",
+                                },
+                            })} className='input pro' />
+                        </FormControl>
+                    </div>
+                </Modal>
+
                 <UpdatePasswordModal />
             </GlobalLayout>
         </>
