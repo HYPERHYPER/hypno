@@ -12,6 +12,7 @@ import { useCallback, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { useForm } from 'react-hook-form';
 import { AutosaveStatusText, SaveStatus } from '@/components/Form/AutosaveStatusText';
+import UpdatePasswordModal from '@/components/Settings/UpdatePasswordModal';
 
 export default withAuth(SettingsPage, 'protected');
 function SettingsPage() {
@@ -110,7 +111,7 @@ function SettingsPage() {
                         <Item name='username' value={user.username || '+'} modalId='username-modal' />
                         <Item name='name' value={`${user.first_name} ${user.last_name}` || ''} modalId='name-modal' />
                         <Item name='email' value={user.email} />
-                        <Item name='password' value={'•••••••'} />
+                        <Item name='password' value={'•••••••'} modalId='password-modal' />
                         <Item name='organization' value={user.organization.name} href='/org' />
                         {/* <Item name='upgrade' value={'unlock custom graphics, effects and more!'} /> */}
                     </div>
@@ -140,6 +141,7 @@ function SettingsPage() {
                         </FormControl>
                     </div>
                 </Modal>
+                <UpdatePasswordModal />
             </GlobalLayout>
         </>
     )

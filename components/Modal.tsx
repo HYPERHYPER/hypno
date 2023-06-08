@@ -1,4 +1,6 @@
 import { ReactNode } from "react";
+import { SaveStatus } from "./Form/AutosaveStatusText";
+import Spinner from "./Spinner";
 
 interface TriggerModalProps {
     id?: string;
@@ -11,6 +13,11 @@ interface ModalProps {
     title?: string;
     onDone?: () => void;
     menu?: ReactNode;
+    actionBtn?: {
+        status: SaveStatus;
+        text: string;
+        onClick: () => void;
+    };
 }
 
 const TriggerModal = ({ id, children }: TriggerModalProps) => {
@@ -19,7 +26,9 @@ const TriggerModal = ({ id, children }: TriggerModalProps) => {
     )
 }
 
-export default function Modal({ title, id, children, onDone, menu }: ModalProps) {
+const btnClassName = "tracking-tight btn btn-primary rounded-[20px] btn-block h-[60px] text-2xl cursor-pointer";
+
+export default function Modal({ title, id, children, onDone, menu, actionBtn }: ModalProps) {
     return (
         <>
             <input type="checkbox" id={id} className="modal-toggle" />
@@ -42,7 +51,15 @@ export default function Modal({ title, id, children, onDone, menu }: ModalProps)
                         {children}
                     </div>
 
-                    <label htmlFor={id} onClick={onDone ? onDone : undefined} className="tracking-tight btn btn-primary rounded-[20px] btn-block h-[60px] text-2xl cursor-pointer">done</label>
+                    {actionBtn ? (
+                        <button onClick={actionBtn.onClick} className={btnClassName} disabled={actionBtn.status == 'success' || actionBtn.status == 'saving' }>
+                            {(actionBtn.status == 'ready' || actionBtn.status == 'error') && actionBtn.text}
+                            {actionBtn.status == 'saving' && <span className="loading loading-dots"></span>}
+                            {actionBtn.status == 'success' && 'success!'}
+                        </button>
+                    ) : (
+                        <label htmlFor={id} onClick={onDone ? onDone : undefined} className={btnClassName}>done</label>
+                    )}
                 </label>
             </label>
         </>
