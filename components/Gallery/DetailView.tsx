@@ -8,6 +8,7 @@ import VideoAsset from "./VideoAsset";
 import useContentHeight from "@/hooks/useContentHeight";
 import _ from 'lodash';
 import { toTextColor } from "@/helpers/color";
+import useWidth from "@/hooks/useWidth";
 
 export default function DetailView({ asset, config, imageProps }: any) {
     // const footer = Boolean(config.aiGeneration?.enabled || asset.mp4_url);
@@ -38,7 +39,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
     const isVideo = !_.isEmpty(asset.mp4_url);
     const height = useContentHeight({ footer });
     const outerHeight = useContentHeight({ footer: false });
-
+    const width = useWidth();
     // portrait
     // mobile
     // desktop
@@ -60,7 +61,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                         </div>
 
                         {asset.mp4_url ? (
-                            <VideoAsset src={asset.mp4_url} poster={asset.posterframe} style={isPortrait ? { maxHeight: height } : {}}
+                            <VideoAsset src={asset.mp4_url} poster={asset.posterframe} style={isPortrait && Number(width) > 668 ? { maxHeight: height } : {}}
                             />
                         ) : (
                             <div className='block'>
