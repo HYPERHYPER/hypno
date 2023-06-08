@@ -8,9 +8,12 @@ import useUserStore from '@/store/userStore';
 import withAuth from '@/components/hoc/withAuth';
 import GlobalLayout from '@/components/GlobalLayout';
 import FormControl from '@/components/Form/FormControl';
+import { useRouter } from 'next/router';
 
 export default withAuth(SignupPage, 'auth');
 function SignupPage() {
+    const { query } = useRouter();
+    const isInviteSignup = !_.isEmpty(query.invite)
     const signup = useUserStore.useSignup();
     const error = useUserStore.useError();
 
@@ -51,8 +54,8 @@ function SignupPage() {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <GlobalLayout>
-                <main className='fixed inset-0 bg-black w-screen min-h-screen'>
-                    <div className='hero min-h-screen'>
+                <main className='absolute inset-0 bg-black w-screen min-h-screen sm:mt-[150px]'>
+                    <div className='hero min-h-screen sm:min-h-full'>
                         <div className='hero-content sm:max-w-3xl w-full text-left flex-col items-start space-y-9'>
                             <div className='space-y-3'>
                                 <h1 className='text-white'>sign up</h1>

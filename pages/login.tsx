@@ -49,7 +49,7 @@ function LoginPage() {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <GlobalLayout>
-                <main className='fixed inset-0 bg-black w-screen min-h-screen'>
+                <main className='absolute inset-0 bg-black w-screen min-h-screen'>
                     <div className='hero min-h-screen'>
                         <div className='hero-content sm:max-w-2xl w-full flex-col items-start space-y-9'>
                             <div className='space-y-3'>
@@ -94,11 +94,9 @@ function LoginPage() {
                             </form>
 
                             {error && (
-                                <div className="alert alert-error justify-center mt-3">
-                                    <div className='font-medium'>
+                                <div className="alert alert-error justify-center mt-3 font-medium gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                         <span>oops! {error.toLowerCase()}</span>
-                                    </div>
                                 </div>
                             )}
                         </div>
