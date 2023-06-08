@@ -40,6 +40,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
     const height = useContentHeight({ footer });
     const outerHeight = useContentHeight({ footer: false });
     const width = useWidth();
+    const btnColor = config?.color === '#000000' ? null : config.color;
     // portrait
     // mobile
     // desktop
@@ -83,7 +84,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                     </div>
 
                     <div className='hidden sm:block sm:mt-3 sm:text-center'>
-                        <a className='btn btn-primary btn-gallery locked sm:max-w-sm' href={asset.download_url} style={config?.color ? { backgroundColor: config.color, borderColor: config.color, color: toTextColor(config.color) } : {}}>download ↓</a>
+                        <a className='btn btn-primary btn-gallery locked sm:max-w-sm' href={asset.download_url} style={btnColor ? { backgroundColor: btnColor, borderColor: btnColor, color: toTextColor(btnColor) } : {}}>download ↓</a>
                         {(config?.aiGeneration && config.aiGeneration.enabled) && (
                             <label htmlFor="my-modal" className='btn btn-info btn-gallery locked' onClick={handleRemix}>
                                 {isLoadingGeneration ?
@@ -102,7 +103,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
             </div>
 
             <div className='block sm:hidden'>
-                <a className='btn btn-primary btn-gallery locked' href={asset.download_url} style={config?.color ? { backgroundColor: config.color, borderColor: config.color, color: toTextColor(config.color) } : {}}>download ↓</a>
+                <a className='btn btn-primary btn-gallery locked' href={asset.download_url} style={btnColor ? { backgroundColor: btnColor, borderColor: btnColor, color: toTextColor(btnColor) } : {}}>download ↓</a>
             </div>
 
             <input type="checkbox" id="my-modal" className="modal-toggle" />
