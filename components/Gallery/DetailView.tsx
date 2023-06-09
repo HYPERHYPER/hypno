@@ -77,7 +77,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                                     alt={asset.event_name + asset.id}
                                     placeholder={imageProps?.blurDataURL ? 'blur' : 'empty'}
                                     style={isPortrait && assetHeight > Number(outerHeight.split('px')[0]) ? { minHeight: height } : {}}
-                                    className={isPortrait ? `w-auto h-full` : `w-full h-auto sm:max-h-[70vh]`} />
+                                    className={isPortrait ? `w-auto h-auto` : `w-full h-auto sm:max-h-[70vh]`} />
                             </div>
                         )}
                     </div>
