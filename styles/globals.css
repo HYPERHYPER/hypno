@@ -90,7 +90,7 @@
 
 @layer components {
   .checkbox {
-    @apply rounded-none border-none bg-white checked:bg-white
+    @apply rounded-none checkbox-info border-none bg-white/20 transition
   }
 
   .btn {
