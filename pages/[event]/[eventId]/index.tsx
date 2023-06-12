@@ -178,7 +178,7 @@ const SubGallery = (props: ResponseData) => {
                                                         </div>
                                                     </Link>
                                                 ))}
-                                                {_.range(0, uploadingCount).map((v, i) => (
+                                                {uploadingCount > 0 && _.range(0, uploadingCount).map((v, i) => (
                                                     <div key={i} className='bg-white/10 backdrop-blur-[50px] px-3 py-6 flex flex-col gap-3 justify-center items-center aspect-[4/3]'>
                                                         <Spinner />
                                                     </div>
