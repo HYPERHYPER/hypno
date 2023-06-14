@@ -151,6 +151,8 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
     )
 }
 
+const isProEvent = (eventType: string) => eventType === 'hypno_pro';
+
 function EventPage(props: ResponseData) {
     const { query } = useRouter();
     const { event, photos } = props;
@@ -215,7 +217,7 @@ function EventPage(props: ResponseData) {
                     {/* <Link href={`/e/${id}`}><h2 className='text-white'>all</h2></Link> */}
                     {/* <Link href=''><h2 className='text-primary'>favorites</h2></Link> */}
                     {/* <Link href=''><h2 className='text-primary'>data</h2></Link> */}
-                    <Link href={`/e/${id}/edit`}><h2 className='text-primary'>edit</h2></Link>
+                    {isProEvent(event.event_type) && <Link href={`/e/${id}/edit`}><h2 className='text-primary'>edit</h2></Link>}
                 </GlobalLayout.Header>
 
                 <ScanQRModal eventId={id} eventName={name} modalId='scan-qr-modal' />

@@ -177,7 +177,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         console.log(e);
     })
 
-    if (_.isEmpty(data)) {
+    if (_.isEmpty(data) || data.event.event_type !== 'hypno_pro') {
         return {
             notFound: true,
         }
