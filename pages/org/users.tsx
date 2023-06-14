@@ -38,6 +38,7 @@ export default withAuth(OrganizationUsersPage, 'protected');
 function OrganizationUsersPage(props: ResponseData) {
     const { users: initialUsers, meta } = props;
     const user = useUserStore.useUser();
+    const org_id = user.organization.id;
 
     const token = useUserStore.useToken();
 
@@ -82,7 +83,7 @@ function OrganizationUsersPage(props: ResponseData) {
                         loader={<></>}
                     >
                         <div className='list pro'>
-                            {_.map(paginatedUsers, (u) => <Item key={u.id} user={u} />)}
+                            {_.map(paginatedUsers, (u) => <Item key={u.id} user={u} orgId={org_id} />)}
                         </div>
                     </InfiniteScroll>
                 </GlobalLayout.Content>
@@ -91,8 +92,8 @@ function OrganizationUsersPage(props: ResponseData) {
     )
 }
 
-const Item = ({ user }: { user: OrgUser }) => {
-    const { username, first_name, last_name } = user;
+const Item = ({ user, orgId }: { user: OrgUser; orgId: number }) => {
+    const { username, first_name, last_name, organization_id } = user;
     return (
         <div className='item'>
             <div className='space-x-3 tracking-tight lowercase flex'>
@@ -101,7 +102,7 @@ const Item = ({ user }: { user: OrgUser }) => {
                 {/* <span className='text-white/40 text-xl'>device</span> */}
             </div>
             <div className='flex items-center gap-3 sm:gap-5 text-primary lowercase'>
-                {/* <span>role</span> */}
+                <span>{orgId === organization_id ? 'member' : 'guest'}</span>
                 {/* <span className='bg-white/20 h-6 w-6 sm:h-10 sm:w-10 flex items-center justify-center rounded-full text-black'><Minus /></span> */}
             </div>
         </div>
