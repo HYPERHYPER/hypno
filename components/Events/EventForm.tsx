@@ -19,6 +19,7 @@ import { AutosaveStatusText, SaveStatus } from '../Form/AutosaveStatusText';
 import useFilters from '@/hooks/useFilters';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Spinner from '../Spinner';
+import useOrganizations from '@/hooks/useOrganizations';
 
 interface FormData {
     event?: any;
@@ -131,29 +132,9 @@ const EventForm = (props: FormData) => {
     const config = watch();
     const watchedWatermarks = watch('watermarks');
 
-    const [organizations, setOrganizations] = useState<{id: number, name: string}[]>([]);
-    useEffect(() => {
-        const fetchOrganizations = async () => {
-            try {
-                const token = parseCookies().hypno_token;
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: 'Bearer ' + token,
-                    }
-                });
-                setOrganizations(response.data.organizations);
-                //@ts-ignore
-                setValue('org_id', _.first(response.data.organizations).id)
-            } catch (error) {
-                console.error('Error fetching organizations:', error);
-            }
-        };
-
-        fetchOrganizations();
-    }, []);
-
+    const { organizations, isLoading: isLoadingOrgs } = useOrganizations(3000);
     const { filters, loadMore: loadMoreFilters, meta: filterMeta } = useFilters(20);
+    
     // TODO: hiding email delivery for now
     // useEffect(() => {
     //     if (config.email_delivery) {
@@ -241,7 +222,7 @@ const EventForm = (props: FormData) => {
                             {event ?
                                 <div className='lowercase text-xl sm:text-4xl'>{event.organization.name}</div>
                                 : (
-                                    <select className='select min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl'>
+                                    <select className='select pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl'>
                                         {_.map(organizations, ((o) => <option key={o.id} value={o.id}>{o.name}</option>))}
                                     </select>
                                 )}
