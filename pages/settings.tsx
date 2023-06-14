@@ -12,7 +12,10 @@ import { useCallback, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { useForm } from 'react-hook-form';
 import { AutosaveStatusText, SaveStatus } from '@/components/Form/AutosaveStatusText';
+import Plus from 'public/pop/plus.svg';
+import FileInput from '@/components/Form/FileInput';
 import UpdatePasswordModal from '@/components/Settings/UpdatePasswordModal';
+import Image from 'next/image';
 
 export default withAuth(SettingsPage, 'protected');
 function SettingsPage() {
@@ -34,6 +37,7 @@ function SettingsPage() {
             last_name: user.last_name || '',
             username: user.username || '',
             email: user.email || '',
+            avatar: user.avatar || '',
         }
     });
     const userConfig = watch();
@@ -109,10 +113,17 @@ function SettingsPage() {
                 <GlobalLayout.Header
                     title='settings'
                     right={
-                        <div className='avatar placeholder'>
-                            <div className="bg-white/20 text-white rounded-full w-[120px]">
-                                <span className="text-4xl uppercase">{user.first_name.charAt(0)}{user.last_name.charAt(0)}</span>
+                        <div className='avatar placeholder indicator'>
+                            <div className="bg-white/20 text-white rounded-full w-[120px] overflow-clip">
+                                {user.avatar ?
+                                    <Image src={user.avatar} alt={`${user.username}-avatar`} fill className='rounded-full' />
+                                    :
+                                    <span className="text-4xl uppercase">{user.first_name.charAt(0)}{user.last_name.charAt(0)}</span>
+                                }
                             </div>
+                            <Modal.Trigger id='avatar-modal'>
+                                <span className="indicator-item indicator-top indicator-end translate-x-1 translate-y-1 btn btn-primary btn-sm btn-circle rounded-full"><Plus /></span>
+                            </Modal.Trigger>
                         </div>
                     }
                 >
@@ -175,6 +186,33 @@ function SettingsPage() {
                 </Modal>
 
                 <UpdatePasswordModal />
+
+                <Modal
+                    id='avatar-modal'
+                    title='add avatar'
+                    menu={AutosaveStatusText(saveStatus)}>
+                    <div className='border-white/20 border-b-2 pb-3 sm:pb-7 flex justify-center' >
+                        <div className='avatar placeholder'>
+                            <div className="bg-white/20 text-white rounded-full w-[250px]">
+                                {user.avatar ?
+                                    <Image src={user.avatar} alt={`${user.username}-avatar`} fill className='rounded-full' />
+                                    :
+                                    <span className="text-4xl uppercase">{user.first_name.charAt(0)}{user.last_name.charAt(0)}</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div className='list pro'>
+                        <FormControl>
+                            <FileInput
+                                inputId='avatar'
+                                onInputChange={(value: string) => setValue('avatar', value, { shouldDirty: true })}
+                                value={userConfig.avatar}
+                                uploadCategory='user'
+                            />
+                        </FormControl>
+                    </div>
+                </Modal>
             </GlobalLayout>
         </>
     )
