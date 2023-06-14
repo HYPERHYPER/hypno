@@ -56,7 +56,7 @@ export const getNestedFormField = (baseKey: string, subKey: string): string => {
     return `${baseKey}.${subKey}`;
 }
 
-export const getS3Filename = (userId: string, type: 'watermark' | 'logo' | 'background' | 'filter', fileName: string, dimensions?: string): string => {
+export const getS3Filename = (userId: string, type: 'watermark' | 'logo' | 'background' | 'filter' | 'user', fileName: string, dimensions?: string): string => {
     if (!fileName) return "";
     let filenameWithDimensions = fileName.replaceAll(" ", "-");
     // if (dimensions) {
