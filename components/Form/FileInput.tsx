@@ -15,7 +15,7 @@ interface UploaderProps {
   value?: string;
   disabled?: boolean;
   validateAspectRatio?: AspectRatio;
-  uploadCategory: 'watermark' | 'logo' | 'background' | 'filter';
+  uploadCategory: 'watermark' | 'logo' | 'background' | 'filter' | 'user';
 }
 
 export default function FileInput(props: UploaderProps) {
@@ -127,7 +127,12 @@ export default function FileInput(props: UploaderProps) {
 
   return (
     <div className='flex gap-3 items-center'>
-      <span className='text-lg sm:text-4xl text-primary truncate'>{uploadStatus == 'error' ? <span className='text-red-500'>error</span> : getFilename(props.value || '')}</span>
+      <div className="dropdown dropdown-top dropdown-hover">
+        <label tabIndex={0} className='text-lg sm:text-4xl text-primary truncate'>{uploadStatus == 'error' ? <span className='text-red-500'>error</span> : getFilename(props.value || '')}</label>
+        <div tabIndex={0} className='left-1/2 mb-5 dropdown-content bg-white/10 backdrop-blur-[30px] rounded-box p-3 sm:p-4'>
+            <img className='max-h-[200px] w-auto' src={props.value || ''} />
+        </div>
+      </div>
       <input
         type='file'
         id={props.inputId}
