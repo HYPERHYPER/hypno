@@ -40,7 +40,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
     const height = useContentHeight({ footer });
     const outerHeight = useContentHeight({ footer: false });
     const width = useWidth();
-    const btnColor = config?.color === '#000000' ? null : config.color;
+    const btnColor = config?.color === '#00FF99' ? null : config.color;
     // portrait
     // mobile
     // desktop

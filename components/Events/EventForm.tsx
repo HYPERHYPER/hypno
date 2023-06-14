@@ -114,7 +114,7 @@ const EventForm = (props: FormData) => {
             custom_gallery: event ? isCustomGallery(event.metadata) : false,
             logo: event?.metadata?.logo || '',
             background: event?.metadata?.background || '',
-            color: event?.metadata?.color || '#000000',
+            color: event?.metadata?.color || '#00FF99',
             is_private: event ? isPrivate(event.is_private) : false,
             data_capture: event?.metadata?.data_capture || false,
             fields: event?.metadata?.fields || [],
