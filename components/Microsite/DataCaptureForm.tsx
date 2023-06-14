@@ -9,6 +9,7 @@ import axios from "axios";
 import { toTextColor } from "@/helpers/color";
 import useContentHeight from "@/hooks/useContentHeight";
 import clsx from "clsx";
+import { Balancer } from "react-wrap-balancer";
 
 interface DataCaptureFormProps {
     title?: string;
@@ -95,8 +96,8 @@ export default function DataCaptureForm({
             <div className='sm:max-w-2xl pt-9 sm:pt-[72px] pb-[72px] sm:px-10 mx-auto'>
                 <div className='flex flex-col text-center'>
                     <div className='mb-4 sm:mb-8 text-lg leading-5 sm:text-3xl'>
-                        <h2>{title || 'want your photos?'}</h2>
-                        <h2 className='text-white/50'>{subtitle || 'add your info to continue...'}</h2>
+                        <h2><Balancer>{title || 'want your photos?'}</Balancer></h2>
+                        {subtitle || (!title && !subtitle) && <h2 className='text-white/50'><Balancer>{subtitle || (!title && 'add your info to continue...')}</Balancer></h2>}
                     </div>
                     <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
                         {fields?.map((v, i) => {
@@ -120,10 +121,10 @@ export default function DataCaptureForm({
                             )
                         })}
                         {enable_legal && (
-                            <div className={clsx('flex flex-row gap-4 p-4 bg-black/10 backdrop-blur-[50px]', explicit_opt_in ? 'text-left justify-start items-center border-l-2 sm:border-l-4 border-white/20' : 'items-start ')}>
+                            <div className={clsx('flex flex-row gap-4 p-4 bg-black/10 backdrop-blur-[50px]', explicit_opt_in ? 'text-left justify-start items-center border-l-2 sm:border-l-4 border-white/20' : 'items-start justify-center')}>
                                 {explicit_opt_in && <input type="checkbox" className="checkbox" ref={acceptTermsRef} />}
                                 <p className='text-xs sm:text-lg text-white/50'>
-                                    {replaceLinks(terms_privacy || '')}
+                                    <Balancer>{replaceLinks(terms_privacy || '')}</Balancer>
                                 </p>
                             </div>
                         )}
