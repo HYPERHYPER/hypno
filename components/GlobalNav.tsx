@@ -56,7 +56,11 @@ export function GlobalNav() {
                             <GlobalNavItem key='settings' item={{ slug: 'settings', name: 'settings' }} close={close} />
                             <div className='hidden sm:block avatar placeholder'>
                                 <div className="bg-white/20 text-white rounded-full w-[40px]">
-                                    <span className="text-xl uppercase">{user.first_name.charAt(0)}</span>
+                                    {user.avatar ?
+                                        <Image src={user.avatar} alt={`${user.username}-avatar`} fill className='rounded-full' />
+                                        :
+                                        <span className="text-xl uppercase">{user.first_name.charAt(0)}</span>
+                                    }
                                 </div>
                             </div>
                         </nav>
