@@ -11,6 +11,7 @@ import Image from 'next/image'
 import Trash from 'assets/icons/trash.svg'
 import Hide from 'assets/icons/hide.svg'
 import Favorite from 'assets/icons/favorite.svg'
+import FavoriteFilled from 'assets/icons/favoriteFilled.svg'
 import Share from 'assets/icons/share.svg'
 import Save from 'assets/icons/save.svg'
 import Play from 'assets/icons/play.svg'
@@ -22,6 +23,10 @@ import { LoadingGrid } from '@/components/Gallery/LoadingAsset';
 import { useRouter } from 'next/router';
 import ScanQRModal from '@/components/Events/ScanQRModal';
 import Modal from '@/components/Modal';
+import useAssetManager from '@/hooks/useAssetManager';
+import clsx from 'clsx';
+import { useCallback, useState } from 'react';
+import Spinner from '@/components/Spinner';
 
 type PhotosResponse = {
     photos: any;
@@ -63,6 +68,89 @@ interface ResponseData {
 //     )
 // }
 
+const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void; }) => {
+    const {
+        isFavorited,
+        isHidden,
+        archiveAsset,
+        toggleFavorited,
+        toggleHidden,
+    } = useAssetManager(asset);
+
+    const [archiveModal, setArchiveModal] = useState<boolean>(false);
+    const [isLoaded, setIsLoaded] = useState<boolean>(false);
+
+    return (
+        <>
+            <div className='group relative rounded-box bg-white/10 w-full aspect-[2/3] overflow-hidden'>
+                <Link href={`/i/${asset.slug}`} className='absolute inset-0 hover:scale-110 transition rounded-box'>
+                    {asset.posterframe && <Image
+                        className='absolute top-0 left-0 w-full h-full rounded-box object-cover transition'
+                        src={asset.posterframe}
+                        fill
+                        alt={`${asset.event_id}-${asset.id}` || ''}
+                        placeholder={asset.blurDataURL ? 'blur' : 'empty'}
+                        blurDataURL={asset.blurDataURL || undefined}
+                        sizes="(min-width: 1280px) 20%, (min-width: 1024px) 25%, (min-width: 768px) 33.33%, 50vw"
+                        onLoadingComplete={() => setIsLoaded(true)}
+                        />
+                    }
+                    {asset.gif &&
+                        <div
+                            className='absolute top-0 left-0 w-full h-full animate-jpeg-strip'
+                            style={{ backgroundImage: `url(${asset.jpeg_url})`, backgroundSize: '100% 500%' }}
+                        />
+                    }
+                </Link>
+                
+                {!isLoaded && <div className='absolute inset-0 flex items-center justify-center'><Spinner /></div>}
+                
+                {archiveModal ? (
+                    <div className='transition absolute inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-10'>
+                        <div className='bg-black p-4 m-4 rounded-2xl'>
+                            <h4 className='mb-3 text-center'>archive asset?</h4>
+                            <div className='flex flex-row justify-between gap-2'>
+                                <button className='btn btn-neutral btn-xs rounded-2xl flex-1' onClick={() => setArchiveModal(false)}>cancel</button>
+                                <button className='btn btn-error btn-xs rounded-2xl flex-1' onClick={() => { archiveAsset(); setArchiveModal(false); onSuccess && onSuccess()}}>confirm</button>
+                            </div>
+                        </div>
+                    </div>
+                )
+                    : (
+                        <>
+                            {(isHidden || isFavorited) &&
+                                <div className='group-hover:opacity-0 transition absolute inset-0 bg-black/50 pointer-events-none flex items-center justify-center'>
+                                    <span className='scale-[1.75] flex flex-row'>
+                                        {isHidden && <Hide />}
+                                        {isFavorited && <FavoriteFilled />}
+                                    </span>
+                                </div>
+                            }
+
+                            <div
+                                style={{ background: '-webkit-linear-gradient(top, rgba(0,0,0,0.65), rgba(0,0,0,0))' }}
+                                className='pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity absolute top-0 left-0 w-full h-full z-10 px-2 py-4 rounded-box'>
+                                <div className='pointer-events-auto flex flex-row flex-wrap justify-between text-white gap-0.5 sm:gap-0'>
+                                    <button className='cursor-pointer rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md' onClick={() => setArchiveModal(true)}><Trash /></button>
+                                    <button className={clsx('rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md', isHidden && 'bg-white/10 backdrop-blur-md')} onClick={() => {toggleHidden();}}><Hide /></button>
+                                    <button className={clsx('rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md', isFavorited && 'bg-white/10 backdrop-blur-md')} onClick={() => {toggleFavorited();}}>{isFavorited ? <FavoriteFilled /> : <Favorite />}</button>
+                                    <a href={asset.download_url} className='cursor-pointer rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md'><Save /></a>
+                                    <Link href={`/pro/${asset.event_id}?i=${asset.id}`} className='rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md'><Share /></Link>
+                                </div>
+
+                                {asset.gif && (
+                                    <div className='absolute top-0 left-0 flex items-center justify-center h-full w-full'>
+                                        <button><Play /></button>
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                    )}
+            </div>
+        </>
+    )
+}
+
 function EventPage(props: ResponseData) {
     const { query } = useRouter();
     const { event, photos } = props;
@@ -77,13 +165,29 @@ function EventPage(props: ResponseData) {
         return [`${previousPageData.meta.next_page}`, token.access_token];
     }
 
-    const { data, size, setSize, error, isValidating } = useSWRInfinite(getKey,
+    const { data, size, setSize, error, isValidating, mutate } = useSWRInfinite(getKey,
         ([url, token]) => fetchWithToken(url, token), {
         fallbackData: [{ photos }],
+        revalidateAll: true,
     });
 
+    const totalCount = (_.first(data)?.meta?.total_count || 0);
     const paginatedPhotos = !_.isEmpty(_.first(data).photos) ? _.map(data, (v) => v.photos).flat() : [];
-    const hasMorePhotos = photos?.meta.total_count != paginatedPhotos?.length;
+    const hasMorePhotos = totalCount != paginatedPhotos?.length;
+
+    const onArchive = useCallback((assetId: number) => {
+        if (!_.isEmpty(data)) {
+            const assetIndexToRemove = paginatedPhotos.findIndex(item => item.id === assetId);
+            const assetPage = Math.floor(assetIndexToRemove / (photos?.meta?.per_page || 10));
+            const photosToUpdate = data && data[assetPage].photos;
+            const idxInPage = assetIndexToRemove % 10;
+            const updatedPhotos = [...photosToUpdate.slice(0, idxInPage), ...photosToUpdate.slice(idxInPage + 1)];
+            let updatedData = data || [];
+            updatedData[0] = {...updatedData[0], meta: {...updatedData[0].meta, total_count: updatedData[0].meta.total_count - 1 }}
+            updatedData[assetPage] = { photos: updatedPhotos, meta: updatedData[assetPage].meta };
+            mutate(updatedData);
+        }
+    }, [data]);
 
     return (
         <>
@@ -106,7 +210,8 @@ function EventPage(props: ResponseData) {
                         </Modal.Trigger>
                     }
                 >
-                    <h2>{photos.meta.total_count} posts</h2>
+                    <h2>{totalCount} posts</h2>
+                    {/* <Link href={`/pro/${id}/p`}><h2 className='text-primary'>public gallery</h2></Link> */}
                     {/* <Link href={`/e/${id}`}><h2 className='text-white'>all</h2></Link> */}
                     {/* <Link href=''><h2 className='text-primary'>favorites</h2></Link> */}
                     {/* <Link href=''><h2 className='text-primary'>data</h2></Link> */}
@@ -127,56 +232,11 @@ function EventPage(props: ResponseData) {
                         <div className='grid grid-cols-2 sm:grid-cols-3 gap-5 lg:grid-cols-4 lg:gap-10 xl:grid-cols-5 3xl:grid-cols-6'>
                             {_.map(paginatedPhotos, (p, i) => {
                                 if (p.slug) {
-                                    return (
-                                        <div key={i} className='rounded-box'>
-                                            <div className='group relative rounded-box bg-white/10 w-full aspect-[2/3] overflow-hidden'>
-                                                <Link href={`/i/${p.slug}`} className='absolute inset-0 hover:scale-110 transition rounded-box'>
-                                                    {/* <div
-                                            className='absolute top-0 left-0 w-full h-full rounded-box'
-                                            style={{ backgroundImage: `url(${p.gif ? p.posterframe : p.jpeg_thumb_url})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}
-                                        /> */}
-                                                    {p.posterframe && <Image
-                                                        className='absolute top-0 left-0 w-full h-full rounded-box object-cover'
-                                                        priority={Number(i) < 10}
-                                                        src={p.posterframe}
-                                                        fill
-                                                        alt={p.event_id + p.id || ''}
-                                                        placeholder={p.blurDataURL ? 'blur' : 'empty'}
-                                                        blurDataURL={p.blurDataURL || undefined}
-                                                        sizes="(min-width: 1280px) 20%, (min-width: 1024px) 25%, (min-width: 768px) 33.33%, 50vw"
-                                                    />
-                                                    }
-                                                    {p.gif &&
-                                                        <div
-                                                            className='absolute top-0 left-0 w-full h-full animate-jpeg-strip'
-                                                            style={{ backgroundImage: `url(${p.jpeg_url})`, backgroundSize: '100% 500%' }}
-                                                        />
-                                                    }
-                                                </Link>
-                                                <div
-                                                    style={{ background: '-webkit-linear-gradient(top, rgba(0,0,0,0.65), rgba(0,0,0,0))' }}
-                                                    className='pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity absolute top-0 left-0 w-full h-full z-10 p-5 rounded-box'>
-                                                    <div className='pointer-events-auto flex flex-row justify-end text-white'>
-                                                        {/* <button><Trash /></button> */}
-                                                        {/* <button><Hide /></button> */}
-                                                        {/* <button><Favorite /></button> */}
-                                                        {/* <a href={p.download_url}><Save /></a> */}
-                                                        <Link href={`/pro/${p.event_id}?i=${p.id}`}><Share /></Link>
-                                                    </div>
-
-                                                    {p.gif && (
-                                                        <div className='absolute top-0 left-0 flex items-center justify-center h-full w-full'>
-                                                            <button><Play /></button>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )
+                                    return <div key={i}><AdminAsset asset={p} onSuccess={() => onArchive(p.id)} /></div>
                                 }
                             }
                             )}
-                            {(isValidating && hasMorePhotos) && <LoadingGrid count={_.min([photos.meta.per_page || 0, photos.meta.total_count || 0]) || 0} />}
+                            {(isValidating && hasMorePhotos) && <LoadingGrid count={_.min([photos.meta.per_page || 0, totalCount]) || 0} />}
                         </div>
                     </InfiniteScroll>
                 </GlobalLayout.Content>

@@ -33,7 +33,7 @@ function DashboardPage(props: ResponseData) {
 
     const getKey = (pageIndex: number, previousPageData: any) => {
         if (previousPageData && pageIndex == previousPageData.pages) return null; // reached the end
-        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events?include_last_photo=true&per_page=10`;
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events?include_last_photo=true&per_page=25`;
         if (pageIndex === 0) return [url, token.access_token];
         const pageIdx = previousPageData.meta.next_page;
         return [`${url}&page=${pageIdx}`, token.access_token];

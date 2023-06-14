@@ -14,9 +14,10 @@ interface ModalProps {
     onDone?: () => void;
     menu?: ReactNode;
     actionBtn?: {
-        status: SaveStatus;
-        text: string;
-        onClick: () => void;
+        status?: SaveStatus;
+        text?: string;
+        onClick?: () => void;
+        hidden?: boolean;
     };
 }
 
@@ -47,17 +48,17 @@ export default function Modal({ title, id, children, onDone, menu, actionBtn }: 
                         </label>
                     </div>
 
-                    <div className="mt-5 sm:mt-10 mb-9 max-h-[60vh] overflow-scroll">
+                    <div className={`mt-5 sm:mt-10 mb-9 max-h-[60vh] overflow-scroll ${actionBtn && actionBtn.hidden ? 'mb-0' : 'mb-9'}`}>
                         {children}
                     </div>
 
-                    {actionBtn ? (
+                    {actionBtn ? (actionBtn.hidden ? null : (
                         <button onClick={actionBtn.onClick} className={btnClassName} disabled={actionBtn.status == 'success' || actionBtn.status == 'saving' }>
                             {(actionBtn.status == 'ready' || actionBtn.status == 'error') && actionBtn.text}
                             {actionBtn.status == 'saving' && <span className="loading loading-dots"></span>}
                             {actionBtn.status == 'success' && 'success!'}
                         </button>
-                    ) : (
+                    )) : (
                         <label htmlFor={id} onClick={onDone ? onDone : undefined} className={btnClassName}>done</label>
                     )}
                 </label>
