@@ -73,7 +73,7 @@ function DashboardPage(props: ResponseData) {
                     >
                         <div className='grid grid-cols-2 sm:grid-cols-3 gap-5 lg:grid-cols-4 lg:gap-10 xl:grid-cols-5 3xl:grid-cols-6'>
                             {!_.isEmpty(paginatedEvents) ? _.map(paginatedEvents, (event, i) => (
-                                <Link href={`/e/${event.id}`} key={i}>
+                                <Link href={`/e/${event.id}`} key={i} prefetch={false}>
                                     <div
                                         style={event.most_recent ?
                                             { backgroundImage: `url(${event.most_recent.service_urls.posterframe})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }
