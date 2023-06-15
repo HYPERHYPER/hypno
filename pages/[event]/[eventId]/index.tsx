@@ -210,47 +210,59 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const isDefault = String(event) === 'pro';
     const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}`;
     const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-    let eventRes = await axios.get(eventUrl, {
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + token,
-        },
-    });
-    let eventData = await eventRes.data?.event;
 
-    // Fetch subset of photos to be displayed in subgallery
-    let photosData = {}
-    if (category) {
-        const photoUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${eventId}/${category}/photos.json`;
-        let resp = await axios.get(photoUrl, {
+    let eventData: any = {};
+    let photosData: any = {};
+    let singleAssetData: any = {};
+
+    try {
+        let eventRes = await axios.get(eventUrl, {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: 'Bearer ' + token,
             },
         });
-        photosData = await resp.data;
-    }
+        eventData = await eventRes.data?.event;
 
-    // Fetch single asset for detail view or for single asset delivery
-    let singleAssetData = {}
-    if (photoSlug || deliverySlug) {
-        let slug = photoSlug || deliverySlug;
-        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/${slug}.json`;
-        let resp = await axios.get(url, {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token,
-            },
-        }).then(async (res) => {
-            singleAssetData = res.data;
-            if (photoSlug) {
-                const placeholder = await getPlaiceholder(res.data.photo.jpeg_url);
-                singleAssetData = {
-                    ...singleAssetData,
-                    placeholder
+        // Fetch subset of photos to be displayed in subgallery
+        if (category) {
+            const photoUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${eventId}/${category}/photos.json`;
+            await axios.get(photoUrl, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + token,
+                },
+            }).then(async (res) => {
+                photosData = await res.data;
+            });
+        }
+
+        // Fetch single asset for detail view or for single asset delivery
+        if (photoSlug || deliverySlug) {
+            let slug = photoSlug || deliverySlug;
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/${slug}.json`;
+            await axios.get(url, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + token,
+                },
+            }).then(async (res) => {
+                singleAssetData = res.data;
+                if (photoSlug) {
+                    const placeholder = await getPlaiceholder(res.data.photo.jpeg_url);
+                    singleAssetData = {
+                        ...singleAssetData,
+                        placeholder
+                    }
                 }
+            });
+        }
+    } catch (e) {
+        if (_.isEmpty(eventData) || (photoSlug && _.isEmpty(singleAssetData)) || (deliverySlug && _.isEmpty(singleAssetData))) {
+            return {
+                notFound: true
             }
-        });
+        }
     }
 
     // if (deliverySlug && !eventData.metadata.email_delivery) {
