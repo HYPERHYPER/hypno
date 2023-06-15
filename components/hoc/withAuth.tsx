@@ -96,9 +96,9 @@ export default function withAuth<T>(
     }, [isLoggedIn, hasHydrated, query, router, user]);
 
     if (!hasMounted) return null;
-    if (!isLoggedIn &&
+    if (!hasHydrated || (!isLoggedIn &&
       routeRole !== 'auth' &&
-      routeRole !== 'optional')
+      routeRole !== 'optional'))
       return (
         <div className='flex min-h-screen flex-col items-center justify-center text-gray-800'>
           <p>Loading...</p>
