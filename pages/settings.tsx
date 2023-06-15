@@ -16,9 +16,11 @@ import Plus from 'public/pop/plus.svg';
 import FileInput from '@/components/Form/FileInput';
 import UpdatePasswordModal from '@/components/Settings/UpdatePasswordModal';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 
 export default withAuth(SettingsPage, 'protected');
 function SettingsPage() {
+    const router = useRouter();
     const user = useUserStore.useUser();
     const logout = useUserStore.useLogout();
     const updateUser = useUserStore.useUpdateUser();
@@ -33,11 +35,11 @@ function SettingsPage() {
         watch
     } = useForm({
         defaultValues: {
-            first_name: user.first_name || '',
-            last_name: user.last_name || '',
-            username: user.username || '',
-            email: user.email || '',
-            avatar: user.avatar || '',
+            first_name: user?.first_name || '',
+            last_name: user?.last_name || '',
+            username: user?.username || '',
+            email: user?.email || '',
+            avatar: user?.avatar || '',
         }
     });
     const userConfig = watch();
@@ -101,6 +103,12 @@ function SettingsPage() {
         }
     }, [isDirty]);
 
+    const handleLogout = () => {
+        logout();
+        router.push('/login'); // Redirect to the login page after logout
+      };
+
+    if (!user) return <>Loading</>
     return (
         <>
             <Head>
@@ -127,7 +135,7 @@ function SettingsPage() {
                         </div>
                     }
                 >
-                    <button onClick={logout}><h2 className='text-primary'>sign out</h2></button>
+                    <button onClick={handleLogout}><h2 className='text-primary'>sign out</h2></button>
                 </GlobalLayout.Header>
                 <GlobalLayout.Content>
                     <div className='list pro'>
