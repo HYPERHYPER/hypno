@@ -291,11 +291,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
     } catch (e) {
         console.log(e);
-    }
-
-    if (_.isEmpty(eventData)) {
-        return {
-            notFound: true,
+        if (_.isEmpty(eventData)) {
+            return {
+                notFound: true,
+            }
         }
     }
 
