@@ -162,11 +162,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
     }).catch((e) => {
         console.log(e);
+        return {
+            notFound: true,
+        }
     })
 
     return {
         props: {
-            user_count: data?.meta?.total_count,
+            user_count: data?.meta?.total_count || null,
         }
     };
 };

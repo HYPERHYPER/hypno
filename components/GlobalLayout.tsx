@@ -28,7 +28,7 @@ const GlobalHeader = ({ title, returnLink, returnAction, right, children }: Glob
                     {returnAction && <button onClick={returnAction.onClick} className="tracking-tight"><h1 className='text-primary'>← {returnAction.name}</h1></button>}
                     <h1>{title}</h1>
                 </div>
-                <div className="flex flex-row gap-3 sm:gap-6 text-white/40">{children}</div>
+                <div className="flex flex-row gap-4 sm:gap-6 text-white/40">{children}</div>
             </div>
             <div className="sm:min-h-[120px]">
                 {right}

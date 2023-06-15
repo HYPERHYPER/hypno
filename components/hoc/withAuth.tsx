@@ -1,10 +1,10 @@
-import { getFromLocalStorage } from "@/lib/localStorage";
 import { useRouter } from "next/router";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useUserStore from "@/store/userStore";
 
 export interface WithAuthProps {
-  user: any;
+  // isLoggedIn: boolean;
+  // user: any;
 }
 
 const HOME_ROUTE = '/dashboard';
@@ -41,45 +41,25 @@ export default function withAuth<T>(
   const ComponentWithAuth = (props: Omit<T, keyof WithAuthProps>) => {
     const router = useRouter();
     const { query } = router;
-    const { accessToken } = query;
+    const [hasMounted, setHasMounted] = useState<boolean>(false);
+    useEffect(() => {
+      setHasMounted(true);
+    }, []);
 
     //*=========== STORE START ===========
     const isLoggedIn = useUserStore.useIsLoggedIn();
-    const isLoading = useUserStore.useIsLoading();
     const login = useUserStore.useLogin();
     const logout = useUserStore.useLogout();
-    const stopLoading = useUserStore.useStopLoading();
     const user = useUserStore.useUser();
+    const hasHydrated = useUserStore.use_hasHydrated();
     //*=========== STORE END ===========
 
     const checkAuth = useCallback(() => {
       if (!user) {
-          isLoggedIn && logout();
-          stopLoading();
+        isLoggedIn && logout();
         return;
       }
-      const loadUser = async () => {
-        // TODO if accessToken passed from admin
-        stopLoading();
-        // try {
-        //   const res = await apiMock.get<ApiReturn<User>>('/me');
-
-        //   login({
-        //     ...res.data.data,
-        //     token: token + '',
-        //   });
-        // } catch (err) {
-        //   localStorage.removeItem('token');
-        // } finally {
-        //   stopLoading();
-        // }
-      };
-
-      // if (!isLoggedIn) {
-      //   loadUser();
-      // }
-      stopLoading();
-    }, [isLoggedIn, login, logout, stopLoading]);
+    }, [isLoggedIn, login, logout]);
 
     useEffect(() => {
       // run checkAuth every page visit
@@ -93,7 +73,7 @@ export default function withAuth<T>(
     }, [checkAuth]);
 
     useEffect(() => {
-      if (!isLoading) {
+      if (hasHydrated) {
         if (isLoggedIn) {
           // Prevent authenticated user from accessing auth or other role pages
           if (routeRole === 'auth') {
@@ -113,23 +93,33 @@ export default function withAuth<T>(
           }
         }
       }
-    }, [isLoggedIn, isLoading, query, router, user]);
+    }, [isLoggedIn, hasHydrated, query, router, user]);
 
-    if (
-      // If unauthenticated user want to access protected pages
-      (isLoading || !isLoggedIn) &&
-      // auth pages and optional pages are allowed to access without login
+    if (!hasMounted) return null;
+    if (!isLoggedIn &&
       routeRole !== 'auth' &&
-      routeRole !== 'optional'
-    ) {
+      routeRole !== 'optional')
       return (
         <div className='flex min-h-screen flex-col items-center justify-center text-gray-800'>
           <p>Loading...</p>
         </div>
-      );
-    }
+      )
+    // if (
+    //   // If unauthenticated user want to access protected pages
+    //   (isLoading || !isLoggedIn) &&
+    //   // auth pages and optional pages are allowed to access without login
+    //   routeRole !== 'auth' &&
+    //   routeRole !== 'optional'
+    // ) {
+    //   return (
+    //     <div className='flex min-h-screen flex-col items-center justify-center text-gray-800'>
+    //       <p>Loading...</p>
+    //     </div>
+    //   );
+    // }
 
-    return <Component {...(props as T)} user={user} />;
+
+    return <Component {...(props as T)} isLoggedIn={isLoggedIn} />;
   }
 
   return ComponentWithAuth;

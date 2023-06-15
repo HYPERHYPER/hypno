@@ -1,7 +1,8 @@
 import { createSelectorHooks } from 'auto-zustand-selectors-hook';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware'
-import nookies, { destroyCookie, setCookie } from 'nookies'
+import { destroyCookie, setCookie } from 'nookies'
+import { NewUser, UserInvite } from '@/types/users';
 
 type UserState = {
   user: any;
@@ -9,6 +10,7 @@ type UserState = {
   error: string;
   isLoading: boolean;
   isLoggedIn: boolean;
+  _hasHydrated: boolean;
 }
 
 type UserAction = {
@@ -17,6 +19,7 @@ type UserAction = {
   logout: () => void;
   signup: (firstName: string, lastName: string, organizationName: string, email: string, password: string) => void;
   stopLoading: () => void;
+  setHasHydrated: (state: any) => void;
 }
 
 const useUserStoreBase = create<UserState & UserAction>()(
@@ -27,6 +30,7 @@ const useUserStoreBase = create<UserState & UserAction>()(
       error: '',
       isLoggedIn: false,
       isLoading: false,
+      _hasHydrated: false,
       updateUser: (updatedUser) => set(() => ({ user: { ...get().user, ...updatedUser } })),
       login: async (email, password) => {
         try {
@@ -62,11 +66,19 @@ const useUserStoreBase = create<UserState & UserAction>()(
           set({ error: error.message });
         }
       },
-      stopLoading: () => set(() => ({ isLoading: false }))
+      stopLoading: () => set(() => ({ isLoading: false })),
+      setHasHydrated: (state) => {
+        set({
+          _hasHydrated: state
+        });
+      }
     }),
     { 
       name: "hypno",
-      partialize: (state) => ({ token: state.token, user: state.user, isLoggedIn: state.isLoggedIn })
+      partialize: (state) => ({ token: state.token, user: state.user, isLoggedIn: state.isLoggedIn }),        
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true)
+      }
     }
   )
 );

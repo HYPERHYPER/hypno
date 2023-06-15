@@ -107,15 +107,15 @@ function DashboardPage(props: ResponseData) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
     // Fetch events
     // const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events?include_last_photo=true&per_page=20`;
-    const token = nookies.get(context).hypno_token;
-    if (!token) {
-        return {
-            redirect: {
-                destination: '/login',
-                permanent: false,
-            },
-        };
-    }
+    // const token = nookies.get(context).hypno_token;
+    // if (!token) {
+    //     return {
+    //         redirect: {
+    //             destination: '/login',
+    //             permanent: false,
+    //         },
+    //     };
+    // }
 
     let data = {};
     // LOAD INITIAL DATA USING USESWR FOR RESPONSIVE NAVIGATION

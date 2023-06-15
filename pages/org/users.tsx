@@ -69,7 +69,7 @@ function OrganizationUsersPage(props: ResponseData) {
                     title='users'
                     returnLink={{ slug: '/org', name: 'organization' }}
                 >
-                    <h2>{meta.total_count} users</h2>
+                    <h2>{meta?.total_count || 0} users</h2>
                     {/* <Modal.Trigger id='new-user-modal'><h2 className='text-primary cursor-pointer'>new user</h2></Modal.Trigger> */}
                 </GlobalLayout.Header>
 
@@ -83,7 +83,7 @@ function OrganizationUsersPage(props: ResponseData) {
                         loader={<></>}
                     >
                         <div className='list pro'>
-                            {_.map(paginatedUsers, (u) => <Item key={u.id} user={u} orgId={org_id} />)}
+                            {_.map(paginatedUsers, (u, i) => <Item key={i} user={u} orgId={org_id} />)}
                         </div>
                     </InfiniteScroll>
                 </GlobalLayout.Content>
@@ -93,6 +93,7 @@ function OrganizationUsersPage(props: ResponseData) {
 }
 
 const Item = ({ user, orgId }: { user: OrgUser; orgId: number }) => {
+    if (!user) return null;
     const { username, first_name, last_name, organization_id } = user;
     return (
         <div className='item'>

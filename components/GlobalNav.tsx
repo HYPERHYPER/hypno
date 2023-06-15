@@ -13,15 +13,18 @@ type Item = {
 }
 
 export function GlobalNav() {
+    const hasHydrated = useUserStore.use_hasHydrated();
     const user = useUserStore.useUser();
+    const isLoggedIn = useUserStore.useIsLoggedIn();
     const { open, dismiss } = useBannerStore();
 
     const [isOpen, setIsOpen] = useState(false);
     const close = () => setIsOpen(false);
 
+    if (!hasHydrated) return <></>;
     return (
         <div className='fixed top-0 left-0 right-0 z-10'>
-            {open && 
+            {open &&
                 <div className='w-full bg-primary p-1 flex justify-between items-center'>
                     <span />
                     <a href='https://apps.apple.com/us/app/hypno-pro/id1491380840?platform=iphone' target='_blank' rel="noreferrer"><span className='text-black'>download hypno pro for iphone →</span></a>
@@ -50,7 +53,7 @@ export function GlobalNav() {
                         // hidden: !isOpen,
                     })}
                 >
-                    {typeof window !== 'undefined' && user && (
+                    {isLoggedIn && (
                         <nav className="h-full flex flex-row items-center gap-3 sm:gap-5 tracking-tight">
                             <GlobalNavItem key='dashboard' item={{ slug: 'dashboard', name: 'dashboard' }} close={close} />
                             <GlobalNavItem key='settings' item={{ slug: 'settings', name: 'settings' }} close={close} />
