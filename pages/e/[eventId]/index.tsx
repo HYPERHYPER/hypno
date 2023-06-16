@@ -27,6 +27,7 @@ import useAssetManager from '@/hooks/useAssetManager';
 import clsx from 'clsx';
 import { useCallback, useState } from 'react';
 import Spinner from '@/components/Spinner';
+import DataDownloadModal from '@/components/Events/DataDownloadModal';
 
 type PhotosResponse = {
     photos: any;
@@ -216,12 +217,13 @@ function EventPage(props: ResponseData) {
                     {/* <Link href={`/pro/${id}/p`}><h2 className='text-primary'>public gallery</h2></Link> */}
                     {/* <Link href={`/e/${id}`}><h2 className='text-white'>all</h2></Link> */}
                     {/* <Link href=''><h2 className='text-primary'>favorites</h2></Link> */}
-                    {/* <Link href=''><h2 className='text-primary'>data</h2></Link> */}
+                    {isProEvent(event.event_type) && <Modal.Trigger id='data-download-modal'><h2 className='text-primary'>data</h2></Modal.Trigger>}
                     {isProEvent(event.event_type) && <Link href={`/e/${id}/edit`}><h2 className='text-primary'>edit</h2></Link>}
                 </GlobalLayout.Header>
 
                 <ScanQRModal eventId={id} eventName={name} modalId='scan-qr-modal' />
-
+                <DataDownloadModal modalId='data-download-modal' eventId={id} />
+                
                 <GlobalLayout.Content>
                     <div className='divider' />
                     <InfiniteScroll
