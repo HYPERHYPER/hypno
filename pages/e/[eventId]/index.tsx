@@ -155,21 +155,21 @@ const isProEvent = (eventType: string) => eventType === 'hypno_pro';
 
 function EventPage(props: ResponseData) {
     const { query } = useRouter();
-    const { event, photos } = props;
+    const { event } = props;
     const { name, id } = event;
 
     const token = useUserStore.useToken();
 
     const getKey = (pageIndex: number, previousPageData: any) => {
         if (previousPageData && !previousPageData?.meta.next_page) return null; // reached the end
-        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${query.eventId}/photos?per_page=${photos.meta.per_page}`;
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${query.eventId}/photos?per_page=20`;
         if (pageIndex === 0) return [url, token.access_token];
         return [`${previousPageData.meta.next_page}`, token.access_token];
     }
 
     const { data, size, setSize, error, isValidating, mutate } = useSWRInfinite(getKey,
         ([url, token]) => fetchWithToken(url, token), {
-        fallbackData: [{ photos }],
+        fallbackData: [{ photos: [], meta: { total_count: 0, next_page: null, per_page: 20}}],
         revalidateAll: true,
     });
 
@@ -180,7 +180,7 @@ function EventPage(props: ResponseData) {
     const onArchive = useCallback((assetId: number) => {
         if (!_.isEmpty(data)) {
             const assetIndexToRemove = paginatedPhotos.findIndex(item => item.id === assetId);
-            const assetPage = Math.floor(assetIndexToRemove / (photos?.meta?.per_page || 10));
+            const assetPage = Math.floor(assetIndexToRemove / (_.first(data)?.meta?.per_page || 10));
             const photosToUpdate = data && data[assetPage].photos;
             const idxInPage = assetIndexToRemove % 10;
             const updatedPhotos = [...photosToUpdate.slice(0, idxInPage), ...photosToUpdate.slice(idxInPage + 1)];
@@ -238,7 +238,7 @@ function EventPage(props: ResponseData) {
                                 }
                             }
                             )}
-                            {(isValidating && hasMorePhotos) && <LoadingGrid count={_.min([photos.meta.per_page || 0, totalCount]) || 0} />}
+                            {(isValidating && hasMorePhotos) && <LoadingGrid count={_.min([_.first(data)?.meta?.per_page || 0, totalCount]) || 0} />}
                         </div>
                     </InfiniteScroll>
                 </GlobalLayout.Content>
@@ -250,48 +250,23 @@ function EventPage(props: ResponseData) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const { eventId } = context.query;
 
-    // Fetch event config + event photos
+    // Fetch event config
     const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}`;
-    const photosUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}/photos`;
     const token = nookies.get(context).hypno_token;
     let eventData: any = {};
-    let photosData: any = {};
 
-    try {
-        const [eventRes, photosRes] = await Promise.all([
-            axios.get(eventUrl, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: 'Bearer ' + token,
-                }
-            }),
-            axios.get(photosUrl, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: 'Bearer ' + token,
-                }
-            })
-        ])
-
-        if (eventRes.status === 200) {
-            eventData = await eventRes.data;
+    await axios.get(eventUrl, {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + token,
+        },
+    }).then(async (res) => {
+        if (res.status === 200) {
+            eventData = await res.data;
         }
-
-        if (photosRes.status === 200) {
-            const photos = await Promise.all(
-                photosRes.data.photos.map(async (photo: any) => {
-                    const placeholder = await getPlaiceholder(photo.posterframe);
-                    return {
-                        ...photo,
-                        blurDataURL: placeholder.base64,
-                    };
-                })
-            );
-            photosData = { ...photosRes.data, photos };
-        }
-    } catch (e) {
+    }).catch((e) => {
         console.log(e);
-    }
+    })
 
     if (_.isEmpty(eventData)) {
         return {
@@ -302,9 +277,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
         props: {
             ...eventData,
-            photos: {
-                ...photosData,
-            }
         }
     };
 };
