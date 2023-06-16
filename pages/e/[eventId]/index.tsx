@@ -119,7 +119,7 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
                     : (
                         <>
                             {(isHidden || isFavorited) &&
-                                <div className='group-hover:opacity-0 transition absolute inset-0 bg-black/50 pointer-events-none flex items-center justify-center'>
+                                <div className='group-hover:opacity-0 transition absolute inset-0 bg-black/30 pointer-events-none flex items-center justify-center'>
                                     <span className='scale-[1.75] flex flex-row'>
                                         {isHidden && <Hide />}
                                         {isFavorited && <FavoriteFilled />}
@@ -274,7 +274,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         ])
 
         if (eventRes.status === 200) {
-            eventData = eventRes.data;
+            eventData = await eventRes.data;
         }
 
         if (photosRes.status === 200) {
@@ -291,10 +291,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
     } catch (e) {
         console.log(e);
-        if (_.isEmpty(eventData)) {
-            return {
-                notFound: true,
-            }
+    }
+
+    if (_.isEmpty(eventData)) {
+        return {
+            notFound: true,
         }
     }
 
