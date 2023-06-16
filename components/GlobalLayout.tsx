@@ -1,6 +1,7 @@
 import { PropsWithChildren, ReactNode } from "react";
 import { GlobalNav } from "./GlobalNav";
 import Link from "next/link";
+import { Balancer } from "react-wrap-balancer";
 
 type LinkItem = {
     name: string;
@@ -26,7 +27,7 @@ const GlobalHeader = ({ title, returnLink, returnAction, right, children }: Glob
                 <div className="flex sm:flex-row items-baseline gap-2 sm:gap-3">
                     {returnLink && <Link href={returnLink.slug}><h1 className='text-primary'>← {returnLink.name}</h1></Link>}
                     {returnAction && <button onClick={returnAction.onClick} className="tracking-tight"><h1 className='text-primary'>← {returnAction.name}</h1></button>}
-                    <h1>{title}</h1>
+                    <h1><Balancer>{title}</Balancer></h1>
                 </div>
                 <div className="flex flex-row gap-4 sm:gap-6 text-white/40">{children}</div>
             </div>
