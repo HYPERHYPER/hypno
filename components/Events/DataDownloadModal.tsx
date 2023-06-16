@@ -4,9 +4,11 @@ import useUserStore from "@/store/userStore";
 import { useState } from "react";
 import { saveAs } from 'file-saver';
 import Duplicate from 'public/pop/duplicate.svg';
+import Checkmark from 'public/pop/checkmark.svg';
 import { SaveStatus } from "../Form/AutosaveStatusText";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import _ from 'lodash';
+import clsx from "clsx";
 
 interface Props {
     modalId: string;
@@ -17,6 +19,14 @@ export default function DataDownloadModal({ modalId, eventId }: Props) {
     const { access_token } = useUserStore.useToken();
     const [status, setStatus] = useState<SaveStatus>('ready');
     const [password, setPassword] = useState<string>('');
+
+    const [copied, setCopied] = useState<boolean>(false);
+    const handleCopied = () => {
+        setCopied(true);
+        setTimeout(() => {
+            setCopied(false);
+        }, 3000);
+    }
 
     const downloadZipFile = (zipBlob: string) => {
         try {
@@ -72,9 +82,13 @@ export default function DataDownloadModal({ modalId, eventId }: Props) {
                 (<div className="list pro">
                     <div className="item">
                         <h2 className="text-white/50">password</h2>
-                        <CopyToClipboard text={password}>
+                        <CopyToClipboard text={password} onCopy={handleCopied}>
                             <h2 className="group cursor-pointer text-primary flex flex-row items-center gap-2 sm:gap-4">
-                                {password} <span className="group-hover:text-white text-white/50 sm:scale-150 transition"><Duplicate /></span>
+                                {password}
+                                <span className={clsx("swap swap-rotate group-hover:text-white text-white/50 sm:scale-150 transition", copied && 'swap-active')}>
+                                    <span className="swap-off"><Duplicate /></span>
+                                    <span className="swap-on text-white"><Checkmark /></span>
+                                </span>
                             </h2>
                         </CopyToClipboard>
                     </div>
