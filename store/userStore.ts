@@ -17,7 +17,7 @@ type UserAction = {
   updateUser: (updatedUser: UserState['user']) => void
   login: (email: string, password: string) => void;
   logout: () => void;
-  signup: (firstName: string, lastName: string, organizationName: string, email: string, password: string) => void;
+  signup: (user: NewUser, invite?: UserInvite) => void;
   stopLoading: () => void;
   setHasHydrated: (state: any) => void;
 }
@@ -50,14 +50,14 @@ const useUserStoreBase = create<UserState & UserAction>()(
           set({ error: error.message });
         }
       },
-      signup: async (firstName, lastName, organizationName, email, password) => {
+      signup: async (newUser, invite) => {
         try {
           // call your registration API and set the user state
-          const registeredUser = await signupUser(firstName, lastName, organizationName, email, password);
+          const registeredUser = await signupUser(newUser, invite);
           console.log(('registered success'))
           try {
             // login user after successful account creation
-            const authenticatedUser = await authenticateUser(email, password);
+            const authenticatedUser = await authenticateUser(newUser.email, newUser.password);
             set({ ...authenticatedUser, isLoggedIn: true, error: '' });
           } catch (error: any) {
             set({ error: error.messsage });
@@ -132,16 +132,11 @@ async function authenticateUser(email: string, password: string) {
   }
 }
 
-async function signupUser(first_name: string, last_name: string, username: string, email: string, password: string) {
+async function signupUser(user: NewUser, invite?: UserInvite) {
   // Call your registration API here and return the registered user object
   const payload = {
-    user: {
-      first_name,
-      last_name,
-      username,
-      email,
-      password,
-    },
+    user,
+    ...invite && {invite}
   };
 
   const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/sign_up`;

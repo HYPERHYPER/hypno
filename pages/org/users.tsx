@@ -70,7 +70,7 @@ function OrganizationUsersPage(props: ResponseData) {
                     returnLink={{ slug: '/org', name: 'organization' }}
                 >
                     <h2>{meta?.total_count || 0} users</h2>
-                    {/* <Modal.Trigger id='new-user-modal'><h2 className='text-primary cursor-pointer'>new user</h2></Modal.Trigger> */}
+                    <Modal.Trigger id='new-user-modal'><h2 className='text-primary cursor-pointer'>new user</h2></Modal.Trigger>
                 </GlobalLayout.Header>
 
                 <NewUserModal />

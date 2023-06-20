@@ -13,7 +13,8 @@ import { useRouter } from 'next/router';
 export default withAuth(SignupPage, 'auth');
 function SignupPage() {
     const { query } = useRouter();
-    const isInviteSignup = !_.isEmpty(query.invite)
+    const isInviteSignup = !_.isEmpty(query.inviter_user_id) && !_.isEmpty(query.organization_id) && !_.isEmpty(query.role);
+
     const signup = useUserStore.useSignup();
     const error = useUserStore.useError();
 
@@ -40,8 +41,13 @@ function SignupPage() {
         setPasswordError('');
         console.log("submitSignup", { data });
         const { user } = data;
+        const invite = isInviteSignup ? {
+            inviter_user_id: String(query.inviter_user_id),
+            organization_id: String(query.organization_id),
+            role: String(query.role),
+        } : undefined;
 
-        signup(user.first_name, user.last_name, user.username, user.email, user.password)
+        signup(user, invite)
         setIsLoading(false);
     }
 
@@ -59,7 +65,11 @@ function SignupPage() {
                         <div className='hero-content sm:max-w-3xl w-full text-left flex-col items-start space-y-9'>
                             <div className='space-y-3'>
                                 <h1 className='text-white'>sign up</h1>
-                                <div><Link href='/login' className='text-primary hover:underline transition-colors text-3xl'>already have an account?</Link></div>
+                                {!isInviteSignup ? 
+                                    <div><Link href='/login' className='text-primary hover:underline transition-colors text-3xl'>already have an account?</Link></div> 
+                                    :
+                                    <h2 className='text-3xl text-primary'>+ accept invite to join organization</h2>
+                                }
                             </div>
                             <form className='flex flex-col w-full border-t-2 border-white/20' onSubmit={handleSubmit(submitSignup)}>
                             <FormControl label='email'>

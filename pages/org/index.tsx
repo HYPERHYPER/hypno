@@ -108,7 +108,7 @@ function OrganizationSettingsPage(props: ResponseData) {
                     <div className='list pro'>
                         <Modal.Trigger id='org-name-modal'><Item name='org name' value={organization.name} /></Modal.Trigger>
                         {/* <Item name='org events' value={'#'} /> */}
-                        <Item name='org users' value={String(props.user_count)} href='/org/users' />
+                        <Item name='org users' value={String(props.user_count || 0)} href='/org/users' />
                         {/* <Item name='next payment' value={user.organization_id} /> */}
                         {/* <Item name='payment method' value={'update'} /> */}
                         {/* <Item name='subscription' value={'enterprise'} /> */}
