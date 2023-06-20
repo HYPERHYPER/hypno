@@ -132,7 +132,7 @@ const EventForm = (props: FormData) => {
     const config = watch();
     const watchedWatermarks = watch('watermarks');
 
-    const { organizations, isLoading: isLoadingOrgs } = useOrganizations(3000);
+    const { organizations, isLoading: isLoadingOrgs } = useOrganizations();
     const { filters, loadMore: loadMoreFilters, meta: filterMeta } = useFilters(20);
     
     // TODO: hiding email delivery for now
@@ -222,9 +222,12 @@ const EventForm = (props: FormData) => {
                             {event ?
                                 <div className='lowercase text-xl sm:text-4xl'>{event.organization.name}</div>
                                 : (
-                                    <select className='select pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl'>
-                                        {_.map(organizations, ((o) => <option key={o.id} value={o.id}>{o.name}</option>))}
-                                    </select>
+                                    isLoadingOrgs ? 
+                                        <span className='loading loading-spinner loading-sm sm:loading-md' /> 
+                                        :
+                                        <select className='select pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl'>
+                                            {_.map(organizations, ((o) => <option key={o.id} value={o.id}>{o.name}</option>))}
+                                        </select>
                                 )}
                         </FormControl>
 

@@ -1,7 +1,7 @@
-import { fetchWithToken } from "@/lib/fetchWithToken";
-import useUserStore from "@/store/userStore";
+import axios from "axios";
 import _ from 'lodash';
-import useSWRInfinite from 'swr/infinite';
+import { parseCookies } from "nookies";
+import { useEffect, useState } from "react";
 
 type Organization = {
     id: number;
@@ -14,44 +14,43 @@ type Organization = {
     };
 }
 
-interface OrganizationsResponse {
-    organizations?: Organization[];
-    meta?: {
-        current_page?: number;
-        next_page?: number;
-        per_page?: number;
-        prev_page?: number;
-        total_count?: number;
-        total_pages?: number;
-    }
-}
+/**
+ * For dropdown usage
+ * Fetch a list of organizations the user has access to and returns them along
+ * with error, validation, and loading status.
+ * @returns This code exports a custom hook named `useOrganizations` that returns an object with the
+ * following properties:
+ */
+export default function useOrganizations() {
+    const token = parseCookies().hypno_token;
+    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/dropdown_index`;
 
-export default function useOrganizations(per_page: number) {
-    const token = useUserStore.useToken();
-    const getKey = (pageIndex: number, previousPageData: any) => {
-        if (previousPageData && pageIndex == previousPageData.pages) return null; // reached the end
-        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations?per_page=${per_page}`;
-        if (pageIndex === 0) return [url, token.access_token];
-        const pageIdx = previousPageData.meta.next_page;
-        return [`${url}&page=${pageIdx}`, token.access_token];
-    }
+    const [organizations, setOrganizations] = useState<Organization[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string>('');
 
-    const { data, size, setSize, error, isValidating, isLoading } = useSWRInfinite(getKey,
-        ([url, token]) => fetchWithToken(url, token), {
-        fallbackData: [{ organizations: [] }],
-    });
-
-    const organizations: Organization[] = _.map(data, (v) => v.organizations).flat();
-    const meta = _.last(data).meta;
-    const loadMore = () => setSize((prev) => prev + 1);
+    useEffect(() => {
+        const fetchOrganizations = async () => {
+            await axios.get(url, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer '+ token
+                }
+            }).then((res) => {
+                setIsLoading(false);
+                setOrganizations(res.data.organizations);
+            }).catch((e) => {
+                setIsLoading(false);
+                setError('oops! error!');
+            })
+        }
+        fetchOrganizations();
+    }, []);
 
     return {
         organizations,
-        meta,
-        loadMore,
         error,
-        isValidating,
-        isLoading,
+        isLoading
     }
 }
 
