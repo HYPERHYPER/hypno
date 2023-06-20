@@ -100,8 +100,8 @@ export default function withAuth<T>(
       routeRole !== 'auth' &&
       routeRole !== 'optional'))
       return (
-        <div className='flex min-h-screen flex-col items-center justify-center text-gray-800'>
-          <p>Loading...</p>
+        <div className='flex min-h-screen flex-col items-center justify-center'>
+          <span className="loading loading-ring loading-lg sm:w-[200px] text-primary"></span>
         </div>
       )
     // if (
