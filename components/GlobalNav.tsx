@@ -53,21 +53,32 @@ export function GlobalNav() {
                         // hidden: !isOpen,
                     })}
                 >
-                    {isLoggedIn && (
-                        <nav className="h-full flex flex-row items-center gap-3 sm:gap-5 tracking-tight">
-                            <GlobalNavItem key='dashboard' item={{ slug: 'dashboard', name: 'dashboard' }} close={close} />
-                            <GlobalNavItem key='settings' item={{ slug: 'settings', name: 'settings' }} close={close} />
-                            <div className='hidden sm:block avatar placeholder'>
-                                <div className="bg-white/20 text-white rounded-full w-[40px]">
-                                    {user.avatar ?
-                                        <Image src={user.avatar} alt={`${user.username}-avatar`} fill className='rounded-full' />
-                                        :
-                                        <span className="text-xl uppercase">{user.first_name.charAt(0)}</span>
-                                    }
+
+                    <nav className="h-full flex flex-row items-center gap-3 sm:gap-5 tracking-tight">
+                        {isLoggedIn ? (
+                            <>
+                                <GlobalNavItem key='dashboard' item={{ slug: 'dashboard', name: 'dashboard' }} close={close} />
+                                <GlobalNavItem key='settings' item={{ slug: 'settings', name: 'settings' }} close={close} />
+                                <div className='hidden sm:block avatar placeholder'>
+                                    <div className="bg-white/20 text-white rounded-full w-[40px]">
+                                        {user.avatar ?
+                                            <Image src={user.avatar} alt={`${user.username}-avatar`} fill className='rounded-full' />
+                                            :
+                                            <span className="text-xl uppercase">{user.first_name.charAt(0)}</span>
+                                        }
+                                    </div>
                                 </div>
-                            </div>
-                        </nav>
-                    )}
+                            </>
+                           ) : (
+                            <>
+                                <GlobalNavItem key='login' item={{ slug: 'login', name: 'login' }} close={close} />
+                                <GlobalNavItem key='help' item={{ slug: 'guide', name: 'help' }} close={close} />
+                            </>
+                        )}
+                    </nav>
+
+
+
                 </div>
             </div>
         </div>

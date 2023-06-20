@@ -79,6 +79,8 @@ function LoginPage() {
                                     />
                                 </FormControl>
 
+                                <Link href={'/password-reset'} className='text-right text-xl text-white/40 mt-4 hover:underline transition'>forgot password?</Link>
+                                
                                 <input type='submit' value='ok' className={clsx('btn btn-primary rounded-lg mt-10 text-4xl h-[80px]', isLoggingIn && 'hidden')} />
                                 {isLoggingIn && <button disabled className='btn btn-primary rounded-lg mt-10 text-4xl h-[80px]'>
                                     <ThreeDots
