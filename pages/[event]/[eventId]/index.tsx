@@ -92,7 +92,10 @@ const SubGallery = (props: ResponseData) => {
 
     /* Setting up the data capture form for the gallery. */
     const [dataCapture, setDataCapture] = useState<boolean>(gallery.data_capture || gallery.email_delivery);
-    const fields = gallery.email_delivery ? [{ id: 'email', name: 'email' }] : _.map(gallery.fields, (f) => ({ id: f.toLowerCase().replaceAll(" ", "_"), name: f }));
+    const fields = gallery.email_delivery ? [{ id: 'email', name: 'email', required: true }] : _.map(gallery.fields, (f) => {
+        const required = _.endsWith(f,'*');
+        return { id: f.toLowerCase().replaceAll(" ", "_"), name: f, required }
+    });
 
     /* MINI GALLERY ?category= */
     // No photos uploaded: loading view

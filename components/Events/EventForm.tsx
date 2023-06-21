@@ -212,7 +212,7 @@ const EventForm = (props: FormData) => {
             <form onSubmit={handleSubmit(submitForm)} className={`grid grid-cols-1 gap-x-14 ${view == 'default' ? 'lg:grid-cols-2' : ''}`}>
                 {view == 'default' && (
                     <div className='border-t-2 border-white/20'>
-                        <FormControl label='title'>
+                        <FormControl label='title*'>
                             <input
                                 className='input pro flex-1'
                                 {...register('name')} />
@@ -435,10 +435,10 @@ const EventForm = (props: FormData) => {
 
                 <Modal title='data' id='data-modal' menu={status && AutosaveStatusText(status)}>
                     <div className='border-t-2 border-white/20'>
-                        <FormControl label='fields' altLabel='separate multiple fields with commas' dir='col'>
+                        <FormControl label='fields' altLabel='separate multiple fields with commas, append asterisk* to required fields' dir='col'>
                             <input
                                 className='input pro left w-full'
-                                placeholder='name, email, phone'
+                                placeholder='name*, email, phone'
                                 disabled={!config.data_capture}
                                 {...register('fields')} />
                         </FormControl>

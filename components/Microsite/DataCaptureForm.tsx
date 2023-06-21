@@ -17,6 +17,7 @@ interface DataCaptureFormProps {
     fields?: Array<{
         id: string,
         name: string,
+        required?: boolean,
     }>
     enable_legal?: boolean;
     explicit_opt_in?: boolean;
@@ -102,10 +103,10 @@ export default function DataCaptureForm({
                     <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
                         {fields?.map((v, i) => {
                             if (v.id == 'country') {
-                                return <CountrySelect key={i} error={!_.isEmpty(errors[v.id])} placeholder={v.name} {...register(v.id, { required: true })} />
+                                return <CountrySelect key={i} error={!_.isEmpty(errors[v.id])} placeholder={v.name} {...register(v.id, { required: v.required })} />
                             }
                             if (v.id == 'birthday') {
-                                return <DateInput key={i} value={formData[v.id]} placeholder={v.name} error={!_.isEmpty(errors[v.id])} updateValue={(value) => setValue('birthday', value)} {...register(v.id, { required: true, valueAsDate: true })} />
+                                return <DateInput key={i} value={formData[v.id]} placeholder={v.name} error={!_.isEmpty(errors[v.id])} updateValue={(value) => setValue('birthday', value)} {...register(v.id, { required: v.required, valueAsDate: true })} />
                             }
                             return (
                                 <input
@@ -113,7 +114,7 @@ export default function DataCaptureForm({
                                     placeholder={`${v.name}${errors[v.id] ? (errors[v.id]?.type === 'pattern' ? ' is not valid' : ' is required') : ''}`}
                                     key={i}
                                     {...register(v.id, {
-                                        required: true,
+                                        required: v.required,
                                         ...(v.id == 'email' && { pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ }),
                                         ...(v.id == 'age' && { pattern: /^[0-9]*$/ })
                                     })}
