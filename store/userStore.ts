@@ -118,7 +118,10 @@ async function authenticateUser(email: string, password: string) {
     throw new Error('Invalid response from server');
   }
 
-  setCookie({}, 'hypno_token', data.access_token);
+  setCookie({}, 'hypno_token', data.access_token, { 
+    encode: (v: any) => v, 
+    path: "/", 
+  });
   return {
     token: {
       access_token: data.access_token,
