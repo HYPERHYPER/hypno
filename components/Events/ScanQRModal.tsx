@@ -12,7 +12,7 @@ export default function ScanQRModal({modalId, eventId, eventName}: Props) {
         <Modal 
             id={modalId} 
             title={'event code'}
-            menu={<h2 className="text-white/50">scan to join this event and add photos via hypno iphone app</h2>}
+            menu={<h2 className="text-white/50">open the hypno pro iphone app to scan + add photos to this event</h2>}
             >
             <div className='flex flex-col items-center gap-4 my-4'>
                 <div className='avatar placeholder'>
