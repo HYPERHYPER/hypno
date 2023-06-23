@@ -17,11 +17,11 @@ interface ResponseData {
 }
 
 const EditEventPage = (props: ResponseData) => {
-    const { event: {
-        id,
-        name,
-        metadata
-    } } = props;
+    const { event } = props;
+
+    const id = event?.id || null;
+    const name = event?.name || '';
+    const metadata = event?.metadata;
 
     const [view, setView] = useState<'default' | 'data' | 'legal'>('default');
     const [status, setStatus] = useState<SaveStatus>('ready');
