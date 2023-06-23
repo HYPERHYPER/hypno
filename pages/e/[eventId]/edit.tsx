@@ -136,8 +136,8 @@ const EditEventPage = (props: ResponseData) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const { eventId, accessToken: accessTokenParam } = context.query;
-    const cookieToken = nookies.get(context).hypno_token;
-    let accessToken = accessTokenParam || cookieToken;
+    // const cookieToken = nookies.get(context).hypno_token;
+    let accessToken = context.req.cookies.hypno_token;
     // if (!accessToken) {
     //     return {
     //         notFound: true,

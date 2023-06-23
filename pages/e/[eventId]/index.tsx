@@ -254,7 +254,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     // Fetch event config
     const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}`;
-    const token = nookies.get(context).hypno_token;
+    // const token = nookies.get(context).hypno_token;
+    const token = context.req.cookies.hypno_token;
+
     let eventData: any = {};
 
     await axios.get(eventUrl, {
