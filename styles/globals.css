@@ -134,7 +134,7 @@
   }
 
   .input.pro, .textarea.pro {
-    @apply bg-transparent active:border-none text-right text-xl sm:text-4xl text-primary outline-none h-auto flex-1
+    @apply bg-transparent active:border-none disabled:border-none text-right text-xl sm:text-4xl text-primary outline-none h-auto flex-1
   }
 
   .textarea.pro.left, .input.pro.left {
@@ -171,6 +171,22 @@
 
   .icon svg {
     @apply scale-150
+  }
+
+  .icon.icon-sm svg {
+    @apply scale-110
+  }
+
+  .icon path {
+    @apply transition
+  }
+
+  .icon.primary path {
+    @apply stroke-primary
+  }
+
+  .icon.grey path {
+    @apply stroke-white/30
   }
 
 }
