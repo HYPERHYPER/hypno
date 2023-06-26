@@ -75,6 +75,7 @@ function DashboardPage(props: ResponseData) {
                             <label tabIndex={0} className='cursor-pointer'><h2>{_.split(String(sort_by), '_')[0]}</h2></label>
                             <ul tabIndex={0} className="dropdown-content sm:text-lg z-[1] menu p-2 shadow bg-black/20 backdrop-blur rounded-box">
                                 <li className='disabled'><a>sort by</a></li>
+                                <li><Link href={`/dashboard?by=created_at&order=${sort_order}`}>created at</Link></li>
                                 <li><Link href={`/dashboard?by=updated_at&order=${sort_order}`}>updated at</Link></li>
                                 <li><Link href={`/dashboard?by=name&order=${sort_order}`}>name</Link></li>
                             </ul>
