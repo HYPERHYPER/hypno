@@ -13,6 +13,10 @@ import NewUserModal from '@/components/Users/NewUserModal';
 import { fetchWithToken } from '@/lib/fetchWithToken';
 import useSWRInfinite from 'swr/infinite';
 import { LoadingGrid } from '@/components/Gallery/LoadingAsset';
+import { useRouter } from 'next/router';
+import ArrowUp from 'public/pop/angle-up.svg';
+import ArrowDown from 'public/pop/angle-down.svg';
+import clsx from 'clsx';
 
 interface ResponseData {
     events: any;
@@ -30,10 +34,13 @@ function DashboardPage(props: ResponseData) {
     // const { events: initialEvents, meta } = props;
     // const user = useUserStore.useUser();
     const token = useUserStore.useToken();
+    const { query } = useRouter();
+    const sort_order = query.order || 'desc';
+    const sort_by = query.by || 'updated_at';
 
     const getKey = (pageIndex: number, previousPageData: any) => {
         if (previousPageData && pageIndex == previousPageData.pages) return null; // reached the end
-        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events?include_last_photo=true&per_page=25`;
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events?include_last_photo=true&per_page=25&sort_by=${sort_by}&sort_order=${sort_order}`;
         if (pageIndex === 0) return [url, token.access_token];
         const pageIdx = previousPageData.meta.next_page;
         return [`${url}&page=${pageIdx}`, token.access_token];
@@ -57,13 +64,29 @@ function DashboardPage(props: ResponseData) {
                 <GlobalLayout.Header
                     title='dashboard'
                 >
+                    <div className='text-primary flex items-center gap-1 sm:gap-3'>
+                        <Link href={`/dashboard?by=${sort_by}&order=${sort_order == 'asc' ? 'desc' : 'asc'}`}>
+                            <div className={clsx('swap swap-rotate sm:scale-150', sort_order == 'asc' ? 'swap-active' : '')}>
+                                <span className='swap-off'><ArrowDown /></span>
+                                <span className='swap-on'><ArrowUp /></span>
+                            </div>
+                        </Link>
+                        <div className="dropdown">
+                            <label tabIndex={0} className='cursor-pointer'><h2>{_.split(String(sort_by), '_')[0]}</h2></label>
+                            <ul tabIndex={0} className="dropdown-content sm:text-lg z-[1] menu p-2 shadow bg-black/20 backdrop-blur rounded-box">
+                                <li className='disabled'><a>sort by</a></li>
+                                <li><Link href={`/dashboard?by=updated_at&order=${sort_order}`}>updated at</Link></li>
+                                <li><Link href={`/dashboard?by=name&order=${sort_order}`}>name</Link></li>
+                            </ul>
+                        </div>
+                    </div>
                     <Link href='/e/new' className='text-primary'><h2>new event</h2></Link>
                 </GlobalLayout.Header>
 
                 <GlobalLayout.Content>
                     <div className='divider mt-0 h-1' />
                     <InfiniteScroll
-                        next={() => setSize((prev) => _.last(data).meta?.next_page || prev+1 )}
+                        next={() => setSize((prev) => _.last(data).meta?.next_page || prev + 1)}
                         hasMore={size != (_.first(data)?.meta?.total_pages || 0)}
                         dataLength={paginatedEvents?.length}
                         loader={<></>}
