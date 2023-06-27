@@ -392,7 +392,7 @@ const EventForm = (props: FormData) => {
                                     <div
                                         tabIndex={config.custom_frontend ? 0 : undefined}
                                         className='dropdown-content shadow mb-2 p-2 rounded-full'>
-                                        <ChromePicker color={config.primary_color || '#000000'} onChange={(color: any, e: any) => { e.preventDefault(); setValue('primary_color', color.hex) }} disableAlpha={true} />
+                                        <ChromePicker color={config.primary_color || '#000000'} onChange={(color: any, e: any) => { e.preventDefault(); setValue('primary_color', color.hex, { shouldDirty: true }) }} disableAlpha={true} />
                                     </div>
                                 </div>
                             </FormControl>

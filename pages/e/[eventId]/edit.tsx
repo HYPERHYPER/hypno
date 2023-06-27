@@ -81,7 +81,6 @@ const EditEventPage = (props: ResponseData) => {
         if (!_.isEmpty(eventPayload)) {
             payloadArr.push(eventPayload);
         }
-        console.log(eventPayload)
 
         const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${id}`;
         const token = parseCookies().hypno_token;
