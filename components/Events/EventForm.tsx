@@ -118,7 +118,7 @@ const EventForm = (props: FormData) => {
             primary_color: event?.custom_frontend?.primary_color || '#00FF99',
             is_private: event ? isPrivate(event.is_private) : false,
             data_capture: event?.custom_frontend?.data_capture || false,
-            fields: event ? convertFieldObjectToArray(event?.custom_frontend?.fields) : [],
+            fields: event ? _.map(convertFieldObjectToArray(event?.custom_frontend?.fields), (f, i) => f.name)?.join(',') : [],
             data_capture_title: event?.custom_frontend?.data_capture_title || '',
             data_capture_subtitle: event?.custom_frontend?.data_capture_subtitle || '',
             enable_legal: event?.custom_frontend?.enable_legal || false,

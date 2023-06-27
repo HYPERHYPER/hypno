@@ -48,7 +48,7 @@ const EditEventPage = (props: ResponseData) => {
                     filter = {id: field[key]}
                 }
                 if (_.includes(customFrontendKeys, key)) {
-                    custom_frontend[key] = convertFieldArrayToObject(field[key])
+                    custom_frontend[key] = key == 'fields' ? convertFieldArrayToObject(field[key]) : field[key]
                 }
                 if (_.includes(eventKeys, key)) {
                     event[key] = field[key]
