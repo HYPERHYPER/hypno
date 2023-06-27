@@ -89,6 +89,11 @@ const nextConfig = {
           source: '/plans',
           destination: process.env.NEXT_PUBLIC_PLANS_URL,
           basePath: false,
+        },
+        {
+          source: '/canon',
+          destination: process.env.NEXT_PUBLIC_CANON_URL,
+          basePath: false,
         }
       ]
     }
