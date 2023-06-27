@@ -18,6 +18,7 @@ import useContentHeight from '@/hooks/useContentHeight';
 import { EventConfig, EventMicrosite } from '@/types/event';
 import SingleAssetDeliveryConfirmation from '@/components/Microsite/SingleAssetDeliveryConfirmation';
 import DataCaptureForm from '@/components/Microsite/DataCaptureForm';
+import { convertFieldObjectToArray } from '@/helpers/event';
 
 type ImageData = {
     id: number;
@@ -67,7 +68,8 @@ const SubGallery = (props: ResponseData) => {
     const outerHeight = useContentHeight({ footer: false });
     const contentHeight = useContentHeight({ footer: true });
     const { event, photos: initialPhotos, count, photo, placeholder } = props;
-    const gallery: EventMicrosite = event.metadata;
+
+    const gallery: EventMicrosite = event.custom_frontend;
     const { query: { category, eventId, event: galleryViewSlug } } = useRouter()
 
     const [photoUploadPending, setPhotoUploadPending] = useState<boolean>(true); // waiting for first photo to arrive
@@ -92,9 +94,9 @@ const SubGallery = (props: ResponseData) => {
 
     /* Setting up the data capture form for the gallery. */
     const [dataCapture, setDataCapture] = useState<boolean>(gallery.data_capture || gallery.email_delivery);
-    const fields = gallery.email_delivery ? [{ id: 'email', name: 'email', required: true }] : _.map(gallery.fields, (f) => {
-        const required = _.endsWith(f,'*');
-        return { id: f.toLowerCase().replaceAll(" ", "_"), name: f, required }
+    const fields = gallery.email_delivery ? [{ id: 'email', name: 'email', required: true, type: 'email' }] : _.map(convertFieldObjectToArray(gallery.fields), (f) => {
+        const required = _.endsWith(f.name,'*');
+        return { id: f.name.toLowerCase().replaceAll(" ", "_"), name: f.name, required, type: f.type }
     });
 
     /* MINI GALLERY ?category= */
@@ -122,7 +124,7 @@ const SubGallery = (props: ResponseData) => {
 
             <CustomGallery event={event}>
                 {isDetailView ? (
-                    <DetailView asset={photo} config={{ aiGeneration: gallery.ai_generation, color: gallery.color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
+                    <DetailView asset={photo} config={{ aiGeneration: gallery.ai_generation, color: gallery.primary_color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
                 ) : (
                     <div
                         style={{ height: outerHeight }}
@@ -148,7 +150,7 @@ const SubGallery = (props: ResponseData) => {
                                         slug: gallery.email_delivery ? photo.slug : _.first(photos)?.slug || '',
                                         metadata: gallery.email_delivery ? photo.metadata : _.first(photos)?.metadata || {}
                                     }}
-                                    color={gallery.color}
+                                    color={gallery.primary_color}
                                     onSuccess={() => setDataCapture(false)}
                                 />
                             ) : (!singleAsset && _.size(photos) > 1) ? (
@@ -195,7 +197,7 @@ const SubGallery = (props: ResponseData) => {
                                     gallery.email_delivery ? (
                                         <SingleAssetDeliveryConfirmation />
                                     ) : (
-                                        <DetailView asset={_.first(photos)} config={{ aiGeneration: gallery.ai_generation, color: gallery.color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64, width: _.first(photos)?.width, height: _.first(photos)?.height }} />
+                                        <DetailView asset={_.first(photos)} config={{ aiGeneration: gallery.ai_generation, color: gallery.primary_color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64, width: _.first(photos)?.width, height: _.first(photos)?.height }} />
                                     )
                                 ))
                         }
@@ -226,6 +228,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             },
         });
         eventData = await eventRes.data?.event;
+        console.log(eventData)
 
         // Fetch subset of photos to be displayed in subgallery
         if (category) {
@@ -261,6 +264,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             });
         }
     } catch (e) {
+        console.log(e)
         if (_.isEmpty(eventData) || (photoSlug && _.isEmpty(singleAssetData)) || (deliverySlug && _.isEmpty(singleAssetData))) {
             return {
                 notFound: true
@@ -282,8 +286,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 id: eventData.id,
                 party_slug: eventData.party_slug,
                 is_private: eventData.is_private,
-                metadata: {
-                    ...eventData.metadata,
+                custom_frontend: {
+                    ...eventData.custom_frontend,
                     ...(deliverySlug && { email_delivery: true })
                 }
             }
