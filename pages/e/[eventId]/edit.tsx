@@ -64,9 +64,9 @@ const EditEventPage = (props: ResponseData) => {
 
         if (!enable_custom_frontend) {
             custom_frontend = {
-                logo: '',
-                background: '',
-                color: '',
+                logo_image: '',
+                home_background_image: '',
+                primary_color: '',
                 enable_legal: false,
                 data_capture: false,
             }
