@@ -1,9 +1,10 @@
 export type EventMicrosite = {
-    logo?: string;
-    background?: string;
-    color?: string;
+    logo_image?: string;
+    home_background_image?: string;
+    background_color?: string;
+    primary_color?: string;
     data_capture?: boolean;
-    fields?: string[];
+    fields?: Object[];
     data_capture_title?: string;
     data_capture_subtitle?: string;
     enable_legal?: boolean;
@@ -23,7 +24,7 @@ export type EventConfig = {
     terms_and_conditions?: string;
     is_private?: boolean;
     delivery?: string; // "qr_gallery" to show qr code to microsite, "qr" to disable
-    metadata?: EventMicrosite | null;
+    custom_frontend?: EventMicrosite | null;
 }
 
 export type EventPayload = {
@@ -32,7 +33,7 @@ export type EventPayload = {
         name?: string;
         client_id?: number;
     };
-    microsite?: EventMicrosite;
+    custom_frontend?: EventMicrosite;
     filter?: { id: number };
     watermarks?: Array<{title: string, url: string}>
     delivery?: string; // "qr_gallery" to show qr code to microsite, "qr" to disable

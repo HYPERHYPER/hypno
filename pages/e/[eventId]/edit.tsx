@@ -7,7 +7,7 @@ import nookies, { parseCookies } from 'nookies'
 import EventForm from '@/components/Events/EventForm';
 import GlobalLayout from '@/components/GlobalLayout';
 import withAuth from '@/components/hoc/withAuth';
-import { isCustomGallery } from '@/helpers/event';
+import { convertFieldArrayToObject, isCustomGallery } from '@/helpers/event';
 import { AutosaveStatusText, SaveStatus } from '@/components/Form/AutosaveStatusText';
 
 interface ResponseData {
@@ -21,7 +21,7 @@ const EditEventPage = (props: ResponseData) => {
 
     const id = event?.id || null;
     const name = event?.name || '';
-    const metadata = event?.metadata;
+    const initialCustomFrontend = event?.custom_frontend;
 
     const [view, setView] = useState<'default' | 'data' | 'legal'>('default');
     const [status, setStatus] = useState<SaveStatus>('ready');
@@ -31,11 +31,11 @@ const EditEventPage = (props: ResponseData) => {
         let payloadArr: any = [];
         let event: any = {};
         const eventKeys = ['name', 'is_private']
-        let microsite: any = {};
-        const micrositeKeys = ['logo', 'background', 'color', 'data_capture', 'fields', 'data_capture_title', 'data_capture_subtitle', 'enable_legal', 'explicit_opt_in', 'terms_privacy', 'email_delivery', 'ai_generation'];
+        let custom_frontend: any = {};
+        const customFrontendKeys = ['logo_image', 'home_background_image', 'primary_color', 'data_capture', 'fields', 'data_capture_title', 'data_capture_subtitle', 'enable_legal', 'explicit_opt_in', 'terms_privacy', 'email_delivery', 'ai_generation'];
         let filter: any = {};
         let delivery: string = '';
-        let custom_gallery = isCustomGallery(metadata);
+        let enable_custom_frontend = isCustomGallery(initialCustomFrontend);
 
         // Build event payload - any field that's not watermark
         // Build watermark payload in seperate reqs by watermark_id
@@ -47,8 +47,8 @@ const EditEventPage = (props: ResponseData) => {
                 if (key == 'filter') {
                     filter = {id: field[key]}
                 }
-                if (_.includes(micrositeKeys, key)) {
-                    microsite[key] = field[key]
+                if (_.includes(customFrontendKeys, key)) {
+                    custom_frontend[key] = convertFieldArrayToObject(field[key])
                 }
                 if (_.includes(eventKeys, key)) {
                     event[key] = field[key]
@@ -56,14 +56,14 @@ const EditEventPage = (props: ResponseData) => {
                 if (key == 'watermark') {
                     payloadArr.push(field);
                 }
-                if (key == 'custom_gallery') {
-                    custom_gallery = field[key];
+                if (key == 'custom_frontend') {
+                    enable_custom_frontend = field[key];
                 }
             }
         })
 
-        if (!custom_gallery) {
-            microsite = {
+        if (!enable_custom_frontend) {
+            custom_frontend = {
                 logo: '',
                 background: '',
                 color: '',
@@ -74,13 +74,14 @@ const EditEventPage = (props: ResponseData) => {
 
         const eventPayload = {
             ...(!_.isEmpty(event) && { event }),
-            ...(!_.isEmpty(microsite) && { microsite }),
+            ...(!_.isEmpty(custom_frontend) && { custom_frontend }),
             ...(!_.isEmpty(filter) && { filter }),
             ...(delivery && { delivery }),
         }
         if (!_.isEmpty(eventPayload)) {
             payloadArr.push(eventPayload);
         }
+        console.log(eventPayload)
 
         const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${id}`;
         const token = parseCookies().hypno_token;

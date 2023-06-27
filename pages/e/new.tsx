@@ -9,6 +9,7 @@ import GlobalLayout from '@/components/GlobalLayout';
 import { useRouter } from 'next/router';
 import { toHexCode } from '@/helpers/color';
 import { EventPayload } from '@/types/event';
+import { convertFieldArrayToObject } from '@/helpers/event';
 
 interface ResponseData {
     status: number;
@@ -19,11 +20,11 @@ interface ResponseData {
 const transformWatermarks = (watermarks: any) => {
     const arr = [];
     for (const key in watermarks) {
-      if (Object.hasOwnProperty.call(watermarks, key)) {
-        if (watermarks[key]) {
-            arr.push({title: key, url: watermarks[key]});
+        if (Object.hasOwnProperty.call(watermarks, key)) {
+            if (watermarks[key]) {
+                arr.push({ title: key, url: watermarks[key] });
+            }
         }
-      }
     }
     return arr;
 }
@@ -52,23 +53,24 @@ function NewEventPage(props: ResponseData) {
                 client_id: eventData.org_id,
                 is_private: eventData.is_private,
             },
-            ...(eventData.custom_gallery && { custom_gallery: { logo_image: "" }}),
-            microsite: {
-                logo: eventData.logo,
-                background: eventData.background,
-                color: toHexCode(eventData.color),
+            custom_frontend: {
+                logo_image: eventData.logo_image,
+                home_background_image: eventData.home_background_image,
+                primary_color: toHexCode(eventData.primary_color),
+                fields: convertFieldArrayToObject(eventData.fields),
                 data_capture: eventData.data_capture,
-                fields: (!_.isEmpty(eventData.fields) && _.first(eventData.fields) != '') ? _.map(_.split(eventData.fields, ','), (f) => f.trim()) : [],
                 data_capture_title: eventData.data_capture_title,
                 data_capture_subtitle: eventData.data_capture_subtitle,
                 enable_legal: eventData.enable_legal,
                 explicit_opt_in: eventData.explicit_opt_in,
-                terms_privacy: eventData.terms_privacy,
+                terms_privacy: eventData.terms_privacy
             },
-            ...(eventData.filter && { filter: {
-                id: eventData.filter
-            }}),
-            ...(eventData.watermarks && { watermarks: transformWatermarks(eventData.watermarks)}),
+            ...(eventData.filter && {
+                filter: {
+                    id: eventData.filter
+                }
+            }),
+            ...(eventData.watermarks && { watermarks: transformWatermarks(eventData.watermarks) }),
             delivery: eventData.qr_delivery ? "qr_gallery" : "qr"
         }
 
@@ -82,7 +84,7 @@ function NewEventPage(props: ResponseData) {
         }).then(async (res) => {
             setStatus('success');
             const data = await res.data;
-            const editEventUrl = `/e/${data.event.id}/edit`
+            const editEventUrl = `/e/${data.event.id}`
             router.push(editEventUrl);
         }).catch((e) => {
             console.log(e)

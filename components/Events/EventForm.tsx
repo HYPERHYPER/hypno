@@ -12,7 +12,7 @@ import useUserStore from '@/store/userStore';
 import { toHexCode } from '@/helpers/color';
 import useDeepCompareEffect from "use-deep-compare-effect";
 import clsx from 'clsx';
-import { isCustomGallery } from '@/helpers/event';
+import { convertFieldObjectToArray, isCustomGallery } from '@/helpers/event';
 import { parseCookies } from 'nookies';
 import { ChromePicker } from 'react-color';
 import { AutosaveStatusText, SaveStatus } from '../Form/AutosaveStatusText';
@@ -112,18 +112,18 @@ const EventForm = (props: FormData) => {
                 '16:9': getWatermarkFromArray(event?.event_filter_watermarks, '16:9')?.url || "",
             },
             qr_delivery: event ? (isShowingQrCode(event.event_ipad_screens)) : true,
-            custom_gallery: event ? isCustomGallery(event.metadata) : false,
-            logo: event?.metadata?.logo || '',
-            background: event?.metadata?.background || '',
-            color: event?.metadata?.color || '#00FF99',
+            custom_frontend: event ? isCustomGallery(event.custom_frontend) : false,
+            logo_image: event?.custom_frontend?.logo_image || '',
+            home_background_image: event?.custom_frontend?.home_background_image || '',
+            primary_color: event?.custom_frontend?.primary_color || '#00FF99',
             is_private: event ? isPrivate(event.is_private) : false,
-            data_capture: event?.metadata?.data_capture || false,
-            fields: event?.metadata?.fields || [],
-            data_capture_title: event?.metadata?.data_capture_title || '',
-            data_capture_subtitle: event?.metadata?.data_capture_subtitle || '',
-            enable_legal: event?.metadata?.enable_legal || false,
-            terms_privacy: event?.metadata?.terms_privacy || DEFAULT_TERMS,
-            explicit_opt_in: event?.metadata?.explicit_opt_in || false,
+            data_capture: event?.custom_frontend?.data_capture || false,
+            fields: event ? convertFieldObjectToArray(event?.custom_frontend?.fields) : [],
+            data_capture_title: event?.custom_frontend?.data_capture_title || '',
+            data_capture_subtitle: event?.custom_frontend?.data_capture_subtitle || '',
+            enable_legal: event?.custom_frontend?.enable_legal || false,
+            terms_privacy: event?.custom_frontend?.terms_privacy || DEFAULT_TERMS,
+            explicit_opt_in: event?.custom_frontend?.explicit_opt_in || false,
             // email_delivery: event?.metadata?.email_delivery || false,
             // ai_generation: event?.metadata?.ai_generation || {},
         }
@@ -334,7 +334,7 @@ const EventForm = (props: FormData) => {
                     view == 'default' && (
                         <div className='lg:border-t-2 lg:border-white/20'>
                             <FormControl label='branded gallery'>
-                                <input type="checkbox" className="toggle pro toggle-lg" {...register('custom_gallery')} />
+                                <input type="checkbox" className="toggle pro toggle-lg" {...register('custom_frontend')} />
                             </FormControl>
 
                             {/* <div className='form-control '>
@@ -357,42 +357,42 @@ const EventForm = (props: FormData) => {
                                         {...register('gallery_subtitle')} />
                                 </div> */}
 
-                            <FormControl label='logo' nested={true} disabled={!config.custom_gallery}>
+                            <FormControl label='logo' nested={true} disabled={!config.custom_frontend}>
                                 <FileInput
                                     inputId='logo'
-                                    onInputChange={(value: string) => setValue('logo', value, { shouldDirty: true })}
-                                    value={config.logo}
-                                    disabled={!config.custom_gallery}
+                                    onInputChange={(value: string) => setValue('logo_image', value, { shouldDirty: true })}
+                                    value={config.logo_image}
+                                    disabled={!config.custom_frontend}
                                     uploadCategory='logo'
                                 />
                             </FormControl>
 
-                            <FormControl label='background' nested={true} disabled={!config.custom_gallery}>
+                            <FormControl label='background' nested={true} disabled={!config.custom_frontend}>
                                 <FileInput
                                     inputId='background'
-                                    onInputChange={(value: string) => setValue('background', value, { shouldDirty: true })}
-                                    value={config.background}
-                                    disabled={!config.custom_gallery}
+                                    onInputChange={(value: string) => setValue('home_background_image', value, { shouldDirty: true })}
+                                    value={config.home_background_image}
+                                    disabled={!config.custom_frontend}
                                     uploadCategory='background'
                                 />
                             </FormControl>
 
-                            <FormControl label='color' nested={true} disabled={!config.custom_gallery}>
+                            <FormControl label='color' nested={true} disabled={!config.custom_frontend}>
                                 <input
                                     className='input pro disabled:text-white/20 transition-colors'
                                     placeholder='# hex code'
-                                    disabled={!config.custom_gallery}
-                                    {...register('color')} />
+                                    disabled={!config.custom_frontend}
+                                    {...register('primary_color')} />
                                 <div className="dropdown dropdown-top dropdown-end">
                                     <label
                                         className='w-full'
-                                        tabIndex={config.custom_gallery ? 0 : undefined}>
-                                        <span className={clsx("inline-flex h-10 w-10 rounded-full border-4 border-white/20 cursor-pointer", !config.custom_gallery && 'opacity-50 cursor-not-allowed')} style={{ backgroundColor: `${_.startsWith(config.color, '#') ? "" : "#"}${config.color}` }} />
+                                        tabIndex={config.custom_frontend ? 0 : undefined}>
+                                        <span className={clsx("inline-flex h-10 w-10 rounded-full border-4 border-white/20 cursor-pointer", !config.custom_frontend && 'opacity-50 cursor-not-allowed')} style={{ backgroundColor: `${_.startsWith(config.primary_color, '#') ? "" : "#"}${config.primary_color}` }} />
                                     </label>
                                     <div
-                                        tabIndex={config.custom_gallery ? 0 : undefined}
+                                        tabIndex={config.custom_frontend ? 0 : undefined}
                                         className='dropdown-content shadow mb-2 p-2 rounded-full'>
-                                        <ChromePicker color={config.color || '#000000'} onChange={(color: any, e: any) => { e.preventDefault(); setValue('color', color.hex) }} disableAlpha={true} />
+                                        <ChromePicker color={config.primary_color || '#000000'} onChange={(color: any, e: any) => { e.preventDefault(); setValue('primary_color', color.hex) }} disableAlpha={true} />
                                     </div>
                                 </div>
                             </FormControl>
@@ -402,18 +402,18 @@ const EventForm = (props: FormData) => {
                                 <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('enable_magic_button')} />
                             </FormControl> */}
 
-                            <FormControl label='private' nested={true} disabled={!config.custom_gallery}>
-                                <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('is_private')} />
+                            <FormControl label='private' nested={true} disabled={!config.custom_frontend}>
+                                <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_frontend} {...register('is_private')} />
                             </FormControl>
 
-                            <FormControl label='data' nested={true} disabled={!config.custom_gallery}>
-                                {config.data_capture && config.custom_gallery && <Modal.Trigger id='data-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
-                                <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('data_capture')} />
+                            <FormControl label='data' nested={true} disabled={!config.custom_frontend}>
+                                {config.data_capture && config.custom_frontend && <Modal.Trigger id='data-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
+                                <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_frontend} {...register('data_capture')} />
                             </FormControl>
 
-                            <FormControl label='legal' nested={true} disabled={!config.custom_gallery}>
-                                {config.enable_legal && config.custom_gallery && <Modal.Trigger id='legal-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5" >custom</div></Modal.Trigger>}
-                                <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('enable_legal')} />
+                            <FormControl label='legal' nested={true} disabled={!config.custom_frontend}>
+                                {config.enable_legal && config.custom_frontend && <Modal.Trigger id='legal-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5" >custom</div></Modal.Trigger>}
+                                <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_frontend} {...register('enable_legal')} />
                             </FormControl>
 
                             {/* <div className='form-control'>

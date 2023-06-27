@@ -41,7 +41,7 @@ const PublicGallery = (props: ResponseData) => {
         fallbackData: [{ photos }],
     });
 
-    const paginatedPhotos = !_.isEmpty(_.first(data).photos) ? _.map(data, (v) => v.photos).flat() : [];
+    const paginatedPhotos = !_.isEmpty(_.first(data)?.photos) ? _.map(data, (v) => v.photos).flat() : [];
     const hasMorePhotos = photos?.meta.total_count != paginatedPhotos?.length;
 
     if (!paginatedPhotos) return <div></div>
