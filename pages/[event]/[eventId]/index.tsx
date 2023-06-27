@@ -68,7 +68,7 @@ const SubGallery = (props: ResponseData) => {
     const outerHeight = useContentHeight({ footer: false });
     const contentHeight = useContentHeight({ footer: true });
     const { event, photos: initialPhotos, count, photo, placeholder } = props;
-    console.log(event)
+
     const gallery: EventMicrosite = event.custom_frontend;
     const { query: { category, eventId, event: galleryViewSlug } } = useRouter()
 
