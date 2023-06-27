@@ -57,7 +57,7 @@ const checkWatermarkChange = (prevWatermarks: any, currentWatermarks: any) => {
 
 const toExpectedValue = (key: string, value: string) => {
     switch (key) {
-        case 'color': return toHexCode(value);
+        case 'primary_color': return toHexCode(value);
         case 'fields': return (!_.isEmpty(value) && _.first(value) != '') ? _.map(_.split(value, ','), (f) => f.trim()) : [];
         case 'qr_delivery': return value ? 'qr_gallery' : 'qr'
         default: return value;
