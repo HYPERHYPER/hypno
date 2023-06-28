@@ -77,16 +77,7 @@ const useUserStoreBase = create<UserState & UserAction>()(
       name: "hypno",
       partialize: (state) => ({ token: state.token, user: state.user, isLoggedIn: state.isLoggedIn }),        
       onRehydrateStorage: () => (state) => {
-        if (state) {
-          if (state.token) {
-            setCookie({}, 'hypno_token', state?.token.access_token, { 
-              encode: (v: any) => v, 
-              path: "/", 
-              httpOnly: true
-            });
-          }
-          state?.setHasHydrated(true);
-        }
+        state?.setHasHydrated(true);
       }
     }
   )
