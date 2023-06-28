@@ -119,11 +119,21 @@ async function authenticateUser(email: string, password: string) {
     throw new Error('Invalid response from server');
   }
 
-  setCookie({}, 'hypno_token', data.access_token, {
-    encode: (v: any) => v,
-    path: "/",
-    httpOnly: true
-  });
+  // setCookie({}, 'hypno_token', data.access_token, {
+  //   encode: (v: any) => v,
+  //   path: "/",
+  //   httpOnly: true
+  // });
+  axios
+    .post('/api/setCookie', { value: data.access_token })
+    .then(response => {
+      // Cookie has been set on the server
+      // You can perform any necessary actions here
+    })
+    .catch(error => {
+      // Handle any errors that occurred during the request
+    });
+
   return {
     token: {
       access_token: data.access_token,
