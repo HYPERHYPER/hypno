@@ -94,7 +94,7 @@ const nextConfig = {
           source: '/canon',
           destination: process.env.NEXT_PUBLIC_CANON_URL,
           basePath: false,
-        }
+        },
       ]
     }
   }

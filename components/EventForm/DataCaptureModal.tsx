@@ -36,12 +36,12 @@ export default function DataCaptureModal({
     const fields = watch().fields;
 
     const { items, add, remove, update, reorder } = useArrayState({ required: false, name: '', type: undefined }, fields)
-    const sensors = useSensors(
-        useSensor(PointerSensor),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-        })
-    );
+    // const sensors = useSensors(
+    //     useSensor(PointerSensor),
+    //     useSensor(KeyboardSensor, {
+    //         coordinateGetter: sortableKeyboardCoordinates,
+    //     })
+    // );
 
     function handleDragEnd(event: DragEndEvent) {
         const { active, over } = event;
@@ -54,7 +54,6 @@ export default function DataCaptureModal({
     }
 
     useDeepCompareEffect(() => {
-        console.log(items)
         setValue('fields', items, { shouldDirty: true });
     }, [items]);
 
@@ -109,29 +108,29 @@ export default function DataCaptureModal({
     )
 }
 
-function SortableItem({ children, id }: { children?: ReactNode, id: any }) {
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-    } = useSortable({ id: id });
+// function SortableItem({ children, id }: { children?: ReactNode, id: any }) {
+//     const {
+//         attributes,
+//         listeners,
+//         setNodeRef,
+//         transform,
+//         transition,
+//     } = useSortable({ id: id });
 
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-    };
+//     const style = {
+//         transform: CSS.Transform.toString(transform),
+//         transition,
+//     };
 
-    return (
-        <Item ref={setNodeRef} style={style} {...attributes} {...listeners}>
-            {children}
-        </Item>
-    );
-}
+//     return (
+//         <Item ref={setNodeRef} style={style} {...attributes} {...listeners}>
+//             {children}
+//         </Item>
+//     );
+// }
 
-const Item = forwardRef(({ id, children, ...props }: any, ref) => {
-    return (
-        <div {...props} ref={ref}>{children}</div>
-    )
-});
+// const Item = forwardRef(({ id, children, ...props }: any, ref) => {
+//     return (
+//         <div {...props} ref={ref}>{children}</div>
+//     )
+// });
