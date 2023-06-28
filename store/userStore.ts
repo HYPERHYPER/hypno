@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware'
 import { destroyCookie, setCookie } from 'nookies'
 import { NewUser, UserInvite } from '@/types/users';
+import axios from 'axios';
 
 type UserState = {
   user: any;
@@ -166,7 +167,7 @@ async function logoutUser(token: string) {
     client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
     client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
   };
-  
+
   // Call your authentication API here and return the user object if the credentials are valid
   // If the credentials are invalid, throw an error
   const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth/revoke`;
@@ -182,12 +183,15 @@ async function logoutUser(token: string) {
     throw new Error('Something went wrong, please try again later');
   }
 
-  setCookie({}, 'hypno_token', '', {
-    encode: (v: any) => v,
-    path: "/",
-    httpOnly: true
-  });
-  destroyCookie({}, 'hypno_token');
+  axios
+    .delete('/api/deleteCookie')
+    .then(response => {
+      // Cookie has been deleted on the server
+      // You can perform any necessary actions here
+    })
+    .catch(error => {
+      // Handle any errors that occurred during the request
+    });
 }
 
 const useUserStore = createSelectorHooks(useUserStoreBase);
