@@ -73,9 +73,9 @@ const useUserStoreBase = create<UserState & UserAction>()(
         });
       }
     }),
-    { 
+    {
       name: "hypno",
-      partialize: (state) => ({ token: state.token, user: state.user, isLoggedIn: state.isLoggedIn }),        
+      partialize: (state) => ({ token: state.token, user: state.user, isLoggedIn: state.isLoggedIn }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       }
@@ -118,9 +118,9 @@ async function authenticateUser(email: string, password: string) {
     throw new Error('Invalid response from server');
   }
 
-  setCookie({}, 'hypno_token', data.access_token, { 
-    encode: (v: any) => v, 
-    path: "/", 
+  setCookie({}, 'hypno_token', data.access_token, {
+    encode: (v: any) => v,
+    path: "/",
     httpOnly: true
   });
   return {
@@ -140,7 +140,7 @@ async function signupUser(user: NewUser, invite?: UserInvite) {
   // Call your registration API here and return the registered user object
   const payload = {
     user,
-    ...invite && {invite}
+    ...invite && { invite }
   };
 
   const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/sign_up`;
@@ -161,11 +161,15 @@ async function signupUser(user: NewUser, invite?: UserInvite) {
 }
 
 async function logoutUser(token: string) {
-  const payload = {};
-
+  const payload = {
+    token: token,
+    client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+    client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+  };
+  
   // Call your authentication API here and return the user object if the credentials are valid
   // If the credentials are invalid, throw an error
-  const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/logout`;
+  const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth/revoke`;
   const response = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -178,6 +182,11 @@ async function logoutUser(token: string) {
     throw new Error('Something went wrong, please try again later');
   }
 
+  setCookie({}, 'hypno_token', '', {
+    encode: (v: any) => v,
+    path: "/",
+    httpOnly: true
+  });
   destroyCookie({}, 'hypno_token');
 }
 
