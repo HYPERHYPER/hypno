@@ -77,7 +77,15 @@ const useUserStoreBase = create<UserState & UserAction>()(
       name: "hypno",
       partialize: (state) => ({ token: state.token, user: state.user, isLoggedIn: state.isLoggedIn }),        
       onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true)
+        if (state) {
+          if (state.token) {
+            setCookie({}, 'hypno_token', state?.token.access_token, { 
+              encode: (v: any) => v, 
+              path: "/", 
+            });
+          }
+          state?.setHasHydrated(true);
+        }
       }
     }
   )
@@ -160,15 +168,11 @@ async function signupUser(user: NewUser, invite?: UserInvite) {
 }
 
 async function logoutUser(token: string) {
-  const payload = {
-    token: token,
-    client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
-    client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
-  };
+  const payload = {};
 
   // Call your authentication API here and return the user object if the credentials are valid
   // If the credentials are invalid, throw an error
-  const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth/revoke`;
+  const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/logout`;
   const response = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(payload),
