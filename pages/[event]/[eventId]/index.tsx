@@ -95,8 +95,8 @@ const SubGallery = (props: ResponseData) => {
     /* Setting up the data capture form for the gallery. */
     const [dataCapture, setDataCapture] = useState<boolean>(gallery.data_capture || gallery.email_delivery);
     const fields = gallery.email_delivery ? [{ id: 'email', name: 'email', required: true, type: 'email' }] : _.map(convertFieldObjectToArray(gallery.fields), (f) => {
-        const required = _.endsWith(f.name,'*');
-        return { id: f.name.toLowerCase().replaceAll(" ", "_"), name: f.name, required, type: f.type }
+        // const required = _.endsWith(f.name,'*');
+        return { id: f.name.toLowerCase().replaceAll(" ", "_"), ...f }
     });
 
     /* MINI GALLERY ?category= */
@@ -214,8 +214,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     // Load theme interface based on event
     const isDefault = String(event) === 'pro';
     const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}`;
-    const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-
+    // const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+    const token = 'vHrgqUWxH0RLPdJH2uALbC3ONL9jYmA_sBWDTGhOL_s'
     let eventData: any = {};
     let photosData: any = {};
     let singleAssetData: any = {};
@@ -229,7 +229,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         });
         eventData = await eventRes.data?.event;
         console.log(eventData)
-
         // Fetch subset of photos to be displayed in subgallery
         if (category) {
             const photoUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${eventId}/${category}/photos.json`;

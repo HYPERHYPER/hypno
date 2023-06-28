@@ -174,7 +174,7 @@
   }
 
   .icon.icon-sm svg {
-    @apply scale-110
+    @apply scale-[0.9]
   }
 
   .icon path {

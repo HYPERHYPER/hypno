@@ -16,8 +16,10 @@ interface DataCaptureFormProps {
     subtitle?: string;
     fields?: Array<{
         id: string,
-        name: string,
+        name?: string,
         required?: boolean,
+        label?: string,
+        type?: string;
     }>
     enable_legal?: boolean;
     explicit_opt_in?: boolean;
@@ -102,11 +104,22 @@ export default function DataCaptureForm({
                     </div>
                     <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
                         {fields?.map((v, i) => {
-                            if (v.id == 'country') {
+                            if (v.type == 'country') {
                                 return <CountrySelect key={i} error={!_.isEmpty(errors[v.id])} placeholder={v.name} {...register(v.id, { required: v.required })} />
                             }
-                            if (v.id == 'birthday') {
-                                return <DateInput key={i} value={formData[v.id]} placeholder={v.name} error={!_.isEmpty(errors[v.id])} updateValue={(value) => setValue('birthday', value)} {...register(v.id, { required: v.required, valueAsDate: true })} />
+                            if (_.includes(v.type, 'birthday')) {
+                                return <DateInput key={i} value={formData[v.id]} placeholder={_.split(v.name, '-')[0]} error={!_.isEmpty(errors[v.id])} updateValue={(value) => setValue(v.id, value)} {...register(v.id, { required: v.required, valueAsDate: true })} />
+                            }
+                            if (v.type == 'checkbox') {
+                                return (
+                                    <div key={i} className={clsx('relative flex flex-row gap-4 p-4 bg-black/10 backdrop-blur-[50px]', 'text-left justify-start items-center border-l-2 sm:border-l-4 border-white/20')}>
+                                        {v.required && <div className={clsx('absolute top-1 right-2 text-2xl', errors[v.id] ? 'text-red-600' : 'text-white/30')}>*</div>}
+                                        <input type="checkbox" className="checkbox" {...register(v.id, { required: v.required })} />
+                                        <p className='text-xs sm:text-lg text-white/50'>
+                                            <Balancer>{replaceLinks(v.label || '')}</Balancer>
+                                        </p>
+                                    </div>
+                                )
                             }
                             return (
                                 <input
@@ -115,8 +128,9 @@ export default function DataCaptureForm({
                                     key={i}
                                     {...register(v.id, {
                                         required: v.required,
-                                        ...(v.id == 'email' && { pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ }),
-                                        ...(v.id == 'age' && { pattern: /^[0-9]*$/ })
+                                        ...(v.type == 'email' && { pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ }),
+                                        ...(v.type == 'age' && { pattern: /^[0-9]*$/ }),
+                                        ...(v.type == 'phone' && { pattern: /^[0-9]*$/ })
                                     })}
                                 />
                             )

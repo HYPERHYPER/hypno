@@ -34,7 +34,7 @@ export default function Modal({ title, id, children, onDone, menu, actionBtn }: 
         <>
             <input type="checkbox" id={id} className="modal-toggle" />
             <label htmlFor={id} className="modal bg-[#333333]/50 backdrop-blur-[20px] cursor-pointer">
-                <label htmlFor="" className="modal-box max-w-3xl px-[40px] py-[35px] relative bg-black rounded-[60px] tracking-tight">
+                <label htmlFor="" className="modal-box max-w-3xl px-[40px] py-[35px] relative bg-black rounded-[60px] tracking-tight overflow-clip">
                     <div className="flex justify-between">
                         <div className="space-y-4">
                             <h1 className="text-white">{title}</h1>
@@ -48,7 +48,7 @@ export default function Modal({ title, id, children, onDone, menu, actionBtn }: 
                         </label>
                     </div>
 
-                    <div className={`mt-5 sm:mt-10 mb-9 max-h-[60vh] overflow-scroll ${actionBtn && actionBtn.hidden ? 'mb-0' : 'mb-9'}`}>
+                    <div className={`mt-5 sm:mt-10 mb-9 max-h-[50vh] overflow-scroll ${actionBtn && actionBtn.hidden ? 'mb-0' : 'mb-9'}`}>
                         {children}
                     </div>
 

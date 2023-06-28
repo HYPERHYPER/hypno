@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import _ from 'lodash';
 import { parseCookies } from 'nookies'
-import EventForm from '@/components/Events/EventForm';
+import EventForm from '@/components/EventForm/EventForm';
 import withAuth from '@/components/hoc/withAuth';
 import GlobalLayout from '@/components/GlobalLayout';
 import { useRouter } from 'next/router';

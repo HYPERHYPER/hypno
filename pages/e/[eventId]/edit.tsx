@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Head from 'next/head';
 import _ from 'lodash';
 import nookies, { parseCookies } from 'nookies'
-import EventForm from '@/components/Events/EventForm';
+import EventForm from '@/components/EventForm/EventForm';
 import GlobalLayout from '@/components/GlobalLayout';
 import withAuth from '@/components/hoc/withAuth';
 import { convertFieldArrayToObject, isCustomGallery } from '@/helpers/event';
@@ -45,10 +45,10 @@ const EditEventPage = (props: ResponseData) => {
                     delivery = field[key];
                 }
                 if (key == 'filter') {
-                    filter = {id: field[key]}
+                    filter = { id: field[key] }
                 }
                 if (_.includes(customFrontendKeys, key)) {
-                    custom_frontend[key] = key == 'fields' ? convertFieldArrayToObject(field[key]) : field[key]
+                    custom_frontend[key] = key == 'fields' ? { ...field[key] } : field[key]
                 }
                 if (_.includes(eventKeys, key)) {
                     event[key] = field[key]
@@ -69,6 +69,7 @@ const EditEventPage = (props: ResponseData) => {
                 primary_color: '',
                 enable_legal: false,
                 data_capture: false,
+                fields: {},
             }
         }
 

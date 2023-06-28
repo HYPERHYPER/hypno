@@ -4,7 +4,7 @@ export type EventMicrosite = {
     background_color?: string;
     primary_color?: string;
     data_capture?: boolean;
-    fields?: Object[];
+    fields?: any;
     data_capture_title?: string;
     data_capture_subtitle?: string;
     enable_legal?: boolean;
@@ -14,7 +14,6 @@ export type EventMicrosite = {
     ai_generation?: any;
 } | any;
 type EventMicrositeKey = keyof EventMicrosite;
-const EventMicrositeKeys: EventMicrositeKey[] = ['logo', 'background', 'color', 'data_capture', 'fields', 'data_capture_title', 'data_capture_subtitle', 'enable_legal', 'explicit_opt_in', 'terms_privacy', 'email_delivery', 'ai_generation'];
 
 export type EventConfig = {
     id?: number;
