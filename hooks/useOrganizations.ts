@@ -1,6 +1,6 @@
+import useUserStore from "@/store/userStore";
 import axios from "axios";
 import _ from 'lodash';
-import { parseCookies } from "nookies";
 import { useEffect, useState } from "react";
 
 type Organization = {
@@ -22,7 +22,7 @@ type Organization = {
  * following properties:
  */
 export default function useOrganizations() {
-    const token = parseCookies().hypno_token;
+    const token = useUserStore.useToken();
     const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/dropdown_index`;
 
     const [organizations, setOrganizations] = useState<Organization[]>([]);
@@ -34,7 +34,7 @@ export default function useOrganizations() {
             await axios.get(url, {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer '+ token
+                    'Authorization': 'Bearer '+ token?.access_token
                 }
             }).then((res) => {
                 setIsLoading(false);
