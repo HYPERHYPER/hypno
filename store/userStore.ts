@@ -82,6 +82,7 @@ const useUserStoreBase = create<UserState & UserAction>()(
             setCookie({}, 'hypno_token', state?.token.access_token, { 
               encode: (v: any) => v, 
               path: "/", 
+              httpOnly: true
             });
           }
           state?.setHasHydrated(true);
@@ -129,6 +130,7 @@ async function authenticateUser(email: string, password: string) {
   setCookie({}, 'hypno_token', data.access_token, { 
     encode: (v: any) => v, 
     path: "/", 
+    httpOnly: true
   });
   return {
     token: {
