@@ -214,8 +214,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     // Load theme interface based on event
     const isDefault = String(event) === 'pro';
     const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}`;
-    // const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-    const token = 'vHrgqUWxH0RLPdJH2uALbC3ONL9jYmA_sBWDTGhOL_s'
+    const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
     let eventData: any = {};
     let photosData: any = {};
     let singleAssetData: any = {};
