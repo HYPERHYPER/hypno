@@ -3,13 +3,13 @@ import FormControl from "../Form/FormControl";
 import Modal from "../Modal";
 import { SaveStatus } from "../Form/AutosaveStatusText";
 import { useState } from "react";
-import { parseCookies } from "nookies";
 import useUserStore from "@/store/userStore";
 import axios from "axios";
 import _ from 'lodash';
 
 export default function UpdatePasswordModal() {
     const user = useUserStore.useUser();
+    const token = useUserStore.useToken();
     const [status, setStatus] = useState<SaveStatus>('ready')
     const {
         register,
@@ -43,11 +43,10 @@ export default function UpdatePasswordModal() {
         }
 
         const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/users/${user.id}/update_password`;
-        const token = parseCookies().hypno_token;
         await axios.put(url, payload, {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token,
+                Authorization: 'Bearer ' + token.access_token,
             },
         }).then((res) => {
             setStatus('success');

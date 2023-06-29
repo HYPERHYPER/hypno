@@ -1,5 +1,4 @@
 import axios from "axios";
-import { parseCookies } from "nookies";
 import { useCallback, useState } from "react";
 import _ from 'lodash';
 import useUserStore from "@/store/userStore";
@@ -12,10 +11,10 @@ export default function useAssetManager(asset: any, onUpdateSuccess?: () => void
     const { id, moderated, likes } = asset;
 
     const user = useUserStore.useUser();
+    const token = useUserStore.useToken();
     const [isFavorited, setIsFavorited] = useState<boolean>(isLikedByUser(user.id, likes));
     const [isHidden, setIsHidden] = useState<boolean>(moderated);
 
-    const token = parseCookies().hypno_token;
     const photoActionUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/photos`
     
     const archiveAsset = useCallback(async () => {
@@ -24,7 +23,7 @@ export default function useAssetManager(asset: any, onUpdateSuccess?: () => void
         await axios.delete(url, {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token,
+                Authorization: 'Bearer ' + token.access_token,
             },
         }).then((res) => {
             console.log(res.data);

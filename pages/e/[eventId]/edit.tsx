@@ -3,12 +3,12 @@ import type { GetServerSideProps } from 'next';
 import { useState } from 'react';
 import Head from 'next/head';
 import _ from 'lodash';
-import nookies, { parseCookies } from 'nookies'
 import EventForm from '@/components/EventForm/EventForm';
 import GlobalLayout from '@/components/GlobalLayout';
 import withAuth from '@/components/hoc/withAuth';
 import { convertFieldArrayToObject, isCustomGallery } from '@/helpers/event';
 import { AutosaveStatusText, SaveStatus } from '@/components/Form/AutosaveStatusText';
+import useUserStore from '@/store/userStore';
 
 interface ResponseData {
     status: number;
@@ -18,6 +18,8 @@ interface ResponseData {
 
 const EditEventPage = (props: ResponseData) => {
     const { event } = props;
+
+    const token = useUserStore.useToken();
 
     const id = event?.id || null;
     const name = event?.name || '';
@@ -84,7 +86,6 @@ const EditEventPage = (props: ResponseData) => {
         }
 
         const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${id}`;
-        const token = parseCookies().hypno_token;
 
         // Create an array of promises for graphics (watermark) update + all other event config updates
         const promises = payloadArr?.map((payload: any) => {
@@ -97,7 +98,7 @@ const EditEventPage = (props: ResponseData) => {
             return axios.put(url, payload, {
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: 'Bearer ' + token,
+                    Authorization: 'Bearer ' + token.access_token,
                 },
             });
         });

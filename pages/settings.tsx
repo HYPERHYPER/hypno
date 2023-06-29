@@ -6,7 +6,6 @@ import GlobalLayout from '@/components/GlobalLayout';
 import Link from 'next/link';
 import Modal from '@/components/Modal';
 import FormControl from '@/components/Form/FormControl';
-import { parseCookies } from 'nookies';
 import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import clsx from 'clsx';
@@ -24,6 +23,7 @@ function SettingsPage() {
     const user = useUserStore.useUser();
     const logout = useUserStore.useLogout();
     const updateUser = useUserStore.useUpdateUser();
+    const token = useUserStore.useToken();
 
     const [saveStatus, setSaveStatus] = useState<SaveStatus>('ready');
     const {
@@ -67,11 +67,10 @@ function SettingsPage() {
         }
 
         const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/users/${user.id}`;
-        const token = parseCookies().hypno_token;
         await axios.put(url, payload, {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token,
+                Authorization: 'Bearer ' + token.access_token,
             },
         }).then((res) => {
             setSaveStatus('success')

@@ -2,7 +2,6 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import _ from 'lodash';
-import { parseCookies } from 'nookies'
 import EventForm from '@/components/EventForm/EventForm';
 import withAuth from '@/components/hoc/withAuth';
 import GlobalLayout from '@/components/GlobalLayout';
@@ -10,6 +9,7 @@ import { useRouter } from 'next/router';
 import { toHexCode } from '@/helpers/color';
 import { EventPayload } from '@/types/event';
 import { convertFieldArrayToObject } from '@/helpers/event';
+import useUserStore from '@/store/userStore';
 
 interface ResponseData {
     status: number;
@@ -32,6 +32,8 @@ const transformWatermarks = (watermarks: any) => {
 export default withAuth(NewEventPage, 'protected');
 function NewEventPage(props: ResponseData) {
     const router = useRouter();
+
+    const token = useUserStore.useToken();
 
     const [view, setView] = useState<'default' | 'data' | 'legal'>('default');
     const [status, setStatus] = useState<'saving' | 'ready' | 'valid' | 'success' | 'error' | string>('ready');
@@ -75,11 +77,11 @@ function NewEventPage(props: ResponseData) {
         }
 
         const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events`;
-        const token = parseCookies().hypno_token;
+
         await axios.post(url, payload, {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token,
+                Authorization: 'Bearer ' + token.access_token,
             },
         }).then(async (res) => {
             setStatus('success');

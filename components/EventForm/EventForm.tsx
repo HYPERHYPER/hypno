@@ -13,7 +13,6 @@ import { toHexCode } from '@/helpers/color';
 import useDeepCompareEffect from "use-deep-compare-effect";
 import clsx from 'clsx';
 import { convertFieldArrayToObject, convertFieldObjectToArray, isCustomGallery } from '@/helpers/event';
-import { parseCookies } from 'nookies';
 import { ChromePicker } from 'react-color';
 import { AutosaveStatusText, SaveStatus } from '../Form/AutosaveStatusText';
 import useFilters from '@/hooks/useFilters';
