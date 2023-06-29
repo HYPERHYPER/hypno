@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware'
 import { destroyCookie, setCookie } from 'nookies'
 import { NewUser, UserInvite } from '@/types/users';
+import axios from 'axios';
 
 type UserState = {
   user: any;
@@ -73,11 +74,11 @@ const useUserStoreBase = create<UserState & UserAction>()(
         });
       }
     }),
-    { 
+    {
       name: "hypno",
-      partialize: (state) => ({ token: state.token, user: state.user, isLoggedIn: state.isLoggedIn }),        
+      partialize: (state) => ({ token: state.token, user: state.user, isLoggedIn: state.isLoggedIn }),
       onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true)
+        state?.setHasHydrated(true);
       }
     }
   )
@@ -118,10 +119,21 @@ async function authenticateUser(email: string, password: string) {
     throw new Error('Invalid response from server');
   }
 
-  setCookie({}, 'hypno_token', data.access_token, { 
-    encode: (v: any) => v, 
-    path: "/", 
-  });
+  // setCookie({}, 'hypno_token', data.access_token, {
+  //   encode: (v: any) => v,
+  //   path: "/",
+  //   httpOnly: true
+  // });
+  axios
+    .post('/api/setCookie', { value: data.access_token })
+    .then(response => {
+      // Cookie has been set on the server
+      // You can perform any necessary actions here
+    })
+    .catch(error => {
+      // Handle any errors that occurred during the request
+    });
+
   return {
     token: {
       access_token: data.access_token,
@@ -139,7 +151,7 @@ async function signupUser(user: NewUser, invite?: UserInvite) {
   // Call your registration API here and return the registered user object
   const payload = {
     user,
-    ...invite && {invite}
+    ...invite && { invite }
   };
 
   const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/sign_up`;
@@ -181,7 +193,15 @@ async function logoutUser(token: string) {
     throw new Error('Something went wrong, please try again later');
   }
 
-  destroyCookie({}, 'hypno_token');
+  axios
+    .delete('/api/deleteCookie')
+    .then(response => {
+      // Cookie has been deleted on the server
+      // You can perform any necessary actions here
+    })
+    .catch(error => {
+      // Handle any errors that occurred during the request
+    });
 }
 
 const useUserStore = createSelectorHooks(useUserStoreBase);

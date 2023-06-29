@@ -8,7 +8,7 @@ import Modal from '@/components/Modal';
 import FormControl from '@/components/Form/FormControl';
 import { GetServerSideProps } from 'next';
 import axios from 'axios';
-import nookies, { parseCookies } from 'nookies';
+import nookies from 'nookies';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AutosaveStatusText, SaveStatus } from '@/components/Form/AutosaveStatusText';
@@ -21,6 +21,7 @@ export default withAuth(OrganizationSettingsPage, 'protected');
 function OrganizationSettingsPage(props: ResponseData) {
     const user = useUserStore.useUser();
     const updateUser = useUserStore.useUpdateUser();
+    const token = useUserStore.useToken();
     const { organization } = user;
 
     const [saveStatus, setSaveStatus] = useState<SaveStatus>('ready');
@@ -50,11 +51,10 @@ function OrganizationSettingsPage(props: ResponseData) {
         }
 
         const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${organization.id}`;
-        const token = parseCookies().hypno_token;
         await axios.put(url, payload, {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token,
+                Authorization: 'Bearer ' + token.access_token,
             },
         }).then((res) => {
             setSaveStatus('success')

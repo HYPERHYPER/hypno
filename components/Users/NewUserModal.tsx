@@ -5,7 +5,6 @@ import _ from 'lodash';
 import clsx from "clsx";
 import { useState } from "react";
 import { SaveStatus } from "../Form/AutosaveStatusText";
-import { parseCookies } from "nookies";
 import axios from "axios";
 import useUserStore from "@/store/userStore";
 
@@ -16,6 +15,7 @@ const userRoles = [
 
 export default function NewUserModal() {
     const user = useUserStore.useUser();
+    const token = useUserStore.useToken();
 
     const [status, setStatus] = useState<SaveStatus>('ready');
     const {
@@ -51,11 +51,10 @@ export default function NewUserModal() {
         }
 
         const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/invite`;
-        const token = parseCookies().hypno_token;
         await axios.post(url, payload, {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token,
+                Authorization: 'Bearer ' + token.access_token,
             },
         }).then((res) => {
             console.log(res)

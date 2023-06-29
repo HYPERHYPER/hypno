@@ -16,8 +16,10 @@ interface DataCaptureFormProps {
     subtitle?: string;
     fields?: Array<{
         id: string,
-        name: string,
+        name?: string,
         required?: boolean,
+        label?: string,
+        type?: string;
     }>
     enable_legal?: boolean;
     explicit_opt_in?: boolean;
@@ -30,6 +32,28 @@ interface DataCaptureFormProps {
     color: string;
     onSuccess: () => void;
 }
+
+const ageValidation = (type?: string) => _.split(type, '-')[1];
+const validateAge = (minAge: string, selectedDate: any) => {
+    const currentDate = new Date();
+    const selectedDateObj = new Date(selectedDate);
+    const age = currentDate.getFullYear() - selectedDateObj.getFullYear();
+
+    if (age < Number(minAge)) {
+        return `You must be ${minAge} years or older`;
+    }
+
+    return true;
+}
+const formatDateForBirthdayKeys = (key: string, value: string): string | Date => {
+    if (key.includes('birthday')) {
+        // Format the date here
+        const formattedDate = formatDate(value);
+        return formattedDate;
+    }
+
+    return value;
+};
 
 export default function DataCaptureForm({
     title,
@@ -69,12 +93,16 @@ export default function DataCaptureForm({
         const photoSlug = asset.slug;
         let metadata = asset.metadata;
 
-        if (data.birthday) {
-            data.birthday = formatDate(data.birthday);
-        }
+        let formattedData : any = data;
+        // Format the date for keys containing "birthday"
+        Object.keys(data).forEach(key => {
+            const formattedValue = formatDateForBirthdayKeys(key, data[key] as string);
+            formattedData[key] = formattedValue;
+        });
+
         metadata = {
             ...metadata,
-            ...data,
+            ...formattedData,
         }
 
         const url = email_delivery ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/deliver/${photoSlug}.json` : `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/${photoSlug}.json`;
@@ -102,11 +130,22 @@ export default function DataCaptureForm({
                     </div>
                     <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
                         {fields?.map((v, i) => {
-                            if (v.id == 'country') {
+                            if (v.type == 'country') {
                                 return <CountrySelect key={i} error={!_.isEmpty(errors[v.id])} placeholder={v.name} {...register(v.id, { required: v.required })} />
                             }
-                            if (v.id == 'birthday') {
-                                return <DateInput key={i} value={formData[v.id]} placeholder={v.name} error={!_.isEmpty(errors[v.id])} updateValue={(value) => setValue('birthday', value)} {...register(v.id, { required: v.required, valueAsDate: true })} />
+                            if (_.includes(v.type, 'birthday')) {
+                                return <DateInput key={i} value={formData[v.id]} placeholder={!_.isEmpty(errors[v.id]) ? `${_.split(v.name, '-')[0]} is required` : _.split(v.name, '-')[0]} error={!_.isEmpty(errors[v.id])} updateValue={(value) => setValue(v.id, value)} {...register(v.id, { required: v.required, valueAsDate: true, validate: ageValidation(v.type) ? (val) => validateAge(ageValidation(v.type), val) : undefined })} />
+                            }
+                            if (v.type == 'checkbox') {
+                                return (
+                                    <div key={i} className={clsx('relative flex flex-row gap-4 p-4 bg-black/10 backdrop-blur-[50px]', 'text-left justify-start items-center border-l-2 sm:border-l-4 border-white/20')}>
+                                        {v.required && <div className={clsx('absolute top-1 right-2 text-2xl', errors[v.id] ? 'text-red-600' : 'text-white/30')}>*</div>}
+                                        <input type="checkbox" className="checkbox" {...register(v.id, { required: v.required })} />
+                                        <p className='text-xs sm:text-lg text-white/50'>
+                                            <Balancer>{replaceLinks(v.label || '')}</Balancer>
+                                        </p>
+                                    </div>
+                                )
                             }
                             return (
                                 <input
@@ -115,8 +154,9 @@ export default function DataCaptureForm({
                                     key={i}
                                     {...register(v.id, {
                                         required: v.required,
-                                        ...(v.id == 'email' && { pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ }),
-                                        ...(v.id == 'age' && { pattern: /^[0-9]*$/ })
+                                        ...(v.type == 'email' && { pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ }),
+                                        ...(v.type == 'age' && { pattern: /^[0-9]*$/ }),
+                                        ...(v.type == 'phone' && { pattern: /^[0-9]*$/ })
                                     })}
                                 />
                             )
