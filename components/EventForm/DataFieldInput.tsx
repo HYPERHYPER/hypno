@@ -33,13 +33,13 @@ export function FieldSelect({ value, onSelect, resetOnSelect }: { value?: FieldT
     return (
         <select
             id="fields"
-            className={clsx('select sm:w-52 rounded-full lowercase sm:text-xl font-medium tracking-tight transition focus:outline-none focus:bg-white/20 focus:text-white',
-                !_.isEmpty(value) ? 'bg-white/20 text-white' : 'bg-primary text-black'
+            className={clsx('select sm:w-52 rounded-full lowercase sm:text-xl font-medium tracking-tight transition focus:outline-none',
+                !_.isEmpty(value) ? 'bg-white/20 text-white focus:bg-white/20 focus:text-white' : 'bg-primary text-black focus:bg-primary focus:text-black'
             )}
             value={value}
             onChange={handleChange}
         >
-            <option value="">add field</option>
+            {_.isEmpty(value) && <option value="">add field</option>}
             <option value="text">Text</option>
             <option value="birthday">Birthday</option>
             <option value="birthday-13">Birthday 13+</option>
