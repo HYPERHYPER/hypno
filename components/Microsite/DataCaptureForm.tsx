@@ -150,13 +150,14 @@ export default function DataCaptureForm({
                             return (
                                 <input
                                     className={`input data-capture ${errors[v.id] && 'error text-red-600'}`}
-                                    placeholder={`${v.name}${errors[v.id] ? (errors[v.id]?.type === 'pattern' ? ' is not valid' : ' is required') : ''}`}
+                                    placeholder={`${v.name}${errors[v.id] ? ((errors[v.id]?.type === 'pattern' || errors[v.id]?.type === 'minLength' || errors[v.id]?.type === 'maxLength') ? ' is not valid' : ' is required') : ''}`}
                                     key={i}
                                     {...register(v.id, {
                                         required: v.required,
                                         ...(v.type == 'email' && { pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ }),
                                         ...(v.type == 'age' && { pattern: /^[0-9]*$/ }),
-                                        ...(v.type == 'phone' && { pattern: /^[0-9]*$/ })
+                                        ...(v.type == 'phone' && { pattern: /^[0-9]*$/ }),
+                                        ...(v.type == 'zip' && { pattern: /^[0-9]*$/, minLength: 5, maxLength: 5 })
                                     })}
                                 />
                             )
