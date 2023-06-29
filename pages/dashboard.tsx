@@ -64,24 +64,24 @@ function DashboardPage(props: ResponseData) {
                 <GlobalLayout.Header
                     title='dashboard'
                 >
+                    <Link href='/e/new' className='text-primary'><h2>new event</h2></Link>
                     <div className='text-primary flex items-center gap-1 sm:gap-3'>
-                        <Link href={`/dashboard?by=${sort_by}&order=${sort_order == 'asc' ? 'desc' : 'asc'}`}>
-                            <div className={clsx('swap swap-rotate sm:scale-150', sort_order == 'asc' ? 'swap-active' : '')}>
-                                <span className='swap-off'><ArrowDown /></span>
-                                <span className='swap-on'><ArrowUp /></span>
-                            </div>
-                        </Link>
                         <div className="dropdown">
                             <label tabIndex={0} className='cursor-pointer'><h2>{_.split(String(sort_by), '_')[0]}</h2></label>
-                            <ul tabIndex={0} className="dropdown-content sm:text-lg z-[1] menu p-2 shadow bg-black/20 backdrop-blur rounded-box">
+                            <ul tabIndex={0} className="dropdown-content sm:text-lg z-[1] menu p-2 shadow bg-black/20 backdrop-blur rounded-box w-32 sm:w-52">
                                 <li className='disabled'><a>sort by</a></li>
                                 <li><Link href={`/dashboard?by=created_at&order=${sort_order}`}>created at</Link></li>
                                 <li><Link href={`/dashboard?by=updated_at&order=${sort_order}`}>updated at</Link></li>
                                 <li><Link href={`/dashboard?by=name&order=${sort_order}`}>name</Link></li>
                             </ul>
                         </div>
+                        <Link href={`/dashboard?by=${sort_by}&order=${sort_order == 'asc' ? 'desc' : 'asc'}`}>
+                            <div className={clsx('swap swap-rotate sm:scale-150', sort_order == 'asc' ? 'swap-active' : '')}>
+                                <span className='swap-off'><ArrowDown /></span>
+                                <span className='swap-on'><ArrowUp /></span>
+                            </div>
+                        </Link>
                     </div>
-                    <Link href='/e/new' className='text-primary'><h2>new event</h2></Link>
                 </GlobalLayout.Header>
 
                 <GlobalLayout.Content>
