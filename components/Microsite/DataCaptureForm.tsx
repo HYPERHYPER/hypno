@@ -33,6 +33,28 @@ interface DataCaptureFormProps {
     onSuccess: () => void;
 }
 
+const ageValidation = (type?: string) => _.split(type, '-')[1];
+const validateAge = (minAge: string, selectedDate: any) => {
+    const currentDate = new Date();
+    const selectedDateObj = new Date(selectedDate);
+    const age = currentDate.getFullYear() - selectedDateObj.getFullYear();
+
+    if (age < Number(minAge)) {
+        return `You must be ${minAge} years or older`;
+    }
+
+    return true;
+}
+const formatDateForBirthdayKeys = (key: string, value: string): string | Date => {
+    if (key.includes('birthday')) {
+        // Format the date here
+        const formattedDate = formatDate(value);
+        return formattedDate;
+    }
+
+    return value;
+};
+
 export default function DataCaptureForm({
     title,
     subtitle,
@@ -71,12 +93,16 @@ export default function DataCaptureForm({
         const photoSlug = asset.slug;
         let metadata = asset.metadata;
 
-        if (data.birthday) {
-            data.birthday = formatDate(data.birthday);
-        }
+        let formattedData : any = data;
+        // Format the date for keys containing "birthday"
+        Object.keys(data).forEach(key => {
+            const formattedValue = formatDateForBirthdayKeys(key, data[key] as string);
+            formattedData[key] = formattedValue;
+        });
+
         metadata = {
             ...metadata,
-            ...data,
+            ...formattedData,
         }
 
         const url = email_delivery ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/deliver/${photoSlug}.json` : `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/${photoSlug}.json`;
@@ -108,7 +134,7 @@ export default function DataCaptureForm({
                                 return <CountrySelect key={i} error={!_.isEmpty(errors[v.id])} placeholder={v.name} {...register(v.id, { required: v.required })} />
                             }
                             if (_.includes(v.type, 'birthday')) {
-                                return <DateInput key={i} value={formData[v.id]} placeholder={_.split(v.name, '-')[0]} error={!_.isEmpty(errors[v.id])} updateValue={(value) => setValue(v.id, value)} {...register(v.id, { required: v.required, valueAsDate: true })} />
+                                return <DateInput key={i} value={formData[v.id]} placeholder={!_.isEmpty(errors[v.id]) ? `${_.split(v.name, '-')[0]} is required` : _.split(v.name, '-')[0]} error={!_.isEmpty(errors[v.id])} updateValue={(value) => setValue(v.id, value)} {...register(v.id, { required: v.required, valueAsDate: true, validate: ageValidation(v.type) ? (val) => validateAge(ageValidation(v.type), val) : undefined })} />
                             }
                             if (v.type == 'checkbox') {
                                 return (
