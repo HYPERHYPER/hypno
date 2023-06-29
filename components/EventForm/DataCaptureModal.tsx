@@ -72,6 +72,7 @@ export default function DataCaptureModal({
 
                 {_.map(items, (v, i) => (
                     <DataFieldInput 
+                        key={i}
                         value={v} 
                         onChange={(value) => update(i, value)} 
                         onRemove={() => remove(i)} 
