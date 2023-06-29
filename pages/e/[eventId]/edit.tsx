@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { GetServerSideProps } from 'next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import _ from 'lodash';
 import EventForm from '@/components/EventForm/EventForm';
@@ -9,6 +9,9 @@ import withAuth from '@/components/hoc/withAuth';
 import { convertFieldArrayToObject, isCustomGallery } from '@/helpers/event';
 import { AutosaveStatusText, SaveStatus } from '@/components/Form/AutosaveStatusText';
 import useUserStore from '@/store/userStore';
+import useSWR from 'swr';
+import { useRouter } from 'next/router';
+import { axiosGetWithToken } from '@/lib/fetchWithToken';
 
 interface ResponseData {
     status: number;
@@ -17,10 +20,17 @@ interface ResponseData {
 }
 
 const EditEventPage = (props: ResponseData) => {
-    const { event } = props;
+    const router = useRouter();
+    const { query } = router;
+    const { event : initialEvent } = props;
 
     const token = useUserStore.useToken();
 
+    const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(query.eventId)}?include_overlays=true&include_ipad_screens=true`;
+    const { data: eventData, isValidating: isValidatingEventData, error: eventError } = useSWR([eventUrl, token.access_token],
+        ([url, token]) => axiosGetWithToken(url, token))
+    
+    const event = initialEvent || eventData?.event;
     const id = event?.id || null;
     const name = event?.name || '';
     const initialCustomFrontend = event?.custom_frontend;
@@ -107,6 +117,19 @@ const EditEventPage = (props: ResponseData) => {
         return Promise.all(promises);
     }
 
+    useEffect(() => {
+        if (eventError || event?.event_type !== 'hypno_pro') {
+            router.push('/404');
+        }
+    }, [eventError, event])
+
+    if (!event && isValidatingEventData) {
+        return (
+            <div className='flex min-h-screen flex-col items-center justify-center'>
+                <span className="loading loading-ring loading-lg sm:w-[200px] text-primary"></span>
+            </div>
+        )
+    }
     return (
         <>
             <Head>
@@ -152,34 +175,36 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     // }
 
     // Fetch event config
-    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}?include_overlays=true&include_ipad_screens=true`;
+    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}?include_overlays=true&include_ipad_screens=true`;
     const token = accessToken;
     let data: any = {};
-    await axios.get(url, {
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + token,
-        },
-    }).then(async (res) => {
-        if (res.status === 200) {
-            data = await res.data;
-            const orgUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${res.data.event.client_id}`;
-            const orgRes = await axios.get(orgUrl, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: 'Bearer ' + token,
-                },
-            });
-            data.event = {
-                ...data.event,
-                organization: orgRes.data.organization
+    if (token && eventId) {
+        await axios.get(url, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
+            },
+        }).then(async (res) => {
+            if (res.status === 200) {
+                data = await res.data;
+                const orgUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${res.data.event.client_id}`;
+                const orgRes = await axios.get(orgUrl, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: 'Bearer ' + token,
+                    },
+                });
+                data.event = {
+                    ...data.event,
+                    organization: orgRes.data.organization
+                }
             }
-        }
-    }).catch((e) => {
-        console.log(e);
-    })
+        }).catch((e) => {
+            console.log(e);
+        })
+    }
 
-    if (_.isEmpty(data) || data.event.event_type !== 'hypno_pro') {
+    if ((_.isEmpty(data) || data?.event?.event_type !== 'hypno_pro') && token && eventId) {
         return {
             notFound: true,
         }

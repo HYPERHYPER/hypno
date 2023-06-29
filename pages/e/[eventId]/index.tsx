@@ -17,7 +17,7 @@ import Save from 'assets/icons/save.svg'
 import Play from 'assets/icons/play.svg'
 import { getPlaiceholder } from 'plaiceholder';
 import useSWRInfinite from 'swr/infinite';
-import { fetchWithToken } from '@/lib/fetchWithToken';
+import { axiosGetWithToken, fetchWithToken } from '@/lib/fetchWithToken';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { LoadingGrid } from '@/components/Gallery/LoadingAsset';
 import { useRouter } from 'next/router';
@@ -25,9 +25,10 @@ import ScanQRModal from '@/components/Events/ScanQRModal';
 import Modal from '@/components/Modal';
 import useAssetManager from '@/hooks/useAssetManager';
 import clsx from 'clsx';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Spinner from '@/components/Spinner';
 import DataDownloadModal from '@/components/Events/DataDownloadModal';
+import useSWR from 'swr';
 
 type PhotosResponse = {
     photos: any;
@@ -84,7 +85,7 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
     return (
         <>
             <div className='group relative rounded-box bg-white/10 w-full aspect-[2/3] overflow-hidden'>
-                <Link href={`/i/${asset.slug}`} className='absolute inset-0 hover:scale-110 transition rounded-box'>
+                <Link href={`/i/${asset.id}`} className='absolute inset-0 hover:scale-110 transition rounded-box'>
                     {asset.posterframe && <Image
                         className='absolute top-0 left-0 w-full h-full rounded-box object-cover transition'
                         src={asset.posterframe}
@@ -94,7 +95,7 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
                         blurDataURL={asset.blurDataURL || undefined}
                         sizes="(min-width: 1280px) 20%, (min-width: 1024px) 25%, (min-width: 768px) 33.33%, 50vw"
                         onLoadingComplete={() => setIsLoaded(true)}
-                        />
+                    />
                     }
                     {asset.gif &&
                         <div
@@ -103,16 +104,16 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
                         />
                     }
                 </Link>
-                
+
                 {!isLoaded && <div className='absolute inset-0 flex items-center justify-center'><Spinner /></div>}
-                
+
                 {archiveModal ? (
                     <div className='transition absolute inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-10'>
                         <div className='bg-black p-4 m-4 rounded-2xl'>
                             <h4 className='mb-3 text-center'>archive asset?</h4>
                             <div className='flex flex-row justify-between gap-2'>
                                 <button className='btn btn-neutral btn-xs rounded-2xl flex-1' onClick={() => setArchiveModal(false)}>cancel</button>
-                                <button className='btn btn-error btn-xs rounded-2xl flex-1' onClick={() => { archiveAsset(); setArchiveModal(false); onSuccess && onSuccess()}}>confirm</button>
+                                <button className='btn btn-error btn-xs rounded-2xl flex-1' onClick={() => { archiveAsset(); setArchiveModal(false); onSuccess && onSuccess() }}>confirm</button>
                             </div>
                         </div>
                     </div>
@@ -133,8 +134,8 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
                                 className='pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity absolute top-0 left-0 w-full h-full z-10 px-2 py-4 rounded-box'>
                                 <div className='pointer-events-auto flex flex-row flex-wrap justify-between text-white gap-0.5 sm:gap-0'>
                                     <button className='cursor-pointer rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md' onClick={() => setArchiveModal(true)}><Trash /></button>
-                                    <button className={clsx('rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md', isHidden && 'bg-white/10 backdrop-blur-md')} onClick={() => {toggleHidden();}}><Hide /></button>
-                                    <button className={clsx('rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md', isFavorited && 'bg-white/10 backdrop-blur-md')} onClick={() => {toggleFavorited();}}>{isFavorited ? <FavoriteFilled /> : <Favorite />}</button>
+                                    <button className={clsx('rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md', isHidden && 'bg-white/10 backdrop-blur-md')} onClick={() => { toggleHidden(); }}><Hide /></button>
+                                    <button className={clsx('rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md', isFavorited && 'bg-white/10 backdrop-blur-md')} onClick={() => { toggleFavorited(); }}>{isFavorited ? <FavoriteFilled /> : <Favorite />}</button>
                                     <a href={asset.download_url} className='cursor-pointer rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md'><Save /></a>
                                     <Link href={`/pro/${asset.event_id}?i=${asset.id}`} className='rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md'><Share /></Link>
                                 </div>
@@ -155,11 +156,19 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
 const isProEvent = (eventType: string) => eventType === 'hypno_pro';
 
 function EventPage(props: ResponseData) {
-    const { query } = useRouter();
-    const { event } = props;
-    const { name, id } = event;
+    const router = useRouter();
+    const { query } = router;
+    const { event: initialEvent } = props;
 
     const token = useUserStore.useToken();
+
+    const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(query.eventId)}`;
+    const { data: eventData, isValidating: isValidatingEventData, error: eventError } = useSWR([eventUrl, token.access_token],
+        ([url, token]) => axiosGetWithToken(url, token))
+
+    const event = initialEvent || eventData?.event;
+    const id = event?.id || '';
+    const name = event?.name || '';
 
     const getKey = (pageIndex: number, previousPageData: any) => {
         if (previousPageData && !previousPageData?.meta.next_page) return null; // reached the end
@@ -170,7 +179,7 @@ function EventPage(props: ResponseData) {
 
     const { data, size, setSize, error, isValidating, mutate } = useSWRInfinite(getKey,
         ([url, token]) => fetchWithToken(url, token), {
-        fallbackData: [{ photos: [], meta: { total_count: 0, next_page: null, per_page: 20}}],
+        fallbackData: [{ photos: [], meta: { total_count: 0, next_page: null, per_page: 20 } }],
         revalidateAll: true,
     });
 
@@ -186,12 +195,25 @@ function EventPage(props: ResponseData) {
             const idxInPage = assetIndexToRemove % 10;
             const updatedPhotos = [...photosToUpdate.slice(0, idxInPage), ...photosToUpdate.slice(idxInPage + 1)];
             let updatedData = data || [];
-            updatedData[0] = {...updatedData[0], meta: {...updatedData[0].meta, total_count: updatedData[0].meta.total_count - 1 }}
+            updatedData[0] = { ...updatedData[0], meta: { ...updatedData[0].meta, total_count: updatedData[0].meta.total_count - 1 } }
             updatedData[assetPage] = { photos: updatedPhotos, meta: updatedData[assetPage].meta };
             mutate(updatedData);
         }
     }, [data]);
 
+    useEffect(() => {
+        if (eventError) {
+            router.push('/404');
+        }
+    }, [eventError])
+
+    if (!event && isValidatingEventData) {
+        return (
+            <div className='flex min-h-screen flex-col items-center justify-center'>
+                <span className="loading loading-ring loading-lg sm:w-[200px] text-primary"></span>
+            </div>
+        )
+    }
     return (
         <>
             <Head>
@@ -223,7 +245,7 @@ function EventPage(props: ResponseData) {
 
                 <ScanQRModal eventId={id} eventName={name} modalId='scan-qr-modal' />
                 <DataDownloadModal modalId='data-download-modal' eventId={id} />
-                
+
                 <GlobalLayout.Content>
                     <div className='divider' />
                     <InfiniteScroll
@@ -254,25 +276,26 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     // Fetch event config
     const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}`;
-    // const token = nookies.get(context).hypno_token;
     const token = context.req.cookies.hypno_token;
 
     let eventData: any = {};
 
-    await axios.get(eventUrl, {
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + token,
-        },
-    }).then(async (res) => {
-        if (res.status === 200) {
-            eventData = await res.data;
-        }
-    }).catch((e) => {
-        console.log(e);
-    })
-
-    if (_.isEmpty(eventData)) {
+    if (token && eventId) {
+        await axios.get(eventUrl, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
+            },
+        }).then(async (res) => {
+            if (res.status === 200) {
+                eventData = await res.data;
+            }
+        }).catch((e) => {
+            console.log(e);
+        })
+    }
+    
+    if (_.isEmpty(eventData) && token && eventId) {
         return {
             notFound: true,
         }
