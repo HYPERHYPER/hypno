@@ -50,6 +50,7 @@ export function FieldSelect({ value, onSelect, resetOnSelect }: { value?: FieldT
             <option value="date">Date</option>
             <option value="email">Email</option>
             <option value="phone">Phone</option>
+            <option value="zip">Zip Code</option>
         </select>
     )
 }
