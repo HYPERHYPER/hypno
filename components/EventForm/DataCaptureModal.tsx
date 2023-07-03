@@ -60,7 +60,7 @@ export default function DataCaptureModal({
     function handleAddField(v: string) {
         if (v) {
             const name = v == 'checkbox' ? 'opt-in' : v;
-            const required = _.includes(v, '-') ? true : false; // always require age validation
+            const required = _.includes(v, '-') && !_.includes(v, 'checkbox') ? true : false; // always require age validation
             add({ required, name, type: v, label: '' })
         }
     }

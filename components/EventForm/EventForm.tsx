@@ -116,7 +116,7 @@ const EventForm = (props: FormData) => {
             data_capture_title: event?.custom_frontend?.data_capture_title || '',
             data_capture_subtitle: event?.custom_frontend?.data_capture_subtitle || '',
             enable_legal: event?.custom_frontend?.enable_legal || false,
-            terms_privacy: event?.custom_frontend?.terms_privacy || DEFAULT_TERMS,
+            terms_privacy: event?.custom_frontend?.terms_privacy || '',
             explicit_opt_in: event?.custom_frontend?.explicit_opt_in || false,
             enable_magic_button: event?.metadata?.magic_button || false,
             magic_button_text: event?.metadata?.magic_button?.text || '',
@@ -456,6 +456,15 @@ const EventForm = (props: FormData) => {
                                 placeholder='enter your info to continue'
                                 disabled={!config.data_capture}
                                 {...register('data_capture_subtitle')} />
+                        </FormControl>
+
+                        <FormControl label='fine print' altLabel='this appears on your web gallery during delivery (optional)' dir='col'>
+                            <h3 className="text-white/40 sm:text-xl">{'format links like <link|https://domain.com>'}</h3>
+                            <input
+                                className='input pro left flex-1 w-full'
+                                placeholder='additional info'
+                                disabled={!config.data_capture}
+                                {...register('terms_privacy')} />
                         </FormControl>
                     </DataCaptureModal>
 
