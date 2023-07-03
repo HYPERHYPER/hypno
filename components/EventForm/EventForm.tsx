@@ -442,30 +442,22 @@ const EventForm = (props: FormData) => {
                     }
 
                     <DataCaptureModal status={status}>
-                        <FormControl label='headline' altLabel='this appears on your web gallery during delivery (optional)' dir='col'>
+                        <FormControl label='headline'>
                             <input
-                                className='input pro left flex-1 w-full'
+                                className='input pro flex-1 w-full'
                                 placeholder='want your content?'
                                 disabled={!config.data_capture}
                                 {...register('data_capture_title')} />
                         </FormControl>
 
-                        <FormControl label='blurb' altLabel='this appears on your web gallery during delivery (optional)' dir='col'>
+                        <FormControl label='blurb'>
                             <input
-                                className='input pro left flex-1 w-full'
+                                className='input pro flex-1 w-full'
                                 placeholder='enter your info to continue'
                                 disabled={!config.data_capture}
                                 {...register('data_capture_subtitle')} />
                         </FormControl>
 
-                        <FormControl label='fine print' altLabel='this appears on your web gallery during delivery (optional)' dir='col'>
-                            <h3 className="text-white/40 sm:text-xl">{'format links like <link|https://domain.com>'}</h3>
-                            <input
-                                className='input pro left flex-1 w-full'
-                                placeholder='additional info'
-                                disabled={!config.data_capture}
-                                {...register('terms_privacy')} />
-                        </FormControl>
                     </DataCaptureModal>
 
                     {/* <Modal title='legal' id='legal-modal' menu={status && AutosaveStatusText(status)}>

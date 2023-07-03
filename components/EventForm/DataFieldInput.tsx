@@ -46,11 +46,11 @@ export function FieldSelect({ value, onSelect, resetOnSelect }: { value?: FieldT
             <option value="birthday-18">Birthday 18+</option>
             <option value="birthday-21">Birthday 21+</option>
             <option value="checkbox">Checkbox</option>
+            <option value="checkbox-pre">Checkbox Selected</option>
             <option value="country">Country</option>
             <option value="date">Date</option>
             <option value="email">Email</option>
             <option value="phone">Phone</option>
-            <option value="checkbox-pre">Pre-checked Checkbox</option>
             <option value="zip">Zip Code</option>
         </select>
     )
