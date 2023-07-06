@@ -118,7 +118,7 @@ const EditEventPage = (props: ResponseData) => {
     }
 
     useEffect(() => {
-        if (eventError || event?.event_type !== 'hypno_pro') {
+        if (eventError || (!_.isNil(event?.event_type) && event?.event_type !== 'hypno_pro')) {
             router.push('/404');
         }
     }, [eventError, event])
