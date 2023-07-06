@@ -22,9 +22,15 @@ export function convertFieldArrayToObject(array: Array<FieldItem>): any {
     const result: any = {};
     _.forEach(array, (item, i) => {
         const { name, ...rest } = item;
-        let id = rest.type == 'checkbox' ? 'opt-in-'+i : `${(name || rest.type).replaceAll(' ', '-')}-${i}`; // unique name
-        let required = _.includes(rest.type, '-') ? true : rest.required; // always require on age validation
-        result[id] = { ...rest, name: name || rest.type, required, index: i };
+        let id = rest.type == 'checkbox' ? 'opt-in-'+i : `${(name || rest.type).replaceAll(' ', '-').toLowerCase()}-${i}`; // unique name
+        let required = _.includes(rest.type, '-') && !_.includes(rest.type, 'checkbox') ? true : rest.required; // always require on age validation
+        result[id] = { 
+            name: name || rest.type, 
+            required, 
+            index: i,
+            label: rest.label, 
+            type: rest.type,
+        };
     })
     return result;
 }

@@ -45,6 +45,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(({ ...rest
             placeholder={rest.placeholder}
             onChange={handleValueChange}
             useRange={false}
+            maxDate={new Date()}
             inputClassName={`input data-capture w-full ${rest.error && 'error text-red-600'}`}
         />
     )

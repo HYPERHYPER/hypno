@@ -227,7 +227,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             },
         });
         eventData = await eventRes.data?.event;
-        console.log(eventData)
+
         // Fetch subset of photos to be displayed in subgallery
         if (category) {
             const photoUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${eventId}/${category}/photos.json`;

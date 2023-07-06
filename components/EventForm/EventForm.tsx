@@ -116,7 +116,7 @@ const EventForm = (props: FormData) => {
             data_capture_title: event?.custom_frontend?.data_capture_title || '',
             data_capture_subtitle: event?.custom_frontend?.data_capture_subtitle || '',
             enable_legal: event?.custom_frontend?.enable_legal || false,
-            terms_privacy: event?.custom_frontend?.terms_privacy || DEFAULT_TERMS,
+            terms_privacy: event?.custom_frontend?.terms_privacy || '',
             explicit_opt_in: event?.custom_frontend?.explicit_opt_in || false,
             enable_magic_button: event?.metadata?.magic_button || false,
             magic_button_text: event?.metadata?.magic_button?.text || '',
@@ -442,21 +442,22 @@ const EventForm = (props: FormData) => {
                     }
 
                     <DataCaptureModal status={status}>
-                        <FormControl label='headline' altLabel='this appears on your web gallery during delivery (optional)' dir='col'>
+                        <FormControl label='headline'>
                             <input
-                                className='input pro left flex-1 w-full'
+                                className='input pro flex-1 w-full'
                                 placeholder='want your content?'
                                 disabled={!config.data_capture}
                                 {...register('data_capture_title')} />
                         </FormControl>
 
-                        <FormControl label='blurb' altLabel='this appears on your web gallery during delivery (optional)' dir='col'>
+                        <FormControl label='blurb'>
                             <input
-                                className='input pro left flex-1 w-full'
+                                className='input pro flex-1 w-full'
                                 placeholder='enter your info to continue'
                                 disabled={!config.data_capture}
                                 {...register('data_capture_subtitle')} />
                         </FormControl>
+
                     </DataCaptureModal>
 
                     {/* <Modal title='legal' id='legal-modal' menu={status && AutosaveStatusText(status)}>

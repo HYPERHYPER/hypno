@@ -24,6 +24,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { useFormContext } from "react-hook-form";
 import { convertFieldArrayToObject } from "@/helpers/event";
 import useDeepCompareEffect from "use-deep-compare-effect";
+import FormControl from "../Form/FormControl";
 
 export default function DataCaptureModal({
     children,
@@ -32,7 +33,7 @@ export default function DataCaptureModal({
     children?: ReactNode,
     status: any,
 }) {
-    const { setValue, watch } = useFormContext();
+    const { setValue, watch, register } = useFormContext();
     const fields = watch().fields;
 
     const { items, add, remove, update, reorder } = useArrayState({ required: false, name: '', type: undefined }, fields)
@@ -60,7 +61,7 @@ export default function DataCaptureModal({
     function handleAddField(v: string) {
         if (v) {
             const name = v == 'checkbox' ? 'opt-in' : v;
-            const required = _.includes(v, '-') ? true : false; // always require age validation
+            const required = _.includes(v, '-') && !_.includes(v, 'checkbox') ? true : false; // always require age validation
             add({ required, name, type: v, label: '' })
         }
     }
@@ -71,18 +72,19 @@ export default function DataCaptureModal({
                 {children}
 
                 {_.map(items, (v, i) => (
-                    <DataFieldInput 
+                    <DataFieldInput
                         key={i}
-                        value={v} 
-                        onChange={(value) => update(i, value)} 
-                        onRemove={() => remove(i)} 
+                        value={v}
+                        onChange={(value) => update(i, value)}
+                        onRemove={() => remove(i)}
                         onReorder={(dir) => {
                             if (i == 0 && dir == 'up') return;
                             if (i == items.length - 1 && dir == 'down') return;
-                            reorder(i, dir == 'up' ? i-1 : i+1);
+                            reorder(i, dir == 'up' ? i - 1 : i + 1);
                         }}
                     />
                 ))}
+
                 {/* <DndContext
                     sensors={sensors}
                     collisionDetection={closestCenter}
@@ -104,6 +106,14 @@ export default function DataCaptureModal({
                 <div className="py-5 flex flex-row justify-between items-center min-h-[60px] border-b-2 border-white/20">
                     <FieldSelect value={undefined} resetOnSelect={true} onSelect={handleAddField} />
                 </div>
+
+                <FormControl label='fine print' dir='col'>
+                    <h3 className="text-white/40 sm:text-xl">{'format links like <link|https://domain.com>'}</h3>
+                    <textarea
+                        className='textarea pro left flex-1 w-full'
+                        placeholder='additional info'
+                        {...register('terms_privacy')} />
+                </FormControl>
             </div>
         </Modal>
     )

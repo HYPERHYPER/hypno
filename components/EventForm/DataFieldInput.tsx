@@ -46,10 +46,12 @@ export function FieldSelect({ value, onSelect, resetOnSelect }: { value?: FieldT
             <option value="birthday-18">Birthday 18+</option>
             <option value="birthday-21">Birthday 21+</option>
             <option value="checkbox">Checkbox</option>
+            <option value="checkbox-pre">Checkbox Selected</option>
             <option value="country">Country</option>
             <option value="date">Date</option>
             <option value="email">Email</option>
             <option value="phone">Phone</option>
+            <option value="zip">Zip Code</option>
         </select>
     )
 }
@@ -71,7 +73,9 @@ export default function DataFieldInput({
     } = value;
 
     const typeSelected = !_.isEmpty(type);
-    const ageValidation = String(type).split("-")[1]
+    const subType = String(type).split("-")[1]
+    const ageValidation = subType != 'pre' ? subType : undefined;
+    const isCheckbox = _.includes(type, 'checkbox');
     const handleChange = (key: string, updatedValue?: boolean | string | FieldType) => {
         onChange && onChange({
             ...value,
@@ -81,7 +85,7 @@ export default function DataFieldInput({
 
     return (
         <div className="py-5 border-b-2 border-white/20 min-h-[60px] w-full">
-            <div className={clsx("flex", type != 'checkbox' ? 'flex-row justify-between items-center' : 'flex-col gap-3')}>
+            <div className={clsx("flex", !isCheckbox ? 'flex-row justify-between items-center' : 'flex-col gap-3')}>
                 <div className="flex flex-row gap-2 items-center">
                     <FieldSelect value={type} onSelect={(value) => handleChange('type', value)} />
                     {typeSelected && !ageValidation && <Required active={required} onClick={() => handleChange('required', !required)} />}
@@ -91,11 +95,11 @@ export default function DataFieldInput({
                         <div onClick={() => onReorder && onReorder('down')} className="cursor-pointer w-6 h-6 flex items-center justify-center hover:text-primary transition"><AngleDown /></div>
                     </div>
                 </div>
-                {type == 'checkbox' && (
+                {isCheckbox && (
                     <h3 className="text-white/40 sm:text-xl">{'format links like <link|https://domain.com>'}</h3>
                 )}
                 {typeSelected &&
-                    type != 'checkbox' ? (
+                    !isCheckbox ? (
                     <input
                         className={clsx('pr-0 input pro w-full')}
                         placeholder={String(type).split("-")[0]}

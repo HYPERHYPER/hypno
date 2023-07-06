@@ -93,7 +93,7 @@ export default function DataCaptureForm({
         const photoSlug = asset.slug;
         let metadata = asset.metadata;
 
-        let formattedData : any = data;
+        let formattedData: any = data;
         // Format the date for keys containing "birthday"
         Object.keys(data).forEach(key => {
             const formattedValue = formatDateForBirthdayKeys(key, data[key] as string);
@@ -136,11 +136,11 @@ export default function DataCaptureForm({
                             if (_.includes(v.type, 'birthday')) {
                                 return <DateInput key={i} value={formData[v.id]} placeholder={!_.isEmpty(errors[v.id]) ? `${_.split(v.name, '-')[0]} is required` : _.split(v.name, '-')[0]} error={!_.isEmpty(errors[v.id])} updateValue={(value) => setValue(v.id, value)} {...register(v.id, { required: v.required, valueAsDate: true, validate: ageValidation(v.type) ? (val) => validateAge(ageValidation(v.type), val) : undefined })} />
                             }
-                            if (v.type == 'checkbox') {
+                            if (_.includes(v.type, 'checkbox')) {
                                 return (
                                     <div key={i} className={clsx('relative flex flex-row gap-4 p-4 bg-black/10 backdrop-blur-[50px]', 'text-left justify-start items-center border-l-2 sm:border-l-4 border-white/20')}>
                                         {v.required && <div className={clsx('absolute top-1 right-2 text-2xl', errors[v.id] ? 'text-red-600' : 'text-white/30')}>*</div>}
-                                        <input type="checkbox" className="checkbox" {...register(v.id, { required: v.required })} />
+                                        <input type="checkbox" className="checkbox" defaultChecked={_.includes(v.type, 'pre')} {...register(v.id, { required: v.required })} />
                                         <p className='text-xs sm:text-lg text-white/50'>
                                             <Balancer>{replaceLinks(v.label || '')}</Balancer>
                                         </p>
@@ -150,25 +150,34 @@ export default function DataCaptureForm({
                             return (
                                 <input
                                     className={`input data-capture ${errors[v.id] && 'error text-red-600'}`}
-                                    placeholder={`${v.name}${errors[v.id] ? (errors[v.id]?.type === 'pattern' ? ' is not valid' : ' is required') : ''}`}
+                                    placeholder={`${v.name}${errors[v.id] ? ((errors[v.id]?.type === 'pattern' || errors[v.id]?.type === 'minLength' || errors[v.id]?.type === 'maxLength') ? ' is not valid' : ' is required') : ''}`}
                                     key={i}
                                     {...register(v.id, {
                                         required: v.required,
                                         ...(v.type == 'email' && { pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/ }),
                                         ...(v.type == 'age' && { pattern: /^[0-9]*$/ }),
-                                        ...(v.type == 'phone' && { pattern: /^[0-9]*$/ })
+                                        ...(v.type == 'phone' && { pattern: /^[0-9]*$/ }),
+                                        ...(v.type == 'zip' && { pattern: /^[0-9]*$/, minLength: 5, maxLength: 5 })
                                     })}
                                 />
                             )
                         })}
-                        {enable_legal && (
+                        {!_.isEmpty(terms_privacy) && (
+                            <div className={clsx('flex flex-row gap-4 p-4 items-start justify-center')}>
+                                <p className='text-xs sm:text-lg text-white'>
+                                    <Balancer>{replaceLinks(terms_privacy || '')}</Balancer>
+                                </p>
+                            </div>
+                        )}
+
+                        {/* {enable_legal && (
                             <div className={clsx('flex flex-row gap-4 p-4 bg-black/10 backdrop-blur-[50px]', explicit_opt_in ? 'text-left justify-start items-center border-l-2 sm:border-l-4 border-white/20' : 'items-start justify-center')}>
                                 {explicit_opt_in && <input type="checkbox" className="checkbox" ref={acceptTermsRef} />}
                                 <p className='text-xs sm:text-lg text-white/50'>
                                     <Balancer>{replaceLinks(terms_privacy || '')}</Balancer>
                                 </p>
                             </div>
-                        )}
+                        )} */}
                         <input className='btn btn-primary btn-gallery locked sm:block' type='submit' value='continue →' style={color ? { backgroundColor: color, borderColor: color, color: toTextColor(color) } : {}} />
                     </form>
                 </div>
