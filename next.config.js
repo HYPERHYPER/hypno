@@ -95,6 +95,11 @@ const nextConfig = {
           destination: process.env.NEXT_PUBLIC_CANON_URL,
           basePath: false,
         },
+        {
+          source: '/air',
+          destination: process.env.NEXT_PUBLIC_AIR_URL,
+          basePath: false,
+        },
       ]
     }
   }
