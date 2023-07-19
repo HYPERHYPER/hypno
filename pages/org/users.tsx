@@ -10,8 +10,12 @@ import { GetServerSideProps } from 'next';
 import nookies from 'nookies';
 import axios from 'axios';
 import useSWRInfinite from 'swr/infinite';
-import { fetchWithToken } from '@/lib/fetchWithToken';
+import { axiosGetWithToken, fetchWithToken } from '@/lib/fetchWithToken';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useContext, useEffect } from 'react';
+import { getEventPrivileges, getOrganizationPrivileges } from '@/helpers/user-privilege';
+import { PrivilegeContext, PrivilegeProvider } from '@/components/PrivilegeContext/PrivilegeContext';
+import useSWR from 'swr';
 
 type OrgUser = {
     username?: string;
@@ -42,6 +46,10 @@ function OrganizationUsersPage(props: ResponseData) {
 
     const token = useUserStore.useToken();
 
+    const orgUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${org_id}`;
+    const { data: orgData, isValidating: isValidatingOrgData, error: orgError } = useSWR([orgUrl, token.access_token],
+        ([url, token]) => axiosGetWithToken(url, token))
+
     const getKey = (pageIndex: number, previousPageData: any) => {
         if (previousPageData && pageIndex == previousPageData.pages) return null; // reached the end
         const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/users?per_page=${meta.per_page}`;
@@ -56,6 +64,9 @@ function OrganizationUsersPage(props: ResponseData) {
     });
 
     const paginatedUsers = _.map(data, (v) => v.users).flat();
+
+    const userOrgPrivileges = orgData ? getOrganizationPrivileges(orgData.organization.user_privileges) : null;
+
     return (
         <>
             <Head>
@@ -64,30 +75,34 @@ function OrganizationUsersPage(props: ResponseData) {
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <GlobalLayout>
-                <GlobalLayout.Header
-                    title='users'
-                    returnLink={{ slug: '/org', name: 'organization' }}
-                >
-                    <h2>{meta?.total_count || 0} users</h2>
-                    <Modal.Trigger id='new-user-modal'><h2 className='text-primary cursor-pointer'>new user</h2></Modal.Trigger>
-                </GlobalLayout.Header>
-
-                <NewUserModal />
-
-                <GlobalLayout.Content>
-                    <InfiniteScroll
-                        next={() => setSize(_.last(data).meta.next_page)}
-                        hasMore={size != (_.first(data)?.meta?.total_pages || 0)}
-                        dataLength={paginatedUsers?.length}
-                        loader={<></>}
+            <PrivilegeProvider privileges={userOrgPrivileges}>
+                <GlobalLayout>
+                    <GlobalLayout.Header
+                        title='users'
+                        returnLink={{ slug: '/org', name: 'organization' }}
                     >
-                        <div className='list pro'>
-                            {_.map(paginatedUsers, (u, i) => <Item key={i} user={u} orgId={org_id} />)}
-                        </div>
-                    </InfiniteScroll>
-                </GlobalLayout.Content>
-            </GlobalLayout>
+                        <h2>{meta?.total_count || 0} users</h2>
+                        {(userOrgPrivileges?.canInviteMember || userOrgPrivileges?.canInviteAdmin) && <Modal.Trigger id='new-user-modal'><h2 className='text-primary cursor-pointer'>new user</h2></Modal.Trigger>}
+                    </GlobalLayout.Header>
+
+                    {(orgData && (userOrgPrivileges?.canInviteMember || userOrgPrivileges?.canInviteAdmin)) && <NewUserModal />}
+
+                    <GlobalLayout.Content>
+                        {userOrgPrivileges?.canViewUsers && (
+                            <InfiniteScroll
+                                next={() => setSize(_.last(data).meta.next_page)}
+                                hasMore={size != (_.first(data)?.meta?.total_pages || 0)}
+                                dataLength={paginatedUsers?.length}
+                                loader={<></>}
+                            >
+                                <div className='list pro'>
+                                    {_.map(paginatedUsers, (u, i) => <Item key={i} user={u} orgId={org_id} />)}
+                                </div>
+                            </InfiniteScroll>
+                        )}
+                    </GlobalLayout.Content>
+                </GlobalLayout>
+            </PrivilegeProvider>
         </>
     )
 }

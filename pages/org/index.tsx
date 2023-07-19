@@ -12,6 +12,9 @@ import nookies from 'nookies';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AutosaveStatusText, SaveStatus } from '@/components/Form/AutosaveStatusText';
+import { axiosGetWithToken } from '@/lib/fetchWithToken';
+import useSWR from 'swr';
+import { getOrganizationPrivileges } from '@/helpers/user-privilege';
 
 interface ResponseData {
     user_count: number;
@@ -22,7 +25,12 @@ function OrganizationSettingsPage(props: ResponseData) {
     const user = useUserStore.useUser();
     const updateUser = useUserStore.useUpdateUser();
     const token = useUserStore.useToken();
-    const { organization } = user;
+
+    const orgUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${user.organization.id}`;
+    const { data: orgData, isValidating: isValidatingOrgData, error: orgError } = useSWR([orgUrl, token.access_token],
+        ([url, token]) => axiosGetWithToken(url, token))
+
+    const organization = orgData?.organization || user.organization;
 
     const [saveStatus, setSaveStatus] = useState<SaveStatus>('ready');
     const {
@@ -88,6 +96,7 @@ function OrganizationSettingsPage(props: ResponseData) {
         }
     }, [isDirty]);
 
+    const userOrgPrivileges = orgData ? getOrganizationPrivileges(orgData.organization.user_privileges) : null;
 
     return (
         <>
@@ -106,25 +115,29 @@ function OrganizationSettingsPage(props: ResponseData) {
                 </GlobalLayout.Header>
                 <GlobalLayout.Content>
                     <div className='list pro'>
-                        <Modal.Trigger id='org-name-modal'><Item name='org name' value={organization.name} /></Modal.Trigger>
+                        {userOrgPrivileges?.canEditOrganization ? (
+                            <Modal.Trigger id='org-name-modal'><Item name='org name' value={organization.name} /></Modal.Trigger>
+                        ) : (
+                            <Item name='org name' value={organization.name} />
+                        )}
                         {/* <Item name='org events' value={'#'} /> */}
-                        <Item name='org users' value={String(props.user_count || 0)} href='/org/users' />
+                        {userOrgPrivileges?.canViewUsers && <Item name='org users' value={String(props.user_count || 0)} href='/org/users' />}
                         {/* <Item name='next payment' value={user.organization_id} /> */}
                         {/* <Item name='payment method' value={'update'} /> */}
                         {/* <Item name='subscription' value={'enterprise'} /> */}
                     </div>
                 </GlobalLayout.Content>
 
-                <Modal 
-                    id='org-name-modal' 
-                    title='edit org name' 
+                <Modal
+                    id='org-name-modal'
+                    title='edit org name'
                     menu={AutosaveStatusText(saveStatus)}
-                    >
+                >
                     <div className='list pro'>
                         <FormControl label='name'>
-                            <input 
+                            <input
                                 {...register('name', { required: true })}
-                                className='flex-1 input pro lowercase' 
+                                className='flex-1 input pro lowercase'
                             />
                         </FormControl>
                     </div>

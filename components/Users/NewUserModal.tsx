@@ -3,10 +3,11 @@ import FormControl from "../Form/FormControl";
 import Modal from "../Modal";
 import _ from 'lodash';
 import clsx from "clsx";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { SaveStatus } from "../Form/AutosaveStatusText";
 import axios from "axios";
 import useUserStore from "@/store/userStore";
+import { PrivilegeContext } from "../PrivilegeContext/PrivilegeContext";
 
 const userRoles = [
     { name: 'member', id: 3 },
@@ -14,6 +15,8 @@ const userRoles = [
 ];
 
 export default function NewUserModal() {
+    const { userPrivileges } = useContext(PrivilegeContext);
+
     const user = useUserStore.useUser();
     const token = useUserStore.useToken();
 
@@ -95,9 +98,11 @@ export default function NewUserModal() {
                     </FormControl>
                     <FormControl label='role'>
                         <div className='flex gap-3 text-xl sm:text-4xl'>
-                            {_.map(userRoles, (u, i) => (
-                                <span key={i} onClick={() => setValue('role', u.id)} className={clsx('cursor-pointer transition', u.id == inviteData.role ? 'text-primary' : 'text-primary/40')}>{u.name}</span>
-                            ))}
+                            {_.map(userRoles, (u, i) => {
+                                if ((!userPrivileges?.canInviteAdmin && u.id == 2) || (!userPrivileges?.canInviteMember && u.id == 3)) return null;
+                                return (
+                                    <span key={i} onClick={() => setValue('role', u.id)} className={clsx('cursor-pointer transition', u.id == inviteData.role ? 'text-primary' : 'text-primary/40')}>{u.name}</span>
+                            )})}
                         </div>
                     </FormControl>
                 </div>
