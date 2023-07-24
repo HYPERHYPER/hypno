@@ -25,10 +25,12 @@ import ScanQRModal from '@/components/Events/ScanQRModal';
 import Modal from '@/components/Modal';
 import useAssetManager from '@/hooks/useAssetManager';
 import clsx from 'clsx';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import Spinner from '@/components/Spinner';
 import DataDownloadModal from '@/components/Events/DataDownloadModal';
 import useSWR from 'swr';
+import { PrivilegeContext, PrivilegeProvider } from '@/components/PrivilegeContext/PrivilegeContext';
+import { getEventPrivileges } from '@/helpers/user-privilege';
 
 type PhotosResponse = {
     photos: any;
@@ -79,6 +81,8 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
         toggleHidden,
     } = useAssetManager(asset);
 
+    const { userPrivileges } = useContext(PrivilegeContext);
+
     const [archiveModal, setArchiveModal] = useState<boolean>(false);
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
@@ -120,7 +124,7 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
                 )
                     : (
                         <>
-                            {(isHidden || isFavorited) &&
+                            {((userPrivileges?.canModeratePhoto && isHidden) || (userPrivileges?.canLikePhoto && isFavorited)) &&
                                 <div className='group-hover:opacity-0 transition absolute inset-0 bg-black/30 pointer-events-none flex items-center justify-center'>
                                     <span className='scale-[1.75] flex flex-row'>
                                         {isHidden && <Hide />}
@@ -133,9 +137,9 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
                                 style={{ background: '-webkit-linear-gradient(top, rgba(0,0,0,0.65), rgba(0,0,0,0))' }}
                                 className='pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity absolute top-0 left-0 w-full h-full z-10 px-2 py-4 rounded-box'>
                                 <div className='pointer-events-auto flex flex-row flex-wrap justify-between text-white gap-0.5 sm:gap-0'>
-                                    <button className='cursor-pointer rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md' onClick={() => setArchiveModal(true)}><Trash /></button>
-                                    <button className={clsx('rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md', isHidden && 'bg-white/10 backdrop-blur-md')} onClick={() => { toggleHidden(); }}><Hide /></button>
-                                    <button className={clsx('rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md', isFavorited && 'bg-white/10 backdrop-blur-md')} onClick={() => { toggleFavorited(); }}>{isFavorited ? <FavoriteFilled /> : <Favorite />}</button>
+                                    {userPrivileges?.canArchivePhoto && <button className='cursor-pointer rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md' onClick={() => setArchiveModal(true)}><Trash /></button> }
+                                    {userPrivileges?.canModeratePhoto && <button className={clsx('rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md', isHidden && 'bg-white/10 backdrop-blur-md')} onClick={() => { toggleHidden(); }}><Hide /></button> }
+                                    {userPrivileges?.canLikePhoto && <button className={clsx('rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md', isFavorited && 'bg-white/10 backdrop-blur-md')} onClick={() => { toggleFavorited(); }}>{isFavorited ? <FavoriteFilled /> : <Favorite />}</button>}
                                     <a href={asset.download_url} className='cursor-pointer rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md'><Save /></a>
                                     <Link href={`/pro/${asset.event_id}?i=${asset.id}`} className='rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md'><Share /></Link>
                                 </div>
@@ -205,7 +209,9 @@ function EventPage(props: ResponseData) {
         if (eventError) {
             router.push('/404');
         }
-    }, [eventError])
+    }, [eventError]);
+
+    const userEventPrivileges = event ? getEventPrivileges(event.user_privileges) : null;
 
     if (!event && isValidatingEventData) {
         return (
@@ -222,51 +228,53 @@ function EventPage(props: ResponseData) {
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <GlobalLayout>
-                <GlobalLayout.Header
-                    title={name}
-                    right={
-                        <Modal.Trigger id='scan-qr-modal'>
-                            <div className='avatar placeholder'>
-                                <div className="rounded-xl bg-white text-white w-[120px]">
-                                    <img src={`https://pro.hypno.com/api/v1/events/${id}/short_qr_code.png`} alt='QR Code' />
+            <PrivilegeProvider privileges={userEventPrivileges}>
+                <GlobalLayout>
+                    <GlobalLayout.Header
+                        title={name}
+                        right={
+                            <Modal.Trigger id='scan-qr-modal'>
+                                <div className='avatar placeholder'>
+                                    <div className="rounded-xl bg-white text-white w-[120px]">
+                                        <img src={`https://pro.hypno.com/api/v1/events/${id}/short_qr_code.png`} alt='QR Code' />
+                                    </div>
                                 </div>
-                            </div>
-                        </Modal.Trigger>
-                    }
-                >
-                    <h2>{totalCount} posts</h2>
-                    {/* <Link href={`/pro/${id}/p`}><h2 className='text-primary'>public gallery</h2></Link> */}
-                    {/* <Link href={`/e/${id}`}><h2 className='text-white'>all</h2></Link> */}
-                    {/* <Link href=''><h2 className='text-primary'>favorites</h2></Link> */}
-                    {isProEvent(event.event_type) && <Modal.Trigger id='data-download-modal'><h2 className='text-primary'>data</h2></Modal.Trigger>}
-                    {isProEvent(event.event_type) && <Link href={`/e/${id}/edit`}><h2 className='text-primary'>edit</h2></Link>}
-                </GlobalLayout.Header>
-
-                <ScanQRModal eventId={id} eventName={name} modalId='scan-qr-modal' />
-                <DataDownloadModal modalId='data-download-modal' eventId={id} />
-
-                <GlobalLayout.Content>
-                    <div className='divider' />
-                    <InfiniteScroll
-                        next={() => setSize((prev) => prev + 1)}
-                        hasMore={hasMorePhotos}
-                        dataLength={paginatedPhotos?.length}
-                        loader={<></>}
-                        scrollThreshold={0.45}
+                            </Modal.Trigger>
+                        }
                     >
-                        <div className='grid grid-cols-2 sm:grid-cols-3 gap-5 lg:grid-cols-4 lg:gap-10 xl:grid-cols-5 3xl:grid-cols-6'>
-                            {_.map(paginatedPhotos, (p, i) => {
-                                if (p.slug) {
-                                    return <div key={i}><AdminAsset asset={p} onSuccess={() => onArchive(p.id)} /></div>
+                        <h2>{totalCount} posts</h2>
+                        {/* <Link href={`/pro/${id}/p`}><h2 className='text-primary'>public gallery</h2></Link> */}
+                        {/* <Link href={`/e/${id}`}><h2 className='text-white'>all</h2></Link> */}
+                        {/* <Link href=''><h2 className='text-primary'>favorites</h2></Link> */}
+                        {isProEvent(event.event_type) && userEventPrivileges?.canDownloadData && <Modal.Trigger id='data-download-modal'><h2 className='text-primary'>data</h2></Modal.Trigger>}
+                        {isProEvent(event.event_type) && userEventPrivileges?.canEditEvent && <Link href={`/e/${id}/edit`}><h2 className='text-primary'>edit</h2></Link>}
+                    </GlobalLayout.Header>
+
+                    <ScanQRModal eventId={id} eventName={name} modalId='scan-qr-modal' />
+                    {userEventPrivileges?.canDownloadData && <DataDownloadModal modalId='data-download-modal' eventId={id} />}
+
+                    <GlobalLayout.Content>
+                        <div className='divider' />
+                        <InfiniteScroll
+                            next={() => setSize((prev) => prev + 1)}
+                            hasMore={hasMorePhotos}
+                            dataLength={paginatedPhotos?.length}
+                            loader={<></>}
+                            scrollThreshold={0.45}
+                        >
+                            <div className='grid grid-cols-2 sm:grid-cols-3 gap-5 lg:grid-cols-4 lg:gap-10 xl:grid-cols-5 3xl:grid-cols-6'>
+                                {_.map(paginatedPhotos, (p, i) => {
+                                    if (p.slug) {
+                                        return <div key={i}><AdminAsset asset={p} onSuccess={() => onArchive(p.id)} /></div>
+                                    }
                                 }
-                            }
-                            )}
-                            {(isValidating && hasMorePhotos) && <LoadingGrid count={_.min([_.first(data)?.meta?.per_page || 0, totalCount]) || 0} />}
-                        </div>
-                    </InfiniteScroll>
-                </GlobalLayout.Content>
-            </GlobalLayout>
+                                )}
+                                {(isValidating && hasMorePhotos) && <LoadingGrid count={_.min([_.first(data)?.meta?.per_page || 0, totalCount]) || 0} />}
+                            </div>
+                        </InfiniteScroll>
+                    </GlobalLayout.Content>
+                </GlobalLayout>
+            </PrivilegeProvider>
         </>
     )
 }
@@ -294,7 +302,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
             console.log(e);
         })
     }
-    
+
     if (_.isEmpty(eventData) && token && eventId) {
         return {
             notFound: true,
