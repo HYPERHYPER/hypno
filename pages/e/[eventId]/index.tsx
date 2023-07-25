@@ -31,6 +31,7 @@ import DataDownloadModal from '@/components/Events/DataDownloadModal';
 import useSWR from 'swr';
 import { PrivilegeContext, PrivilegeProvider } from '@/components/PrivilegeContext/PrivilegeContext';
 import { getEventPrivileges } from '@/helpers/user-privilege';
+import ArchiveEventModal from '@/components/Events/ArchiveEventModal';
 
 type PhotosResponse = {
     photos: any;
@@ -248,11 +249,12 @@ function EventPage(props: ResponseData) {
                         {/* <Link href=''><h2 className='text-primary'>favorites</h2></Link> */}
                         {isProEvent(event.event_type) && userEventPrivileges?.canDownloadData && <Modal.Trigger id='data-download-modal'><h2 className='text-primary'>data</h2></Modal.Trigger>}
                         {isProEvent(event.event_type) && userEventPrivileges?.canEditEvent && <Link href={`/e/${id}/edit`}><h2 className='text-primary'>edit</h2></Link>}
+                        {isProEvent(event.event_type) && userEventPrivileges?.canArchiveEvent && <Modal.Trigger id='archive-event-modal'><h2 className='text-primary'>archive</h2></Modal.Trigger>}
                     </GlobalLayout.Header>
 
                     <ScanQRModal eventId={id} eventName={name} modalId='scan-qr-modal' />
                     {userEventPrivileges?.canDownloadData && <DataDownloadModal modalId='data-download-modal' eventId={id} />}
-
+                    {userEventPrivileges?.canArchiveEvent && <ArchiveEventModal modalId='archive-event-modal' eventId={id} />}
                     <GlobalLayout.Content>
                         <div className='divider' />
                         <InfiniteScroll
