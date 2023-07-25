@@ -16,10 +16,9 @@ export default function useAssetManager(asset: any, onUpdateSuccess?: () => void
     const [isHidden, setIsHidden] = useState<boolean>(moderated);
 
     const photoActionUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/photos`
-    
+
     const archiveAsset = useCallback(async () => {
         const url = `${photoActionUrl}/${id}/archive`
-        console.log(url)
         await axios.delete(url, {
             headers: {
                 'Content-Type': 'application/json',
@@ -37,7 +36,7 @@ export default function useAssetManager(asset: any, onUpdateSuccess?: () => void
         await axios.post(url, {}, {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token,
+                Authorization: 'Bearer ' + token.access_token,
             },
         }).then((res) => {
             console.log(res.data);
@@ -52,7 +51,7 @@ export default function useAssetManager(asset: any, onUpdateSuccess?: () => void
         await axios.post(url, {}, {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token,
+                Authorization: 'Bearer ' + token.access_token,
             },
         }).then((res) => {
             console.log(res.data);
