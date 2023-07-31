@@ -32,6 +32,7 @@ import useSWR from 'swr';
 import { PrivilegeContext, PrivilegeProvider } from '@/components/PrivilegeContext/PrivilegeContext';
 import { getEventPrivileges } from '@/helpers/user-privilege';
 import ArchiveEventModal from '@/components/Events/ArchiveEventModal';
+import { downloadPhoto } from '@/helpers/image';
 
 type PhotosResponse = {
     photos: any;
@@ -87,6 +88,10 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
     const [archiveModal, setArchiveModal] = useState<boolean>(false);
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
+    const handlePhotoDownload = () => {
+        downloadPhoto(asset);
+    }
+
     return (
         <>
             <div className='group relative rounded-box bg-white/10 w-full aspect-[2/3] overflow-hidden'>
@@ -102,10 +107,10 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
                         onLoadingComplete={() => setIsLoaded(true)}
                     />
                     }
-                    {asset.gif &&
+                    {asset.gif || asset.mp4_url &&
                         <div
                             className='absolute top-0 left-0 w-full h-full animate-jpeg-strip'
-                            style={{ backgroundImage: `url(${asset.jpeg_url})`, backgroundSize: '100% 500%' }}
+                            style={{ backgroundImage: `url(${asset.urls.jpeg_url})`, backgroundSize: '100% 500%' }}
                         />
                     }
                 </Link>
@@ -125,7 +130,7 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
                 )
                     : (
                         <>
-                            {((userPrivileges?.canModeratePhoto && isHidden) || (userPrivileges?.canLikePhoto && isFavorited)) &&
+                            {((isHidden) || (userPrivileges?.canLikePhoto && isFavorited)) &&
                                 <div className='group-hover:opacity-0 transition absolute inset-0 bg-black/30 pointer-events-none flex items-center justify-center'>
                                     <span className='scale-[1.75] flex flex-row'>
                                         {isHidden && <Hide />}
@@ -141,7 +146,11 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
                                     {userPrivileges?.canArchivePhoto && <button className='cursor-pointer rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md' onClick={() => setArchiveModal(true)}><Trash /></button> }
                                     {userPrivileges?.canModeratePhoto && <button className={clsx('rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md', isHidden && 'bg-white/10 backdrop-blur-md')} onClick={() => { toggleHidden(); }}><Hide /></button> }
                                     {userPrivileges?.canLikePhoto && <button className={clsx('rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md', isFavorited && 'bg-white/10 backdrop-blur-md')} onClick={() => { toggleFavorited(); }}>{isFavorited ? <FavoriteFilled /> : <Favorite />}</button>}
-                                    <a href={asset.download_url} className='cursor-pointer rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md'><Save /></a>
+                                    {asset.mp4_url ?
+                                        <a href={asset.download_url} className='cursor-pointer rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md'><Save /></a>
+                                        :
+                                        <button onClick={handlePhotoDownload} className='cursor-pointer rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md'><Save /></button>
+                                    }
                                     <Link href={`/pro/${asset.event_id}?i=${asset.id}`} className='rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md'><Share /></Link>
                                 </div>
 
