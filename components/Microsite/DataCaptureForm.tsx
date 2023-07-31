@@ -10,6 +10,7 @@ import { toTextColor } from "@/helpers/color";
 import useContentHeight from "@/hooks/useContentHeight";
 import clsx from "clsx";
 import { Balancer } from "react-wrap-balancer";
+import { getCookie } from "cookies-next";
 
 interface DataCaptureFormProps {
     title?: string;
@@ -105,8 +106,8 @@ export default function DataCaptureForm({
             ...formattedData,
         }
 
-        const url = email_delivery ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/deliver/${photoSlug}.json` : `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/${photoSlug}.json`;
-        const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+        const token = String(getCookie('hypno_microsite'));
+        const url = email_delivery ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/deliver/${photoSlug}.json` : `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/photos/${photoSlug}/data_capture`;
         const payload = email_delivery ? { email: data.email } : { metadata };
         let resp = await axios.put(url, payload, {
             headers: {

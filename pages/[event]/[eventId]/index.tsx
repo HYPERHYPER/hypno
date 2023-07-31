@@ -19,37 +19,34 @@ import { EventConfig, EventMicrosite } from '@/types/event';
 import SingleAssetDeliveryConfirmation from '@/components/Microsite/SingleAssetDeliveryConfirmation';
 import DataCaptureForm from '@/components/Microsite/DataCaptureForm';
 import { convertFieldObjectToArray } from '@/helpers/event';
+import { getCookie, setCookie } from 'cookies-next';
 
 type ImageData = {
     id: number;
     event_id: number;
-    event_name: string;
     slug: string;
-    media_slug: string;
-    state: string;
     url: string;
-    jpeg_url: string;
-    jpeg_thumb_url: string;
-    jpeg_3000_thumb_url: string;
     posterframe: string;
     mp4_url: string;
-    gif: string;
     ipad_id: number;
     uploaded: string;
     updated_at: string;
     moderated: boolean;
     captured_at: string;
     format_generation: string; //(actually a number in quotes)
-    grizzly_url: string;
     download_url: string;
-    hi_res_url: string; //not in use
-    raw_asset_url: string;
-    raw_asset_mp4_url: string; // not in use
     metadata: Object; // need to type?
-    export: boolean;
-    export_settings: Object; //need to type
     width: number;
     height: number;
+    urls: {
+        url: string;
+        jpeg_url: string;
+        jpeg_thumb_url: string;
+        jpeg_3000_thumb_url: string;
+        posterframe: string;
+        mp4_url: string;
+        gif: string;
+    }
 };
 
 interface ResponseData {
@@ -71,11 +68,12 @@ const SubGallery = (props: ResponseData) => {
 
     const gallery: EventMicrosite = event.custom_frontend;
     const { query: { category, eventId, event: galleryViewSlug } } = useRouter()
+    const token = String(getCookie('hypno_microsite'));
 
     const [photoUploadPending, setPhotoUploadPending] = useState<boolean>(true); // waiting for first photo to arrive
     const [photoUploadCompleted, setPhotoUploadCompleted] = useState<boolean>(false);
-    const photoUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${eventId}/${category}/photos.json`;
-    const { data, error } = useSWR([photoUrl, process.env.NEXT_PUBLIC_AUTH_TOKEN],
+    const photoUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}/photos/index_from_category?category=${category}`;
+    const { data, error } = useSWR(category ? [photoUrl, token] : null,
         ([url, token]) => axiosGetWithToken(url, token),
         {
             fallbackData: { photos: initialPhotos },
@@ -116,9 +114,8 @@ const SubGallery = (props: ResponseData) => {
             <Head>
                 <title>{event.name + ' | hypno™' || 'hypno™'}</title>
                 <meta name="description" content="" />
-                <meta name="og:image" content={photo ? photo.jpeg_3000_thumb_url : _.first(photos)?.jpeg_3000_thumb_url} />
-                <meta name="og:image:type" content='image/jpeg' />
-                <meta name="og:video" content={photo ? photo.mp4_url : _.first(photos)?.mp4_url} />
+                <meta name="og:image" content={photo ? photo.urls.jpeg_3000_thumb_url : _.first(photos)?.urls.jpeg_3000_thumb_url} />                <meta name="og:image:type" content='image/jpeg' />
+                <meta name="og:video" content={photo ? photo.urls.mp4_url : _.first(photos)?.mp4_url} />
                 <meta name="og:video:type" content='video/mp4' />
             </Head>
 
@@ -167,16 +164,16 @@ const SubGallery = (props: ResponseData) => {
                                                             </div>
                                                             <div className='transition'>
                                                                 <AutosizeImage
-                                                                    src={p.gif ? p.posterframe : p.jpeg_thumb_url}
-                                                                    alt={p.event_name + p.id}
+                                                                    src={p.urls.gif ? p.urls.posterframe : p.urls.jpeg_thumb_url}
+                                                                    alt={`${p.event_id}-${p.id}`}
                                                                     width={p.width}
                                                                     height={p.height}
                                                                     priority={i < 11}
                                                                 />
-                                                                {p.gif &&
+                                                                {p.urls.gif &&
                                                                     <div
                                                                         className='absolute top-0 left-0 w-full h-full animate-jpeg-strip'
-                                                                        style={{ backgroundImage: `url(${p.jpeg_url})`, backgroundSize: '100% 500%' }}
+                                                                        style={{ backgroundImage: `url(${p.urls.jpeg_url})`, backgroundSize: '100% 500%' }}
                                                                     />
                                                                 }
                                                             </div>
@@ -209,57 +206,71 @@ const SubGallery = (props: ResponseData) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+    const { req, res } = context;
     const { event, eventId, category, i: photoSlug, slug: deliverySlug } = context.query;
 
-    // Load theme interface based on event
-    const isDefault = String(event) === 'pro';
-    const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}`;
-    const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
     let eventData: any = {};
     let photosData: any = {};
     let singleAssetData: any = {};
+    let token = '';
 
     try {
+        // Fetch token
+        const tokenUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth/token`;
+        const tokenPayload = {
+            grant_type: "client_credentials",
+            client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+            client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+            scope: "custom_frontend"
+        };
+        const tokenRes = await axios.post(tokenUrl, tokenPayload, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        token = tokenRes.data?.access_token;
+        setCookie('hypno_microsite', token, { req, res });
+
+        // Load custom frontend based on event
+        const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}/custom_frontend`;
         let eventRes = await axios.get(eventUrl, {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: 'Bearer ' + token,
             },
         });
-        eventData = await eventRes.data?.event;
+        eventData = eventRes.data?.event;
 
         // Fetch subset of photos to be displayed in subgallery
         if (category) {
-            const photoUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/events/${eventId}/${category}/photos.json`;
-            await axios.get(photoUrl, {
+            const photosUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}/photos/index_from_category?category=${category}`;
+            let photosRes = await axios.get(photosUrl, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: 'Bearer ' + token,
                 },
-            }).then(async (res) => {
-                photosData = await res.data;
-            });
+            })
+            photosData = photosRes.data;
         }
 
         // Fetch single asset for detail view or for single asset delivery
         if (photoSlug || deliverySlug) {
             let slug = photoSlug || deliverySlug;
-            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/${slug}.json`;
-            await axios.get(url, {
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/photos/${slug}/custom_frontend_show`;
+            const res = await axios.get(url, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: 'Bearer ' + token,
                 },
-            }).then(async (res) => {
-                singleAssetData = res.data;
-                if (photoSlug) {
-                    const placeholder = await getPlaiceholder(res.data.photo.jpeg_url);
-                    singleAssetData = {
-                        ...singleAssetData,
-                        placeholder
-                    }
-                }
             });
+            singleAssetData = res.data;
+            if (photoSlug) {
+                const placeholder = await getPlaiceholder(res.data.photo.urls.url);
+                singleAssetData = {
+                    ...singleAssetData,
+                    placeholder
+                };
+            }
         }
     } catch (e) {
         console.log(e)
@@ -270,11 +281,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
     }
 
-    // if (deliverySlug && !eventData.metadata.email_delivery) {
-    //     return {
-    //         notFound: true
-    //     }
-    // }
     return {
         props: {
             ...photosData,

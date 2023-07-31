@@ -9,6 +9,7 @@ import useContentHeight from "@/hooks/useContentHeight";
 import _ from 'lodash';
 import { toTextColor } from "@/helpers/color";
 import useWidth from "@/hooks/useWidth";
+import { downloadPhoto } from "@/helpers/image";
 
 export default function DetailView({ asset, config, imageProps }: any) {
     // const footer = Boolean(config.aiGeneration?.enabled || asset.mp4_url);
@@ -49,12 +50,20 @@ export default function DetailView({ asset, config, imageProps }: any) {
     // fill width
     // centered
 
+    const downloadButton = ({ mobile }: { mobile: boolean }) => {
+        const className = `btn btn-primary btn-gallery locked ${!mobile ? 'sm:max-w-sm' : ''}`;
+        const style = btnColor ? { backgroundColor: btnColor, borderColor: btnColor, color: toTextColor(btnColor) } : {};
+        const text = 'download ↓'
+        return asset.mp4_url ? <a className={className} href={asset.download_url} style={style}>{text}</a> : <button className={className} onClick={() => downloadPhoto(asset)}>{text}</button>
+    }
+
     return (
         <>
             <div
                 style={{ minHeight: isPortrait ? Math.max(Number(height.split('px')[0]), assetHeight) + 'px' : height }}
                 className={clsx(`inline-flex px-[25px] items-center flex-col mx-auto w-full`, isPortrait && assetHeight > Number(height.split('px')[0]) ? 'justify-between' : 'justify-center pb-[30px]', footer ? 'mb-[72px]' : '')}>
-                {/* className={clsx(`max-w-none sm:max-h-[80vh] sm:w-auto sm:flex sm:items-center sm:justify-center sm:mx-auto px-[25px]`, footer ? 'mb-[72px]': 'mb-6')}> */}
+                {/* className={clsx(`
+                max-w-none sm:max-h-[80vh] sm:w-auto sm:flex sm:items-center sm:justify-center sm:mx-auto px-[25px]`, footer ? 'mb-[72px]': 'mb-6')}> */}
                 <div className={clsx(isPortrait && 'md:max-w-lg sm:mb-0', isPortrait && !isVideo && assetHeight > Number(height.split('px')[0]) && "mb-[72px]")}>
                     <div className='relative backdrop-blur-[50px] w-fit'>
                         <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
@@ -73,8 +82,8 @@ export default function DetailView({ asset, config, imageProps }: any) {
                                     onResize={(e) => setAssetHeight(e.target.height)}
                                     priority
                                     fill={!imageProps.width}
-                                    src={asset.url}
-                                    alt={asset.event_name + asset.id}
+                                    src={asset.urls.url}
+                                    alt={`${asset.event_id}-${asset.id}`}
                                     placeholder={imageProps?.blurDataURL ? 'blur' : 'empty'}
                                     style={isPortrait && assetHeight > Number(outerHeight.split('px')[0]) ? { minHeight: height } : {}}
                                     className={isPortrait ? `w-auto h-auto` : `w-full h-auto sm:max-h-[70vh]`} />
@@ -83,7 +92,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                     </div>
 
                     <div className='hidden sm:block sm:mt-3 sm:text-center'>
-                        <a className='btn btn-primary btn-gallery locked sm:max-w-sm' href={asset.download_url} style={btnColor ? { backgroundColor: btnColor, borderColor: btnColor, color: toTextColor(btnColor) } : {}}>download ↓</a>
+                        {downloadButton({ mobile: false })}
                         {(config?.aiGeneration && config.aiGeneration.enabled) && (
                             <label htmlFor="my-modal" className='btn btn-info btn-gallery locked' onClick={handleRemix}>
                                 {isLoadingGeneration ?
@@ -102,7 +111,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
             </div>
 
             <div className='block sm:hidden'>
-                <a className='btn btn-primary btn-gallery locked' href={asset.download_url} style={btnColor ? { backgroundColor: btnColor, borderColor: btnColor, color: toTextColor(btnColor) } : {}}>download ↓</a>
+                {downloadButton({ mobile: true })}
             </div>
 
             <input type="checkbox" id="my-modal" className="modal-toggle" />
@@ -114,7 +123,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                         </div>
 
                         <div className='block'>
-                            <img src={String(output)} alt={asset.event_name + asset.id} className='max-h-[75vh] w-auto sm:min-w-[512px] sm:h-[75vh]' />
+                           {output && <img src={String(output)} alt={`output-${asset.event_id}-${asset.id}`} className='max-h-[75vh] w-auto sm:min-w-[512px] sm:h-[75vh]' />}
                         </div>
                     </div>
                 </label>
