@@ -54,7 +54,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
         const className = `btn btn-primary btn-gallery locked ${!mobile ? 'sm:max-w-sm' : ''}`;
         const style = btnColor ? { backgroundColor: btnColor, borderColor: btnColor, color: toTextColor(btnColor) } : {};
         const text = 'download ↓'
-        return asset.mp4_url ? <a className={className} href={asset.download_url} style={style}>{text}</a> : <button className={className} onClick={() => downloadPhoto(asset)}>{text}</button>
+        return asset.mp4_url ? <a className={className} href={asset.download_url} style={style}>{text}</a> : <button style={style} className={className} onClick={() => downloadPhoto(asset)}>{text}</button>
     }
 
     return (
