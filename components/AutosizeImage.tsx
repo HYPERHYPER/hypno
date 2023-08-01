@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import clsx from "clsx";
 
 /**
  * Image component fills container width and maintains aspect ratio height to display full image
@@ -33,9 +34,11 @@ export default function AutosizeImage({
         if (!src) return;
         getBlurDataUrl();
     }, [])
-    
+
+    const isLoaded = paddingTop !== "0";
+
     return (
-        <div className='relative border-0' style={{ paddingTop }}>
+        <div className={clsx('relative border-0 transition-opacity', isLoaded ? 'opacity-100' : 'opacity-0')} style={{ paddingTop }}>
             <Image
                 src={src}
                 fill
