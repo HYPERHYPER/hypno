@@ -97,6 +97,9 @@ const SubGallery = (props: ResponseData) => {
         return { id: f.name.toLowerCase().replaceAll(" ", "_"), ...f }
     });
 
+    const isProEvent = !_.isEmpty(gallery);
+    const showBrowseGalleryBanner = event.is_private == 1 && isProEvent && (isDetailView || (!dataCapture && !gallery.email_delivery));
+
     /* MINI GALLERY ?category= */
     // No photos uploaded: loading view
     // All photos uploaded + data capture required: data capture -> gallery
@@ -119,7 +122,7 @@ const SubGallery = (props: ResponseData) => {
                 <meta name="og:video:type" content='video/mp4' />
             </Head>
 
-            <CustomGallery event={event}>
+            <CustomGallery event={event} galleryBanner={showBrowseGalleryBanner}>
                 {isDetailView ? (
                     <DetailView asset={photo} config={{ aiGeneration: gallery.ai_generation, color: gallery.primary_color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
                 ) : (

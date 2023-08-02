@@ -71,7 +71,9 @@ export const MediaGrid = ({ assets, detailBaseUrl }: { assets: AssetData[]; deta
     return (
         <ResponsiveMasonry columnsCountBreakPoints={assets?.length < 4 ? { 375: 2, 750: 2, 900: 2 } : { 375: 3, 750: 2, 900: 3, 1200: 4 }}>
             <Masonry gutter={'10px'} >
-                {assets.map((p, i) => (
+                {assets.map((p, i) => {
+                    if (!p.posterframe) return null;
+                    return (
                     <Link key={i} href={`${detailBaseUrl}${p.slug}`}>
                         <div className='w-full block relative bg-white/10 backdrop-blur-[50px] overflow-hidden' style={{ aspectRatio: getAspectRatio(p.width, p.height) }} >
                             <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
@@ -95,7 +97,7 @@ export const MediaGrid = ({ assets, detailBaseUrl }: { assets: AssetData[]; deta
                             </div>
                         </div>
                     </Link>
-                ))}
+                )})}
             </Masonry>
         </ResponsiveMasonry>
     )

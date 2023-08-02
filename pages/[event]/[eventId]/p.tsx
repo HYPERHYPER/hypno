@@ -73,7 +73,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     // Fetch event config + event photos
     const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}`;
-    const photosUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}/photos?per_page=10`;
+    const photosUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}/photos?per_page=12`;
     let eventData: any = {};
     let photosData: any = {};
 

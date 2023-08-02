@@ -21,7 +21,7 @@ export type EventConfig = {
     party_slug?: string;
     client_id?: number;
     terms_and_conditions?: string;
-    is_private?: boolean;
+    is_private?: number; // 1 == public, 2 == private
     delivery?: string; // "qr_gallery" to show qr code to microsite, "qr" to disable
     custom_frontend?: EventMicrosite | null;
 }

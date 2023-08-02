@@ -60,8 +60,8 @@ export default function DetailView({ asset, config, imageProps }: any) {
     return (
         <>
             <div
-                style={{ minHeight: isPortrait ? Math.max(Number(height.split('px')[0]), assetHeight) + 'px' : height }}
-                className={clsx(`inline-flex px-[25px] items-center flex-col mx-auto w-full`, isPortrait && assetHeight > Number(height.split('px')[0]) ? 'justify-between' : 'justify-center pb-[30px]', footer ? 'mb-[72px]' : '')}>
+                style={(!isVideo && isPortrait) ? { minHeight: isPortrait ? Math.max(Number(height.split('px')[0]), assetHeight) + 'px' : height } : (!isVideo && Number(width) < 668 ? { minHeight: '55vh' }: {})}
+                className={clsx(`inline-flex px-[25px] items-center flex-col mx-auto w-full`, isPortrait && assetHeight > Number(height.split('px')[0]) ? 'justify-between' : (!isPortrait ? 'justify-center' : 'justify-start pb-[30px]'), footer ? 'mb-[72px]' : '')}>
                 {/* className={clsx(`
                 max-w-none sm:max-h-[80vh] sm:w-auto sm:flex sm:items-center sm:justify-center sm:mx-auto px-[25px]`, footer ? 'mb-[72px]': 'mb-6')}> */}
                 <div className={clsx(isPortrait && 'md:max-w-lg sm:mb-0', isPortrait && !isVideo && assetHeight > Number(height.split('px')[0]) && "mb-[72px]")}>
@@ -71,7 +71,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                         </div>
 
                         {asset.mp4_url ? (
-                            <VideoAsset src={asset.mp4_url} poster={asset.posterframe} style={isPortrait && Number(width) > 668 ? { maxHeight: height } : {}} />
+                            <VideoAsset src={asset.mp4_url} poster={asset.posterframe} style={isPortrait && Number(width) > 668 ? { height: 'auto', minHeight: height } : {}} />
                         ) : (
                             <div className='block'>
                                 <Image
