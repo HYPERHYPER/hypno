@@ -15,6 +15,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
     // const footer = Boolean(config.aiGeneration?.enabled || asset.mp4_url);
     const footer = true; // always show download btn
     const [assetHeight, setAssetHeight] = useState<number>(0);
+    const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
     const { output, generateImgToImg, generateTextInpainting, isLoading: isLoadingGeneration } = useStableDiffusion();
     const handleRemix = async (e: any) => {
@@ -60,22 +61,22 @@ export default function DetailView({ asset, config, imageProps }: any) {
     return (
         <>
             <div
-                style={(!isVideo && isPortrait) ? { minHeight: isPortrait ? Math.max(Number(height.split('px')[0]), assetHeight) + 'px' : height } : (!isVideo && Number(width) < 668 ? { minHeight: '55vh' }: {})}
+                style={(!isVideo && isPortrait) ? { minHeight: isPortrait ? Math.max(Number(height.split('px')[0]), assetHeight) + 'px' : height } : (!isVideo && Number(width) < 668 ? { minHeight: '55vh' } : {})}
                 className={clsx(`inline-flex px-[25px] items-center flex-col mx-auto w-full`, isPortrait && assetHeight > Number(height.split('px')[0]) ? 'justify-between' : (!isPortrait ? 'justify-center' : 'justify-start pb-[30px]'), footer ? 'mb-[72px]' : '')}>
                 {/* className={clsx(`
                 max-w-none sm:max-h-[80vh] sm:w-auto sm:flex sm:items-center sm:justify-center sm:mx-auto px-[25px]`, footer ? 'mb-[72px]': 'mb-6')}> */}
-                <div className={clsx(isPortrait && 'md:max-w-lg sm:mb-0', isPortrait && !isVideo && assetHeight > Number(height.split('px')[0]) && "mb-[72px]")}>
-                    <div className='relative backdrop-blur-[50px] w-fit'>
-                        <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
-                            <Spinner />
-                        </div>
-
+                <div className={clsx('relative', isPortrait && 'md:max-w-lg sm:mb-0', isPortrait && !isVideo && assetHeight > Number(height.split('px')[0]) && "mb-[72px]")}>
+                    <div className='absolute w-full h-full min-h-[100px] min-w-[100px] flex itmes-center justify-center'>
+                        <Spinner />
+                    </div>
+                    <div className={clsx('relative backdrop-blur-[50px] w-fit transition duration-300', isLoaded ? 'opacity-100' : 'opacity-0')}>
                         {asset.mp4_url ? (
                             <VideoAsset src={asset.mp4_url} poster={asset.posterframe} style={isPortrait && Number(width) > 668 ? { height: 'auto', minHeight: height } : {}} />
                         ) : (
                             <div className='block'>
                                 <Image
                                     {...imageProps}
+                                    onLoadingComplete={() => setIsLoaded(true)}
                                     //@ts-ignore
                                     onLoad={(e) => setAssetHeight(e.target.height)}
                                     //@ts-ignore
@@ -123,7 +124,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                         </div>
 
                         <div className='block'>
-                           {output && <img src={String(output)} alt={`output-${asset.event_id}-${asset.id}`} className='max-h-[75vh] w-auto sm:min-w-[512px] sm:h-[75vh]' />}
+                            {output && <img src={String(output)} alt={`output-${asset.event_id}-${asset.id}`} className='max-h-[75vh] w-auto sm:min-w-[512px] sm:h-[75vh]' />}
                         </div>
                     </div>
                 </label>

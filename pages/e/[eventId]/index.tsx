@@ -95,7 +95,7 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
     return (
         <>
             <div className='group relative rounded-box bg-white/10 w-full aspect-[2/3] overflow-hidden'>
-                <Link href={`/i/${asset.id}`} className='absolute inset-0 hover:scale-110 transition rounded-box'>
+                <Link href={`/i/${asset.id}`} className={clsx('absolute inset-0 hover:scale-105 transition rounded-box duration-300', isLoaded ? 'opacity-100' : 'opacity-0')}>
                     {asset.posterframe && <Image
                         className='absolute top-0 left-0 w-full h-full rounded-box object-cover transition'
                         src={asset.posterframe}

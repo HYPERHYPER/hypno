@@ -23,6 +23,7 @@ export default function AutosizeImage({
 }) {
     const [paddingTop, setPaddingTop] = useState<string>("0");
     const [blurDataURL, setBlurDataURL] = useState<string>('');
+    const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
     useEffect(() => {
         const getBlurDataUrl = async () => {
@@ -35,10 +36,9 @@ export default function AutosizeImage({
         getBlurDataUrl();
     }, [])
 
-    const isLoaded = paddingTop !== "0";
 
     return (
-        <div className={clsx('relative border-0 transition-opacity', isLoaded ? 'opacity-100' : 'opacity-0')} style={{ paddingTop }}>
+        <div className={clsx('relative border-0 transition-opacity duration-300', isLoaded ? 'opacity-100' : 'opacity-0')} style={{ paddingTop }}>
             <Image
                 src={src}
                 fill
@@ -47,6 +47,7 @@ export default function AutosizeImage({
                 alt={alt}
                 onLoadingComplete={({ naturalWidth, naturalHeight }) => {
                     setPaddingTop(`calc(100% / (${naturalWidth} / ${naturalHeight})`);
+                    setIsLoaded(true);
                     onLoadingComplete && onLoadingComplete();
                 }}
                 placeholder={blurDataURL ? 'blur' : 'empty'}
