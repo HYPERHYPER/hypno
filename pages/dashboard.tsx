@@ -72,6 +72,7 @@ function DashboardPage(props: ResponseData) {
                                 <li className='disabled'><a>sort by</a></li>
                                 <li><Link href={`/dashboard?by=created_at&order=${sort_order}`}>created at</Link></li>
                                 <li><Link href={`/dashboard?by=updated_at&order=${sort_order}`}>updated at</Link></li>
+                                <li><Link href={`/dashboard?by=last_uploaded_at&order=${sort_order}`}>last uploaded at</Link></li>
                                 <li><Link href={`/dashboard?by=name&order=${sort_order}`}>name</Link></li>
                             </ul>
                         </div>
