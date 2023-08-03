@@ -3,11 +3,11 @@ import Spinner from "../Spinner";
 import { ThreeDots } from "react-loader-spinner";
 import Image from 'next/image';
 import useContentHeight from "@/hooks/useContentHeight";
-import { getAspectRatio } from "@/helpers/image";
+import { downloadPhoto, getAspectRatio } from "@/helpers/image";
 import VideoAsset from "./VideoAsset";
 
-export default function DetailView({ asset, config, imageProps }: any) {
-    const footer = Boolean(config.aiGeneration?.enabled || asset.mp4_url);
+export default function CenteredDetailView({ asset, config, imageProps }: any) {
+    // const footer = Boolean(config.aiGeneration?.enabled || asset.mp4_url);
     const height = useContentHeight({ footer: true });
 
     const { output, generateImgToImg, generateTextInpainting, isLoading: isLoadingGeneration } = useStableDiffusion();
@@ -30,12 +30,18 @@ export default function DetailView({ asset, config, imageProps }: any) {
         }
     }
 
-    const aspectRatio = getAspectRatio(asset.metadata.aspect_ratio.split(":")[0], asset.metadata.aspect_ratio.split(":")[1]);
+    const aspectRatio = getAspectRatio(asset.metadata?.aspect_ratio?.split(":")[0], asset.metadata?.aspect_ratio?.split(":")[1]);
+    const downloadButton = ({ mobile }: { mobile: boolean }) => {
+        const className = `btn btn-primary btn-gallery locked ${!mobile ? 'sm:max-w-sm' : ''}`;
+        const text = 'download ↓'
+        return asset.mp4_url ? <a className={className} href={asset.download_url}>{text}</a> : <button className={className} onClick={() => downloadPhoto(asset)}>{text}</button>
+    }
+
     return (
         <>
             <div
                 style={{ height }}
-                className={`absolute top-1/2 left-0 right-0 -translate-y-1/2 sm:mx-auto h-[${height}] px-[25px] md:px-[90px] flex flex-1 flex-col justify-center items-center`}>
+                className={`sm:mt-7 absolute top-1/2 left-0 right-0 -translate-y-1/2 sm:mx-auto h-[${height}] px-[25px] md:px-[90px] flex flex-1 flex-col justify-center items-center`}>
                 <div style={{ aspectRatio }} className='relative backdrop-blur-[50px]'>
                     <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
                         <Spinner />
@@ -49,8 +55,8 @@ export default function DetailView({ asset, config, imageProps }: any) {
                                 {...imageProps}
                                 priority
                                 fill={!imageProps.width}
-                                src={asset.url}
-                                alt={asset.event_name + asset.id}
+                                src={asset.urls.url}
+                                alt={`${asset.event_id}-${asset.id}`}
                                 placeholder={imageProps?.blurDataURL ? 'blur' : 'empty'}
                                 style={{ maxHeight: height }}
                                 className={`max-h-[calc(100vh-22vw-22vw-env(safe-area-inset-bottom))] max-h-[${height}] w-auto`} />
@@ -59,8 +65,8 @@ export default function DetailView({ asset, config, imageProps }: any) {
                 </div>
 
                 <div className='hidden sm:block sm:mt-3'>
-                    {asset.mp4_url && <a className='btn btn-primary btn-gallery locked' href={asset.download_url}>download ↓</a>}
-                    {(!asset.mp4_url && config?.aiGeneration && config.aiGeneration.enabled) && (
+                    {downloadButton({mobile: false})}
+                    {(!asset.mp4_url && config?.aiGeneration && config?.aiGeneration.enabled) && (
                         <label htmlFor="my-modal" className='btn btn-info btn-gallery locked' onClick={handleRemix}>
                             {isLoadingGeneration ?
                                 <ThreeDots
@@ -77,7 +83,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
             </div>
 
             <div className='block sm:hidden'>
-                {asset.mp4_url && <a className='btn btn-primary btn-gallery locked' href={asset.download_url}>download ↓</a>}
+                {downloadButton({mobile: true})}
                 {(!asset.mp4_url && config?.aiGeneration && config.aiGeneration.enabled) && (
                     <label htmlFor="my-modal" className='btn btn-info btn-gallery locked' onClick={handleRemix}>
                         {isLoadingGeneration ?
@@ -102,7 +108,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                         </div>
 
                         <div className='block'>
-                            <img src={String(output)} alt={asset.event_name + asset.id} className='max-h-[75vh] w-auto sm:min-w-[512px] sm:h-[75vh]' />
+                            {output && <img src={String(output)} alt={`output-${asset.event_id}-${asset.id}`} className='max-h-[75vh] w-auto sm:min-w-[512px] sm:h-[75vh]' />}
                         </div>
                     </div>
                 </label>

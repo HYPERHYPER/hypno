@@ -2,12 +2,15 @@ import axios from 'axios';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import _ from 'lodash';
-import Spinner from '@/components/Spinner';
-import GalleryNavBar from '@/components/Gallery/GalleryNavBar';
 import { getPlaiceholder } from 'plaiceholder';
-import { CustomGallery } from '@/components/Gallery/CustomGallery';
 import GlobalLayout from '@/components/GlobalLayout';
 import CenteredDetailView from '@/components/Gallery/CenteredDetailView';
+import useUserStore from '@/store/userStore';
+import { useRouter } from 'next/router';
+import useSWR from 'swr';
+import { axiosGetWithToken } from '@/lib/fetchWithToken';
+import withAuth from '@/components/hoc/withAuth';
+import { useEffect } from 'react';
 
 type ImageData = {
     id: number;
@@ -41,43 +44,36 @@ type ImageData = {
     mp4_url: string;
 };
 
-type EventData = {
-    name: string;
-    fields: string[];
-    gallery_title: string;
-    gallery_subtitle: string;
-    data_capture_title: string;
-    data_capture_subtitle: string;
-    data_capture_screen: boolean;
-    terms: string;
-    privacy: string;
-    logo: string;
-    background: string;
-    color: string;
-    terms_and_conditions: string;
-    email_delivery: boolean;
-    ai_generation: any;
-    metadata: any;
-}
-
 interface ResponseData {
-    status: number;
-    message: string;
     photo: ImageData;
-    event: EventData;
     placeholder: any;
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-const DetailGallery = (props: ResponseData) => {
-    const { photo, event } = props;
+export default withAuth(DetailGallery, 'protected');
+function DetailGallery(props: ResponseData) {
+    const { photo, placeholder } = props;
+    const router = useRouter();
 
-    const galleryTitle = photo?.event_name;
-    const aiGeneration = props.event.metadata?.ai_generation || null;
-    const { base64, img } = props.placeholder;
+    const token = useUserStore.useToken();
+
+    const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(photo.event_id)}`;
+    const { data: eventData, isValidating: isValidatingEventData, error: eventError } = useSWR([eventUrl, token.access_token],
+        ([url, token]) => axiosGetWithToken(url, token));
+    useEffect(() => {
+        // Block page if don't have access to view event
+        if (eventError) {
+            router.push('/404');
+        }
+    }, [eventError]);
+
+    const galleryTitle = eventData?.event?.name || '';
+    const aiGeneration = eventData?.event?.metadata?.ai_generation || null;
+    const { base64, img } = placeholder;
     const imageProps = {
-        ...img,
+        width: img.width,
+        height: img.height,
         blurDataURL: base64,
     }
 
@@ -127,9 +123,9 @@ const DetailGallery = (props: ResponseData) => {
     return (
         <>
             <Head>
-                <title>{galleryTitle + ' | hypno™' || 'hypno™'}</title>
+                <title>{galleryTitle ? `${galleryTitle} | hypno™` : 'hypno™'}</title>
                 <meta name="description" content="Taken with HYPNO: The animated, social photo booth" />
-                <meta name="og:image" content={photo.jpeg_3000_thumb_url || photo.posterframe} />
+                <meta name="og:image" content={photo.posterframe} />
                 <meta name="og:image:type" content='image/jpeg' />
                 <meta name="og:video" content={photo.mp4_url} />
                 <meta name="og:video:type" content='video/mp4' />
@@ -137,56 +133,68 @@ const DetailGallery = (props: ResponseData) => {
 
             <GlobalLayout>
                 <GlobalLayout.Content>
-                    <CenteredDetailView asset={photo} config={{ aiGeneration }} imageProps={imageProps} />
+                    <CenteredDetailView
+                        asset={photo}
+                        config={{ aiGeneration }} 
+                        imageProps={imageProps} />
                 </GlobalLayout.Content>
             </GlobalLayout>
-
-            {/* <CustomGallery event={event}>
-                <DetailView asset={photo} config={{ aiGeneration }} imageProps={imageProps} />
-            </CustomGallery> */}
         </>
     );
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const { photoSlug } = context.query;
-    // Request to get photo for detail view
-    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/${photoSlug}.json`;
-    const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-    let eventData = {};
+    if (_.isNil(String(photoSlug))) { return { notFound: true } }
+
     let photoData = {};
-    let placeholder = {};
-    let resp = await axios.get(url, {
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + token,
-        },
-    }).then(async (res) => {
-        photoData = res.data;
-        const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${res.data.photo.event_id}`;
-        let eventRes = await axios.get(eventUrl, {
+
+    try {
+        // Fetch token
+        const tokenUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/oauth/token`;
+        const tokenPayload = {
+            grant_type: "client_credentials",
+            client_id: process.env.NEXT_PUBLIC_CLIENT_ID,
+            client_secret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
+            scope: "custom_frontend"
+        };
+        const tokenRes = await axios.post(tokenUrl, tokenPayload, {
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token,
-            },
+            }
         });
-        eventData = await eventRes.data?.event;
+        let token = tokenRes.data?.access_token;
 
-        placeholder = await getPlaiceholder(res.data.photo.jpeg_url);
-    })
+        // Fetch asset for detail view
+        if (photoSlug) {
+            const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/photos/${photoSlug}/custom_frontend_show`;
+            const res = await axios.get(url, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + token,
+                },
+            });
+            photoData = res.data;
+            if (photoSlug) {
+                const placeholder = await getPlaiceholder(res.data.photo.urls.url);
+                photoData = {
+                    ...photoData,
+                    placeholder
+                };
+            }
+        }
+    } catch (e) {
+        console.log(e)
+        if (_.isEmpty(photoData)) {
+            return {
+                notFound: true
+            }
+        }
+    }
 
-    if (_.isEmpty(photoData)) { return { notFound: true }}
     return {
         props: {
             ...photoData,
-            event: {
-                ...eventData,
-                //@ts-ignore
-                ...eventData.metadata,
-            },
-            placeholder: placeholder,
         }
     }
 };
-
-export default DetailGallery;

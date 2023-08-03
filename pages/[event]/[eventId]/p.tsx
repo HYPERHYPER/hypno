@@ -30,7 +30,7 @@ const PublicGallery = (props: ResponseData) => {
     const { name, id } = event;
 
     const getKey = (pageIndex: number, previousPageData: any) => {
-        if (previousPageData && !previousPageData?.meta.next_page) return null; // reached the end
+        if ((_.isNil(previousPageData) && pageIndex > 0) || (previousPageData && !previousPageData?.meta.next_page)) return null; // reached the end
         const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${query.eventId}/photos?per_page=${photos.meta.per_page}`;
         if (pageIndex === 0) return [url, process.env.NEXT_PUBLIC_AUTH_TOKEN];
         return [`${previousPageData.meta.next_page}`, process.env.NEXT_PUBLIC_AUTH_TOKEN];
@@ -42,7 +42,7 @@ const PublicGallery = (props: ResponseData) => {
     });
 
     const paginatedPhotos = !_.isEmpty(_.first(data)?.photos) ? _.map(data, (v) => v.photos).flat() : [];
-    const hasMorePhotos = photos?.meta.total_count != paginatedPhotos?.length;
+    const hasMorePhotos = size != (_.first(data)?.meta?.total_pages || 0);
 
     if (!paginatedPhotos) return <div></div>
     return (
@@ -53,7 +53,7 @@ const PublicGallery = (props: ResponseData) => {
             </Head>
 
             <CustomGallery event={event}>
-                <section className={`text-white min-h-screen mt-8`}>
+                <section className={`text-white mt-3 sm:mt-8 mb-[35px] lg:px-[90px]`}>
                     <InfiniteMediaGrid
                         next={() => setSize(size + 1)}
                         assets={paginatedPhotos}
@@ -73,7 +73,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     // Fetch event config + event photos
     const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}`;
-    const photosUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}/photos`;
+    const photosUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}/photos?per_page=12`;
     let eventData: any = {};
     let photosData: any = {};
 
@@ -119,8 +119,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
     }
 
+    // Event is not public if is_private !== 1
     // @ts-ignore
-    if (eventData.is_private) {
+    if (eventData.event.is_private != 1) {
         return { notFound: true, }
     }
 

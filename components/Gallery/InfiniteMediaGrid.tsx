@@ -34,6 +34,14 @@ type AssetData = {
     export_settings: Object; //need to type
     width: number;
     height: number;
+    mp4_url: string;
+    urls: {
+        jpeg_url: string;
+        jpeg_thumb_url: string;
+        jpeg_3000_thumb_url: string;
+        posterframe: string;
+        gif: string;
+    }
 };
 
 interface InfiniteMediaGridProps {
@@ -49,9 +57,10 @@ export default function InfiniteMediaGrid({ next, data, assets, hasMore, detailB
             next={next}
             hasMore={hasMore}
             loader={<></>}
-            scrollThreshold={0.45}            
+            scrollThreshold={0.45}
             endMessage={<div></div>}
             dataLength={assets?.length}
+            scrollableTarget='custom-gallery-parent'
         >
             <MediaGrid assets={assets} detailBaseUrl={detailBaseUrl} />
         </InfiniteScroll>
@@ -60,36 +69,36 @@ export default function InfiniteMediaGrid({ next, data, assets, hasMore, detailB
 
 export const MediaGrid = ({ assets, detailBaseUrl }: { assets: AssetData[]; detailBaseUrl: string; }) => {
     return (
-        <div className={`sm:mx-auto block h-full mb-[35px] xl:px-[90px]`}>
-            <ResponsiveMasonry columnsCountBreakPoints={{ 375: 3, 750: 2, 900: 3, 1200: 4 }}>
-                <Masonry gutter={'10px'} >
-                    {assets.map((p, i) => (
-                        <Link key={i} href={`${detailBaseUrl}${p.slug}`}>
-                            <div className='w-full block relative bg-white/10 backdrop-blur-[50px] overflow-hidden' style={{ aspectRatio: getAspectRatio(p.width, p.height) }} >
-                                <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
-                                    <Spinner />
-                                </div>
-                                <div className='hover:scale-110 transition'>
-                                    <AutosizeImage
-                                        src={p.posterframe}
-                                        alt={`${p.event_id}-${p.id}`}
-                                        width={p.width}
-                                        height={p.height}
-                                        priority={i < 11}
-                                        sizes="(max-width: 600px) 100vw, 50vw"
-                                    />
-                                    {p.gif &&
-                                        <div
-                                            className='absolute top-0 left-0 w-full h-full animate-jpeg-strip'
-                                            style={{ backgroundImage: `url(${p.jpeg_url})`, backgroundSize: '100% 500%' }}
-                                        />
-                                    }
-                                </div>
+        <ResponsiveMasonry columnsCountBreakPoints={assets?.length < 4 ? { 375: 2, 750: 2, 900: 2 } : { 375: 3, 750: 2, 900: 3, 1200: 4 }}>
+            <Masonry gutter={'10px'} >
+                {assets.map((p, i) => {
+                    if (!p.posterframe) return null;
+                    return (
+                    <Link key={i} href={`${detailBaseUrl}${p.slug}`}>
+                        <div className='w-full block relative bg-white/10 backdrop-blur-[50px] overflow-hidden' style={{ aspectRatio: getAspectRatio(p.width, p.height) }} >
+                            <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
+                                <Spinner />
                             </div>
-                        </Link>
-                    ))}
-                </Masonry>
-            </ResponsiveMasonry>
-        </div>
+                            <div className='hover:scale-105 transition'>
+                                <AutosizeImage
+                                    src={p.posterframe}
+                                    alt={`${p.event_id}-${p.id}`}
+                                    width={p.width}
+                                    height={p.height}
+                                    priority={i < 11}
+                                    sizes="(max-width: 600px) 100vw, 50vw"
+                                />
+                                {p.gif || p.mp4_url &&
+                                    <div
+                                        className='absolute top-0 left-0 w-full h-full animate-jpeg-strip'
+                                        style={{ backgroundImage: `url(${p.urls.jpeg_url})`, backgroundSize: '100% 500%' }}
+                                    />
+                                }
+                            </div>
+                        </div>
+                    </Link>
+                )})}
+            </Masonry>
+        </ResponsiveMasonry>
     )
 }

@@ -31,6 +31,8 @@ import DataDownloadModal from '@/components/Events/DataDownloadModal';
 import useSWR from 'swr';
 import { PrivilegeContext, PrivilegeProvider } from '@/components/PrivilegeContext/PrivilegeContext';
 import { getEventPrivileges } from '@/helpers/user-privilege';
+import ArchiveEventModal from '@/components/Events/ArchiveEventModal';
+import { downloadPhoto } from '@/helpers/image';
 
 type PhotosResponse = {
     photos: any;
@@ -86,10 +88,14 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
     const [archiveModal, setArchiveModal] = useState<boolean>(false);
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
+    const handlePhotoDownload = () => {
+        downloadPhoto(asset);
+    }
+
     return (
         <>
             <div className='group relative rounded-box bg-white/10 w-full aspect-[2/3] overflow-hidden'>
-                <Link href={`/i/${asset.id}`} className='absolute inset-0 hover:scale-110 transition rounded-box'>
+                <Link href={`/i/${asset.id}`} className={clsx('absolute inset-0 hover:scale-105 transition rounded-box duration-300', isLoaded ? 'opacity-100' : 'opacity-0')}>
                     {asset.posterframe && <Image
                         className='absolute top-0 left-0 w-full h-full rounded-box object-cover transition'
                         src={asset.posterframe}
@@ -101,10 +107,10 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
                         onLoadingComplete={() => setIsLoaded(true)}
                     />
                     }
-                    {asset.gif &&
+                    {asset.gif || asset.mp4_url &&
                         <div
                             className='absolute top-0 left-0 w-full h-full animate-jpeg-strip'
-                            style={{ backgroundImage: `url(${asset.jpeg_url})`, backgroundSize: '100% 500%' }}
+                            style={{ backgroundImage: `url(${asset.urls.jpeg_url})`, backgroundSize: '100% 500%' }}
                         />
                     }
                 </Link>
@@ -124,7 +130,7 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
                 )
                     : (
                         <>
-                            {((userPrivileges?.canModeratePhoto && isHidden) || (userPrivileges?.canLikePhoto && isFavorited)) &&
+                            {((isHidden) || (userPrivileges?.canLikePhoto && isFavorited)) &&
                                 <div className='group-hover:opacity-0 transition absolute inset-0 bg-black/30 pointer-events-none flex items-center justify-center'>
                                     <span className='scale-[1.75] flex flex-row'>
                                         {isHidden && <Hide />}
@@ -140,7 +146,11 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
                                     {userPrivileges?.canArchivePhoto && <button className='cursor-pointer rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md' onClick={() => setArchiveModal(true)}><Trash /></button> }
                                     {userPrivileges?.canModeratePhoto && <button className={clsx('rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md', isHidden && 'bg-white/10 backdrop-blur-md')} onClick={() => { toggleHidden(); }}><Hide /></button> }
                                     {userPrivileges?.canLikePhoto && <button className={clsx('rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md', isFavorited && 'bg-white/10 backdrop-blur-md')} onClick={() => { toggleFavorited(); }}>{isFavorited ? <FavoriteFilled /> : <Favorite />}</button>}
-                                    <a href={asset.download_url} className='cursor-pointer rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md'><Save /></a>
+                                    {asset.mp4_url ?
+                                        <a href={asset.download_url} className='cursor-pointer rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md'><Save /></a>
+                                        :
+                                        <button onClick={handlePhotoDownload} className='cursor-pointer rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md'><Save /></button>
+                                    }
                                     <Link href={`/pro/${asset.event_id}?i=${asset.id}`} className='rounded-full hover:bg-white/10 transition p-2 hover:backdrop-blur-md'><Share /></Link>
                                 </div>
 
@@ -246,13 +256,15 @@ function EventPage(props: ResponseData) {
                         {/* <Link href={`/pro/${id}/p`}><h2 className='text-primary'>public gallery</h2></Link> */}
                         {/* <Link href={`/e/${id}`}><h2 className='text-white'>all</h2></Link> */}
                         {/* <Link href=''><h2 className='text-primary'>favorites</h2></Link> */}
+                        {isProEvent(event.event_type) && event.is_private == 1 && <Link href={`/pro/${id}/p`}><h2 className='text-primary'>gallery</h2></Link>}
                         {isProEvent(event.event_type) && userEventPrivileges?.canDownloadData && <Modal.Trigger id='data-download-modal'><h2 className='text-primary'>data</h2></Modal.Trigger>}
                         {isProEvent(event.event_type) && userEventPrivileges?.canEditEvent && <Link href={`/e/${id}/edit`}><h2 className='text-primary'>edit</h2></Link>}
+                        {isProEvent(event.event_type) && userEventPrivileges?.canArchiveEvent && <Modal.Trigger id='archive-event-modal'><h2 className='text-primary'>archive</h2></Modal.Trigger>}
                     </GlobalLayout.Header>
 
                     <ScanQRModal eventId={id} eventName={name} modalId='scan-qr-modal' />
                     {userEventPrivileges?.canDownloadData && <DataDownloadModal modalId='data-download-modal' eventId={id} />}
-
+                    {userEventPrivileges?.canArchiveEvent && <ArchiveEventModal modalId='archive-event-modal' eventId={id} />}
                     <GlobalLayout.Content>
                         <div className='divider' />
                         <InfiniteScroll

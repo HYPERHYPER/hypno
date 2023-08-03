@@ -100,6 +100,16 @@ const nextConfig = {
           destination: process.env.NEXT_PUBLIC_AIR_URL,
           basePath: false,
         },
+        {
+          source: '/pricing',
+          destination: process.env.NEXT_PUBLIC_PRICING_URL,
+          basePath: false,
+        },
+        {
+          source: '/eye',
+          destination: process.env.NEXT_PUBLIC_EYE_URL,
+          basePath: false,
+        },
       ]
     }
   }

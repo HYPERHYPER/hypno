@@ -1,4 +1,5 @@
 import _ from "lodash";
+import {saveAs} from "file-saver";
 
 /**
  * It takes a width and height and returns a percentage value that represents the height as a
@@ -63,4 +64,10 @@ export function isValidAspectRatio(imageWidth: number, imageHeight: number, aspe
     const actualAspectRatio = imageWidth / imageHeight;
     const targetAspectRatio = Number(parsedAspectRatio[0]) / Number(parsedAspectRatio[1]);
     return Math.abs(actualAspectRatio - targetAspectRatio) <= tolerance;
+}
+
+export function downloadPhoto(asset: any) {
+    const assetUrl = asset.urls.url;
+    const fileName = `hypno-${asset.event_id}-${asset.id}`;
+    saveAs(assetUrl, fileName);
 }
