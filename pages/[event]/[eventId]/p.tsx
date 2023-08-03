@@ -30,7 +30,7 @@ const PublicGallery = (props: ResponseData) => {
     const { name, id } = event;
 
     const getKey = (pageIndex: number, previousPageData: any) => {
-        if (previousPageData && !previousPageData?.meta.next_page) return null; // reached the end
+        if ((_.isNil(previousPageData) && pageIndex > 0) || (previousPageData && !previousPageData?.meta.next_page)) return null; // reached the end
         const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${query.eventId}/photos?per_page=${photos.meta.per_page}`;
         if (pageIndex === 0) return [url, process.env.NEXT_PUBLIC_AUTH_TOKEN];
         return [`${previousPageData.meta.next_page}`, process.env.NEXT_PUBLIC_AUTH_TOKEN];
