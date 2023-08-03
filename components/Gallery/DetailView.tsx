@@ -17,25 +17,25 @@ export default function DetailView({ asset, config, imageProps }: any) {
     const [assetHeight, setAssetHeight] = useState<number>(0);
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
-    const { output, generateImgToImg, generateTextInpainting, isLoading: isLoadingGeneration } = useStableDiffusion();
-    const handleRemix = async (e: any) => {
-        // e.preventDefault();
-        if (config.aiGeneration) {
-            const buffer = await fetch(`/api/file?url=${asset.url}`)
-                .then((res) => res.json())
-                .then((data) => {
-                    return data.data
-                })
+    // const { output, generateImgToImg, generateTextInpainting, isLoading: isLoadingGeneration } = useStableDiffusion();
+    // const handleRemix = async (e: any) => {
+    //     // e.preventDefault();
+    //     if (config.aiGeneration) {
+    //         const buffer = await fetch(`/api/file?url=${asset.url}`)
+    //             .then((res) => res.json())
+    //             .then((data) => {
+    //                 return data.data
+    //             })
 
-            const { prompt, seed, imageStrength } = config.aiGeneration;
-            switch (config.aiGeneration.type) {
-                case 'img2img': {
-                    generateImgToImg({ imageBuffer: buffer, prompt, seed: seed || undefined, imageStrength });
-                    return;
-                }
-            }
-        }
-    }
+    //         const { prompt, seed, imageStrength } = config.aiGeneration;
+    //         switch (config.aiGeneration.type) {
+    //             case 'img2img': {
+    //                 generateImgToImg({ imageBuffer: buffer, prompt, seed: seed || undefined, imageStrength });
+    //                 return;
+    //             }
+    //         }
+    //     }
+    // }
 
     const isPortrait = asset.height > asset.width;
     const isVideo = !_.isEmpty(asset.mp4_url);
@@ -94,7 +94,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
 
                     <div className='hidden sm:block sm:mt-3 sm:text-center'>
                         {downloadButton({ mobile: false })}
-                        {(config?.aiGeneration && config.aiGeneration.enabled) && (
+                        {/* {(config?.aiGeneration && config.aiGeneration.enabled) && (
                             <label htmlFor="my-modal" className='btn btn-info btn-gallery locked' onClick={handleRemix}>
                                 {isLoadingGeneration ?
                                     <ThreeDots
@@ -106,7 +106,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                                         visible={true}
                                     /> : 'remix ☢︎'}
                             </label>
-                        )}
+                        )} */}
                     </div>
                 </div>
             </div>
@@ -115,7 +115,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                 {downloadButton({ mobile: true })}
             </div>
 
-            <input type="checkbox" id="my-modal" className="modal-toggle" />
+            {/* <input type="checkbox" id="my-modal" className="modal-toggle" />
             <label htmlFor="my-modal" className="modal h-screen mt-0 backdrop-blur-[30px]">
                 <label htmlFor='' className="modal-box bg-transparent shadow-none sm:max-w-5xl">
                     <div className='relative bg-white/10 backdrop-blur-[50px] aspect-square w-auto max-h-[75vh] sm:h-[75vh] mx-auto'>
@@ -128,7 +128,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                         </div>
                     </div>
                 </label>
-            </label>
+            </label> */}
         </>
     )
 }

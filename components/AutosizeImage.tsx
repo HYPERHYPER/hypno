@@ -22,36 +22,36 @@ export default function AutosizeImage({
     sizes?: string;
 }) {
     const [paddingTop, setPaddingTop] = useState<string>("0");
-    const [blurDataURL, setBlurDataURL] = useState<string>('');
+    // const [blurDataURL, setBlurDataURL] = useState<string>('');
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
-    useEffect(() => {
-        const getBlurDataUrl = async () => {
-            const res = await fetch(`/api/image?url=${src}`);
-            const placeholderData = await res.json();
-            setBlurDataURL(placeholderData.base64);
-        }
+    // useEffect(() => {
+    //     const getBlurDataUrl = async () => {
+    //         const res = await fetch(`/api/image?url=${src}`);
+    //         const placeholderData = await res.json();
+    //         setBlurDataURL(placeholderData.base64);
+    //     }
 
-        if (!src) return;
-        getBlurDataUrl();
-    }, [])
+    //     if (!src) return;
+    //     getBlurDataUrl();
+    // }, [])
 
 
     return (
-        <div className={clsx('relative border-0 transition-opacity duration-300', isLoaded ? 'opacity-100' : 'opacity-0')} style={{ paddingTop }}>
+        <div className={clsx('relative border-0 transition-opacity duration-300 min-h-[1px]', isLoaded ? 'opacity-100' : 'opacity-0')} style={{ paddingTop }}>
             <Image
                 src={src}
                 fill
                 style={{ objectFit: 'cover' }}
-                quality={100}
                 alt={alt}
                 onLoadingComplete={({ naturalWidth, naturalHeight }) => {
                     setPaddingTop(`calc(100% / (${naturalWidth} / ${naturalHeight})`);
                     setIsLoaded(true);
                     onLoadingComplete && onLoadingComplete();
                 }}
-                placeholder={blurDataURL ? 'blur' : 'empty'}
-                blurDataURL={blurDataURL || undefined}
+                // placeholder={blurDataURL ? 'blur' : 'empty'}
+                // blurDataURL={blurDataURL || undefined}
+                priority={true}
                 {...rest}
             />
         </div>
