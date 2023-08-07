@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import _, { debounce } from 'lodash';
 import { useForm, FormProvider } from 'react-hook-form';
 import { ThreeDots } from 'react-loader-spinner';
@@ -212,6 +212,22 @@ const EventForm = (props: FormData) => {
         }
     }, [isSubmitSuccessful, isSubmitting]);
 
+    const [featureAccess, setFeatureAccess] = useState<any>(null);
+    // useEffect to update featureAccess whenever config.org_id changes
+    useEffect(() => {
+        // Find the organization with the matching id
+        const org = _.find(organizations, (org) => org.id == config.org_id);
+        // Update featureAccess based on the found organization
+        if (org) {
+            setFeatureAccess(org.metadata.hypno_pro);
+        } else {
+            // If no matching organization is found, set featureAccess to a default value
+            setFeatureAccess(null);
+        }
+        // The dependency array ensures this effect runs whenever config.org_id changes
+    }, [config.org_id, organizations]);
+
+
     return (
         <>
             <FormProvider {...methods}>
@@ -231,7 +247,7 @@ const EventForm = (props: FormData) => {
                                         isLoadingOrgs ?
                                             <span className='loading loading-spinner loading-sm sm:loading-md' />
                                             :
-                                            <select className='select pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl'>
+                                            <select onChange={(e) => setValue('org_id', e.target.value)} value={config.org_id} className='select pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl'>
                                                 {_.map(organizations, ((o) => <option key={o.id} value={o.id}>{o.name}</option>))}
                                             </select>
                                     )}
@@ -285,7 +301,7 @@ const EventForm = (props: FormData) => {
                                 </InfiniteScroll>
                             </Modal>
 
-                            <FormControl label='graphics'>
+                            <FormControl label='graphics' featureGated={featureAccess?.graphics ? undefined : 'creator'}>
                                 <Modal.Trigger id='graphics-modal'>
                                     {_.every(config.watermarks, (value) => value === "") ?
                                         <div className='text-xl sm:text-4xl text-white/20'>none</div>
@@ -326,7 +342,7 @@ const EventForm = (props: FormData) => {
                                 </div>
                             </Modal>
 
-                            <FormControl label='effects'>
+                            <FormControl label='effects' featureGated={featureAccess?.effects ? undefined : 'creator'}>
                                 <div className='text-xl sm:text-4xl text-white/20'>coming soon</div>
                             </FormControl>
 
@@ -339,7 +355,7 @@ const EventForm = (props: FormData) => {
                     {
                         view == 'default' && (
                             <div className='lg:border-t-2 lg:border-white/20'>
-                                <FormControl label='branded gallery'>
+                                <FormControl label='branded gallery' featureGated={featureAccess?.custom_branding ? undefined : 'creator'}>
                                     <input type="checkbox" className="toggle pro toggle-lg" {...register('custom_frontend')} />
                                 </FormControl>
 
@@ -412,12 +428,12 @@ const EventForm = (props: FormData) => {
                                     <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_frontend} {...register('is_private')} />
                                 </FormControl>
 
-                                <FormControl label='data/legal' nested={true} disabled={!config.custom_frontend}>
+                                <FormControl label='data/legal' nested={true} disabled={!config.custom_frontend} featureGated={featureAccess?.data_capture ? undefined : 'brand'}>
                                     {config.data_capture && config.custom_frontend && <Modal.Trigger id='data-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
                                     <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_frontend} {...register('data_capture')} />
                                 </FormControl>
 
-                                <FormControl label='domain' nested={true} disabled={!config.custom_frontend}>
+                                <FormControl label='domain' nested={true} disabled={!config.custom_frontend} featureGated={featureAccess?.data_capture ? undefined : 'brand'}>
                                     <div className='text-xl sm:text-4xl text-white/20'>coming soon</div>
                                 </FormControl>
                                 {/* <FormControl label='legal' nested={true} disabled={!config.custom_frontend}>

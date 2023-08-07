@@ -117,6 +117,10 @@
     @apply border-white/20 border-b-2 py-3 sm:py-7 sm:h-[100px] text-lg sm:text-4xl font-normal flex flex-row justify-between items-center
   }
 
+  .list.list-sm .item {
+    @apply border-white/20 border-b-[1px] 2xl:border-b-2 py-1 2xl:py-1 text-xs sm:text-xs 2xl:text-xs h-fit sm:h-fit font-normal flex flex-row justify-between items-center
+  }
+
   .input, .select, .textarea {
     @apply input-ghost bg-white/[.08] text-white focus:bg-white/10 focus:text-white placeholder:text-white/20 disabled:bg-white/[0.03] disabled:border-white/[0.03] disabled:placeholder:text-white/10
   }
