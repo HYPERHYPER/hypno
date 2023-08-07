@@ -118,7 +118,7 @@
   }
 
   .list.list-sm .item {
-    @apply border-white/20 border-b-[1px] 2xl:border-b-2 py-1 2xl:py-1 text-xs sm:text-xs 2xl:text-xs h-fit sm:h-fit font-normal flex flex-row justify-between items-center
+    @apply border-white/20 border-b-[1px] 2xl:border-b-2 py-1 2xl:py-1 text-sm 2xl:text-sm h-fit sm:h-fit font-normal flex flex-row justify-between items-center
   }
 
   .input, .select, .textarea {

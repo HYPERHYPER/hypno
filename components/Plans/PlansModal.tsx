@@ -116,7 +116,7 @@ const getProductId = (plan_type: string, subscription: 'annual' | 'monthly') => 
 const PlanCard = ({ type, current, billingFrequency, onPlanSelect }: { type: string, current?: string, billingFrequency?: 'annual' | 'monthly', onPlanSelect: (type: string) => void; }) => (
     <div className={clsx("text-white bg-black h-full rounded-3xl p-6 border-2 transition", type == current ? 'border-white border-2' : 'border-black hover:border-primary')}>
         <h2 className="text-2xl 3xl:text-5xl">{type}</h2>
-        <div>
+        <div className='mb-4 mt-6'>
             <h3 className="text-lg 3xl:text-2xl text-white/40">{PLAN_TYPES[type].tagline}</h3>
             <h3 className="text-lg 3xl:text-2xl text-primary">${billingFrequency == 'annual' ? PLAN_TYPES[type].annualPrice : PLAN_TYPES[type].monthlyPrice}/mo</h3>
         </div>
@@ -124,7 +124,7 @@ const PlanCard = ({ type, current, billingFrequency, onPlanSelect }: { type: str
         <div className='font-thin space-y-1'>
             <h4>{PLAN_TYPES[type].users} {PLAN_TYPES[type].users > 1 ? 'users' : 'user'}</h4>
             <h4>each add&apos;l  user ${PLAN_TYPES[type].additionalPrice}/mo</h4>
-            <h4>{PLAN_TYPES[type].uploads != 'unlimited' ? '100 uploads/mo' : 'unlimted uploads'}</h4>
+            <h4>{PLAN_TYPES[type].uploads != 'unlimited' ? '100 uploads/mo' : 'unlimited uploads'}</h4>
         </div>
 
         <div className='space-y-4 sm:space-y-6 my-4'>
@@ -134,7 +134,7 @@ const PlanCard = ({ type, current, billingFrequency, onPlanSelect }: { type: str
                     <div key={key}>
                         <h3 className="text-lg 3xl:text-2xl text-white/40">{key}</h3>
                         <div className="list list-sm pro">
-                            {items.map((f: string, i: number) => <div key={i} className="item text-xs font-medium">{f} {_.includes(FEATURE_ACCESS[f], type) ? <span className='text-primary'><Checkmark /></span> : <span className='text-white/20'><Minus /></span>}</div>)}
+                            {items.map((f: string, i: number) => <div key={i} className="item font-medium">{f} {_.includes(FEATURE_ACCESS[f], type) ? <span className='text-primary'><Checkmark /></span> : <span className='text-white/20'><Minus /></span>}</div>)}
                         </div>
                     </div>
                 )
@@ -154,13 +154,13 @@ export default function PaymentPlansModal() {
     const user = useUserStore.useUser();
     const orgId = user?.organization_id;
     const token = useUserStore.useToken();
-    const router = useRouter();
 
     const orgUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${user.organization.id}`;
     const { data: orgData, isValidating: isValidatingOrgData, error: orgError, mutate } = useSWR([orgUrl, token.access_token],
         ([url, token]) => axiosGetWithToken(url, token))
 
     const orgTier = orgData?.organization.metadata.hypno_pro.current_tier;
+    console.log(orgData?.organization)
 
     const [billingFrequency, setBillingFrequency] = useState<'annual' | 'monthly'>('monthly');
 
