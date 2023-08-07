@@ -51,14 +51,16 @@ const MainContent = ({ children }: { children: ReactNode; }) => {
 
 export default function GlobalLayout({
     children,
+    paymentPlansModal = false,
 }: {
     children: ReactNode;
+    paymentPlansModal?: boolean;
 }) {
     return (
         <div className="bg-black overflow-y-scroll pb-36 px-5 sm:px-8">
             <GlobalNav />
             {children}
-            <PaymentPlansModal />
+            {paymentPlansModal && <PaymentPlansModal />}
         </div>
     );
 }

@@ -136,7 +136,7 @@ const EditEventPage = (props: ResponseData) => {
                 <title>{name || 'edit event'} | hypno™</title>
             </Head>
 
-            <GlobalLayout>
+            <GlobalLayout paymentPlansModal={true}>
                 <GlobalLayout.Header
                     title={view == 'default' ? 'edit' : view}
                     returnLink={view == 'default' ? { slug: `/e/${id}`, name: name } : undefined}
