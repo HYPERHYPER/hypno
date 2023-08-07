@@ -24,6 +24,7 @@ type OrgUser = {
     organization_id?: number;
     first_name?: string;
     last_name?: string;
+    roles?: string;
 }
 
 interface ResponseData {
@@ -66,7 +67,6 @@ function OrganizationUsersPage(props: ResponseData) {
     const paginatedUsers = _.map(data, (v) => v.users).flat();
 
     const userOrgPrivileges = orgData ? getOrganizationPrivileges(orgData.organization.user_privileges) : null;
-
     return (
         <>
             <Head>
@@ -109,7 +109,7 @@ function OrganizationUsersPage(props: ResponseData) {
 
 const Item = ({ user, orgId }: { user: OrgUser; orgId: number }) => {
     if (!user) return null;
-    const { username, first_name, last_name, organization_id } = user;
+    const { username, first_name, last_name, roles } = user;
     return (
         <div className='item'>
             <div className='space-x-3 tracking-tight lowercase flex'>
@@ -118,7 +118,7 @@ const Item = ({ user, orgId }: { user: OrgUser; orgId: number }) => {
                 {/* <span className='text-white/40 text-xl'>device</span> */}
             </div>
             <div className='flex items-center gap-3 sm:gap-5 text-primary lowercase'>
-                <span>{orgId === organization_id ? 'member' : 'guest'}</span>
+                <span>{roles === 'account_owner' ? 'owner' : roles}</span>
                 {/* <span className='bg-white/20 h-6 w-6 sm:h-10 sm:w-10 flex items-center justify-center rounded-full text-black'><Minus /></span> */}
             </div>
         </div>
