@@ -240,34 +240,40 @@ export default function PaymentPlansModal() {
                     <div className="space-y-4">
                         <h1 className="text-white">plans + pricing</h1>
                         <div className="flex flex-row gap-4">
-                            <h2 className="text-primary">choose a subscription plan for your organization</h2>
+                            <h2 className="text-primary">{orgTier == 'custom' ?
+                                'you are currently signed up for a custom subscription plan. please contact us to make any changes.'
+                                : 'choose a subscription plan for your organization'}
+                            </h2>
                         </div>
                     </div>
                     <button className="h-[30px] sm:h-[60px] w-[30px] sm:w-[60px] flex items-center cursor-pointer">
                         <div className="bg-white/40 w-[30px] sm:w-[60px] h-1 rounded-sm" />
                     </button>
                 </div>
+                {orgTier != 'custom' &&
+                    <>
+                        {isLoading ? (
+                            <div className='w-full flex flex-col justify-center items-center gap-4 py-8'>
+                                <span className="loading loading-ring sm:w-[50px] text-white"></span>
+                                <h2 className='text-white text-lg'>updating your subscription plan...</h2>
+                            </div>
+                        ) : (
+                            <div>
+                                <div className='flex items-center gap-3 justify-center bg-black p-4 rounded-3xl'>
+                                    <span className={clsx('text-lg sm:text-2xl transition', billingFrequency == 'monthly' ? 'text-primary' : 'text-white/30')}>monthly</span>
+                                    <input type='checkbox' className='toggle pro' checked={billingFrequency == 'annual'} onChange={() => setBillingFrequency((prev) => prev == 'monthly' ? 'annual' : 'monthly')} />
+                                    <span className={clsx('text-lg sm:text-2xl transition', billingFrequency == 'annual' ? 'text-primary' : 'text-white/30')}>annual-20% off</span>
+                                </div>
 
-                {isLoading ? (
-                    <div className='w-full flex flex-col justify-center items-center gap-4 py-8'>
-                        <span className="loading loading-ring sm:w-[50px] text-white"></span>
-                        <h2 className='text-white text-lg'>updating your subscription plan...</h2>
-                    </div>
-                ) : (
-                    <div>
-                        <div className='flex items-center gap-3 justify-center bg-black p-4 rounded-3xl'>
-                            <span className={clsx('text-lg sm:text-2xl transition', billingFrequency == 'monthly' ? 'text-primary' : 'text-white/30')}>monthly</span>
-                            <input type='checkbox' className='toggle pro' checked={billingFrequency == 'annual'} onChange={() => setBillingFrequency((prev) => prev == 'monthly' ? 'annual' : 'monthly')} />
-                            <span className={clsx('text-lg sm:text-2xl transition', billingFrequency == 'annual' ? 'text-primary' : 'text-white/30')}>annual-20% off</span>
-                        </div>
-
-                        <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-                            {_.map(['free', 'creator', 'studio', 'brand'], (type, i) => (
-                                <PlanCard key={i} type={type} current={orgTier} onPlanSelect={handlePlanSelect} billingFrequency={billingFrequency} />
-                            ))}
-                        </div>
-                    </div>
-                )}
+                                <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+                                    {_.map(['free', 'creator', 'studio', 'brand'], (type, i) => (
+                                        <PlanCard key={i} type={type} current={orgTier} onPlanSelect={handlePlanSelect} billingFrequency={billingFrequency} />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </>
+                }
 
             </form>
             <form method="dialog" className="modal-backdrop">
