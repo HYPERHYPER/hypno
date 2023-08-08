@@ -433,7 +433,7 @@ const EventForm = (props: FormData) => {
                                     <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_frontend} {...register('data_capture')} />
                                 </FormControl>
 
-                                <FormControl label='domain' nested={true} disabled={!config.custom_frontend} featureGated={featureAccess?.data_capture ? undefined : 'brand'}>
+                                <FormControl label='domain' nested={true} disabled={!config.custom_frontend} featureGated={featureAccess?.custom_domain ? undefined : 'brand'}>
                                     <div className='text-xl sm:text-4xl text-white/20'>coming soon</div>
                                 </FormControl>
                                 {/* <FormControl label='legal' nested={true} disabled={!config.custom_frontend}>
