@@ -2,6 +2,7 @@ import { PropsWithChildren, ReactNode } from "react";
 import { GlobalNav } from "./GlobalNav";
 import Link from "next/link";
 import { Balancer } from "react-wrap-balancer";
+import PaymentPlansModal from "./Plans/PlansModal";
 
 type LinkItem = {
     name: string;
@@ -50,13 +51,16 @@ const MainContent = ({ children }: { children: ReactNode; }) => {
 
 export default function GlobalLayout({
     children,
+    paymentPlansModal = false,
 }: {
     children: ReactNode;
+    paymentPlansModal?: boolean;
 }) {
     return (
         <div className="bg-black overflow-y-scroll pb-36 px-5 sm:px-8">
             <GlobalNav />
             {children}
+            {paymentPlansModal && <PaymentPlansModal />}
         </div>
     );
 }

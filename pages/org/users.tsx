@@ -24,6 +24,7 @@ type OrgUser = {
     organization_id?: number;
     first_name?: string;
     last_name?: string;
+    roles?: string | Array<any>;
 }
 
 interface ResponseData {
@@ -52,21 +53,18 @@ function OrganizationUsersPage(props: ResponseData) {
 
     const getKey = (pageIndex: number, previousPageData: any) => {
         if (previousPageData && pageIndex == previousPageData.pages) return null; // reached the end
-        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/users?per_page=${meta.per_page}`;
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/users?per_page=${meta.per_page || 30}`;
         if (pageIndex === 0) return [url, token.access_token];
         const pageIdx = previousPageData.meta.next_page;
         return [`${url}&page=${pageIdx}`, token.access_token];
     }
 
     const { data, size, setSize, error, isValidating } = useSWRInfinite(getKey,
-        ([url, token]) => fetchWithToken(url, token), {
-        fallbackData: [{ users: initialUsers, meta }],
-    });
+        ([url, token]) => axiosGetWithToken(url, token));
 
     const paginatedUsers = _.map(data, (v) => v.users).flat();
 
     const userOrgPrivileges = orgData ? getOrganizationPrivileges(orgData.organization.user_privileges) : null;
-
     return (
         <>
             <Head>
@@ -109,16 +107,16 @@ function OrganizationUsersPage(props: ResponseData) {
 
 const Item = ({ user, orgId }: { user: OrgUser; orgId: number }) => {
     if (!user) return null;
-    const { username, first_name, last_name, organization_id } = user;
+    const { username, first_name, last_name, roles, id } = user;
     return (
-        <div className='item'>
+        <div className='item' key={id}>
             <div className='space-x-3 tracking-tight lowercase flex'>
                 {username && <span className='text-white text-xl sm:text-4xl'>{username}</span>}
                 <span className='text-white/40 text-xl sm:text-4xl'>{first_name} {last_name}</span>
                 {/* <span className='text-white/40 text-xl'>device</span> */}
             </div>
             <div className='flex items-center gap-3 sm:gap-5 text-primary lowercase'>
-                <span>{orgId === organization_id ? 'member' : 'guest'}</span>
+                <span>{roles === 'account_owner' ? 'owner' : _.first(roles)?.kind}</span>
                 {/* <span className='bg-white/20 h-6 w-6 sm:h-10 sm:w-10 flex items-center justify-center rounded-full text-black'><Minus /></span> */}
             </div>
         </div>

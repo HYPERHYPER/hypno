@@ -99,7 +99,7 @@ function NewEventPage(props: ResponseData) {
             <Head>
                 <title>new event | hypno™</title>
             </Head>
-            <GlobalLayout>
+            <GlobalLayout paymentPlansModal={true}>
                 <GlobalLayout.Header
                     title={view == 'default' ? 'new event' : view}
                     returnLink={view == 'default' ? { slug: '/dashboard', name: 'dashboard' } : undefined}

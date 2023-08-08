@@ -4,23 +4,6 @@ import { AutosaveStatusText } from "../Form/AutosaveStatusText";
 import DataFieldInput, { FieldSelect } from "./DataFieldInput";
 import _ from "lodash";
 import useArrayState from "@/hooks/useArrayState";
-import {
-    DndContext,
-    closestCenter,
-    KeyboardSensor,
-    PointerSensor,
-    useSensor,
-    useSensors,
-    DragEndEvent,
-} from '@dnd-kit/core';
-import {
-    arrayMove,
-    SortableContext,
-    sortableKeyboardCoordinates,
-    useSortable,
-    verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { useFormContext } from "react-hook-form";
 import { convertFieldArrayToObject } from "@/helpers/event";
 import useDeepCompareEffect from "use-deep-compare-effect";
@@ -43,16 +26,6 @@ export default function DataCaptureModal({
     //         coordinateGetter: sortableKeyboardCoordinates,
     //     })
     // );
-
-    function handleDragEnd(event: DragEndEvent) {
-        const { active, over } = event;
-
-        if (active.id !== over?.id) {
-            const oldIndex = items.indexOf(active.id);
-            const newIndex = items.indexOf(over?.id);
-            reorder(oldIndex, newIndex);
-        }
-    }
 
     useDeepCompareEffect(() => {
         setValue('fields', items, { shouldDirty: true });

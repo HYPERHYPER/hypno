@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Modal from '@/components/Modal';
 import FormControl from '@/components/Form/FormControl';
 import axios from 'axios';
-import { useCallback, useEffect, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { useForm } from 'react-hook-form';
 import { AutosaveStatusText, SaveStatus } from '@/components/Form/AutosaveStatusText';
@@ -16,6 +16,8 @@ import FileInput from '@/components/Form/FileInput';
 import UpdatePasswordModal from '@/components/Settings/UpdatePasswordModal';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import { axiosGetWithToken } from '@/lib/fetchWithToken';
+import useSWR from 'swr';
 
 export default withAuth(SettingsPage, 'protected');
 function SettingsPage() {
@@ -25,6 +27,12 @@ function SettingsPage() {
     const updateUser = useUserStore.useUpdateUser();
     const token = useUserStore.useToken();
 
+    const orgUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${user.organization.id}`;
+    const { data: orgData, isValidating: isValidatingOrgData, error: orgError } = useSWR([orgUrl, token.access_token],
+        ([url, token]) => axiosGetWithToken(url, token))
+
+    const orgTier = orgData?.organization.metadata.hypno_pro.current_tier;
+        
     const [saveStatus, setSaveStatus] = useState<SaveStatus>('ready');
     const {
         register,
@@ -105,7 +113,24 @@ function SettingsPage() {
     const handleLogout = () => {
         logout();
         router.push('/login'); // Redirect to the login page after logout
-      };
+    };
+
+    const handleBillingRedirect = async () => {
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${user.organization.id}/billing_portal`;
+        await axios.get(url, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token.access_token,
+            },
+        }).then((res) => {
+            if (res.status == 200) {
+                const billingUrl = res.data.url;
+                window.location.href = billingUrl;
+            }
+        }).catch((e) => {
+            console.log(e);
+        })
+    }
 
     if (!user) return <>Loading</>
     return (
@@ -116,7 +141,7 @@ function SettingsPage() {
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <GlobalLayout>
+            <GlobalLayout paymentPlansModal={true}>
                 <GlobalLayout.Header
                     title='settings'
                     right={
@@ -141,9 +166,14 @@ function SettingsPage() {
                         <Item name='username' value={user.username || '+'} modalId='username-modal' />
                         <Item name='name' value={`${user.first_name} ${user.last_name}` || ''} modalId='name-modal' />
                         <Item name='email' value={user.email} modalId='email-modal' />
-                        <Item name='password' value={'•••••••'} modalId='password-modal' />
+                        <Item name='password' value={'change'} modalId='password-modal' />
                         <Item name='organization' value={user.organization.name} href='/org' />
-                        {/* <Item name='upgrade' value={'unlock custom graphics, effects and more!'} /> */}
+                        <Item name='plan' value={
+                            <>{orgData?.organization && <span className='cursor-pointer' onClick={() => window.payment_plans_modal.showModal()}>{orgTier}</span>}</>
+                        } />
+                        <Item name='billing' value={
+                            <>{orgTier && orgTier == 'custom' ? <span className='text-white/20'>contact sales</span>: orgTier == 'free' ? <span className='text-white/20'>none</span> : <span className='cursor-pointer' onClick={handleBillingRedirect}>manage →</span>}</>
+                        } />
                     </div>
                 </GlobalLayout.Content>
 
@@ -225,7 +255,7 @@ function SettingsPage() {
     )
 }
 
-const Item = ({ name, value, href, modalId }: { name: string, value: string, href?: string, modalId?: string, }) => {
+const Item = ({ name, value, href, modalId }: { name: string, value: string | ReactNode, href?: string, modalId?: string, }) => {
     return (
         <div className='item'>
             <span className='text-white/40'>{name}</span>

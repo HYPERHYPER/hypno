@@ -37,7 +37,7 @@ export function GlobalNav() {
             >
                 <div className="flex items-center lg:h-auto">
                     <Link
-                        href="/"
+                        href={isLoggedIn ? "/dashboard" : "/"}
                         className="group flex w-full items-center gap-x-2.5"
                         onClick={close}
                     >
@@ -59,7 +59,8 @@ export function GlobalNav() {
                             <>
                                 <GlobalNavItem key='dashboard' item={{ slug: 'dashboard', name: 'dashboard' }} close={close} />
                                 <GlobalNavItem key='settings' item={{ slug: 'settings', name: 'settings' }} close={close} />
-                                <div className='hidden sm:block avatar placeholder'>
+                                <Link href='https://discord.gg/eJc8GtsPQV' className='text-lg sm:text-xl text-primary hover:text-white'>support</Link>
+                                <Link href='/settings' className='hidden sm:block avatar placeholder'>
                                     <div className="bg-white/20 text-white rounded-full w-[40px]">
                                         {user.avatar ?
                                             <Image src={user.avatar} alt={`${user.username}-avatar`} fill className='rounded-full' />
@@ -67,7 +68,7 @@ export function GlobalNav() {
                                             <span className="text-xl uppercase">{user.first_name.charAt(0)}</span>
                                         }
                                     </div>
-                                </div>
+                                </Link>
                             </>
                            ) : (
                             <>
