@@ -69,7 +69,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                     <div className='absolute w-full h-full min-h-[100px] min-w-[100px] flex itmes-center justify-center'>
                         <Spinner />
                     </div>
-                    <div className={clsx('relative backdrop-blur-[50px] w-fit transition duration-300', isLoaded ? 'opacity-100' : 'opacity-0')}>
+                    <div className={clsx('relative backdrop-blur-[50px] w-fit transition duration-300', (isLoaded || isVideo) ? 'opacity-100' : 'opacity-0')}>
                         {asset.mp4_url ? (
                             <VideoAsset src={asset.mp4_url} poster={asset.posterframe} style={isPortrait && Number(width) > 668 ? { height: 'auto', minHeight: height } : {}} />
                         ) : (
