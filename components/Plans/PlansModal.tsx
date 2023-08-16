@@ -88,7 +88,7 @@ const PLAN_TYPES: PlanType = {
     brand: {
         tagline: 'enterprise data/legal',
         annualPrice: 4999,
-        monthlyPrice: 3999,
+        monthlyPrice: 6250,
         users: 5,
         additionalPrice: 999,
         uploads: 'unlimited'

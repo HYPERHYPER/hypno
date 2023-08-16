@@ -111,7 +111,7 @@ function OrganizationSettingsPage(props: ResponseData) {
                     title='organization'
                     returnLink={{ slug: '/settings', name: 'settings' }}
                 >
-                    <h2 className='text-white/40'>since Apr 2023</h2>
+                    <h2 className='text-white/40'>since 2023</h2>
                 </GlobalLayout.Header>
                 <GlobalLayout.Content>
                     <div className='list pro'>
