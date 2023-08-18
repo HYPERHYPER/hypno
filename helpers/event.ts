@@ -7,7 +7,7 @@ export const isCustomGallery = (custom_frontend: EventMicrosite) => {
         logo_image, home_background_image, enable_legal, data_capture
     }
 
-    return _.some(customGalleryConfig, _.identity) || primary_color != '#00FF99';
+    return _.some(customGalleryConfig, _.identity) || (primary_color != '#00FF99' && !_.isEmpty(primary_color));
 }
 
 interface FieldItem {
