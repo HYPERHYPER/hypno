@@ -44,10 +44,11 @@ const EditEventPage = (props: ResponseData) => {
         let event: any = {};
         const eventKeys = ['name', 'is_private']
         let custom_frontend: any = {};
-        const customFrontendKeys = ['logo_image', 'home_background_image', 'primary_color', 'data_capture', 'fields', 'data_capture_title', 'data_capture_subtitle', 'enable_legal', 'explicit_opt_in', 'terms_privacy', 'email_delivery', 'ai_generation'];
+        const customFrontendKeys = ['logo_image', 'home_background_image', 'primary_color', 'data_capture', 'fields', 'data_capture_title', 'data_capture_subtitle', 'enable_legal', 'explicit_opt_in', 'terms_privacy', 'email_delivery'];
         let filter: any = {};
         let delivery: string = '';
         let enable_custom_frontend = isCustomGallery(initialCustomFrontend);
+        let metadata: any = {};
 
         // Build event payload - any field that's not watermark
         // Build watermark payload in seperate reqs by watermark_id
@@ -71,6 +72,9 @@ const EditEventPage = (props: ResponseData) => {
                 if (key == 'custom_frontend') {
                     enable_custom_frontend = field[key];
                 }
+                if (key == 'ai_generation') {
+                    metadata = { ai_generation: { ...field[key]} }
+                }
             }
         })
 
@@ -90,11 +94,12 @@ const EditEventPage = (props: ResponseData) => {
             ...(!_.isEmpty(custom_frontend) && { custom_frontend }),
             ...(!_.isEmpty(filter) && { filter }),
             ...(delivery && { delivery }),
+            ...(!_.isEmpty(metadata) && { metadata })
         }
         if (!_.isEmpty(eventPayload)) {
             payloadArr.push(eventPayload);
         }
-
+        console.log('payload', eventPayload)
         const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${id}`;
 
         // Create an array of promises for graphics (watermark) update + all other event config updates

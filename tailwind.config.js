@@ -16,6 +16,7 @@ module.exports = {
       },
       animation: {
         'jpeg-strip': 'jpeg-strip 800ms steps(1, end) infinite',
+        'marquee': 'marquee 5s linear infinite',
       },
       keyframes: {
         'jpeg-strip': {
@@ -28,6 +29,10 @@ module.exports = {
           '85.7142857143%': { backgroundPosition: '0 50%' },
           '100%': { backgroundPosition: '0 25%' },
         },
+        'marquee': {
+          '0%': { left: 0 },
+          '100%': { left: '-100%' },
+        }
       },
     },
   },
@@ -36,7 +41,7 @@ module.exports = {
       {
         mytheme: {
           primary: '#00FF99',
-          secondary: '#D926AA',
+          secondary: '#00FFFF',
           accent: '#1FB2A5',
           neutral: '#FFFFFF',
           info: '#FFFFFF',

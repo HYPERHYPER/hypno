@@ -23,6 +23,13 @@ export type EventConfig = {
     terms_and_conditions?: string;
     is_private?: number; // 1 == public, 2 == private
     delivery?: string; // "qr_gallery" to show qr code to microsite, "qr" to disable
+    metadata?: {
+        ai_generation?: {
+            enabled?: boolean;
+            text_prompt?: string;
+            image_strength?: any;
+        }
+    }
     custom_frontend?: EventMicrosite | null;
 }
 

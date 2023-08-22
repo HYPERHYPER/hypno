@@ -124,7 +124,7 @@ const SubGallery = (props: ResponseData) => {
 
             <CustomGallery event={event} galleryBanner={showBrowseGalleryBanner}>
                 {isDetailView ? (
-                    <DetailView asset={photo} config={{ aiGeneration: gallery.ai_generation, color: gallery.primary_color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
+                    <DetailView asset={photo} config={{ aiGeneration: event?.metadata?.ai_generation, color: gallery.primary_color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
                 ) : (
                     <div
                         style={{ height: outerHeight }}
@@ -197,7 +197,7 @@ const SubGallery = (props: ResponseData) => {
                                     gallery.email_delivery ? (
                                         <SingleAssetDeliveryConfirmation />
                                     ) : (
-                                        <DetailView asset={_.first(photos)} config={{ aiGeneration: gallery.ai_generation, color: gallery.primary_color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64, width: _.first(photos)?.width, height: _.first(photos)?.height }} />
+                                        <DetailView asset={_.first(photos)} config={{ aiGeneration: event?.metadata?.ai_generation, color: gallery.primary_color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64, width: _.first(photos)?.width, height: _.first(photos)?.height }} />
                                     )
                                 ))
                         }
@@ -293,6 +293,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 id: eventData.id,
                 party_slug: eventData.party_slug,
                 is_private: eventData.is_private,
+                metadata: eventData.metadata || {},  
                 custom_frontend: {
                     ...eventData.custom_frontend,
                     ...(deliverySlug && { email_delivery: true })

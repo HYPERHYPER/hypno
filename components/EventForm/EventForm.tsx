@@ -20,6 +20,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import Spinner from '../Spinner';
 import useOrganizations from '@/hooks/useOrganizations';
 import DataCaptureModal from './DataCaptureModal';
+import EffectsModal from './EffectsModal';
 
 interface FormData {
     event?: any;
@@ -122,7 +123,7 @@ const EventForm = (props: FormData) => {
             magic_button_text: event?.metadata?.magic_button?.text || '',
             magic_button_url: event?.metadata?.magic_button?.url || '',
             // email_delivery: event?.metadata?.email_delivery || false,
-            // ai_generation: event?.metadata?.ai_generation || {},
+            ai_generation: event?.metadata?.ai_generation || {},
         }
     });
 
@@ -226,7 +227,6 @@ const EventForm = (props: FormData) => {
         }
         // The dependency array ensures this effect runs whenever config.org_id changes
     }, [config.org_id, organizations]);
-
 
     return (
         <>
@@ -343,8 +343,13 @@ const EventForm = (props: FormData) => {
                             </Modal>
 
                             <FormControl label='effects' featureGated={featureAccess?.effects ? undefined : 'creator'}>
-                                <div className='text-xl sm:text-4xl text-white/20'>coming soon</div>
+                                {config.ai_generation.enabled && <Modal.Trigger id='effects-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
+                                <input type="checkbox" className="toggle pro toggle-lg" {...register('ai_generation.enabled')} />
                             </FormControl>
+
+                            <EffectsModal
+                                status={status}
+                            />
 
                             <FormControl label='show delivery code'>
                                 <input type="checkbox" className="toggle pro toggle-lg" {...register('qr_delivery')} />
