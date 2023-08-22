@@ -1,8 +1,7 @@
 import { useStableDiffusion } from "@/hooks/useStableDiffusion";
 import Spinner from "../Spinner";
-import { ThreeDots } from "react-loader-spinner";
 import Image from 'next/image';
-import { useCallback, useRef, useState } from "react";
+import { useState } from "react";
 import clsx from "clsx";
 import VideoAsset from "./VideoAsset";
 import useContentHeight from "@/hooks/useContentHeight";

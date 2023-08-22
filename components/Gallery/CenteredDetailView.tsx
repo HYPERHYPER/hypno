@@ -1,14 +1,10 @@
 import { useStableDiffusion } from "@/hooks/useStableDiffusion";
 import Spinner from "../Spinner";
-import { ThreeDots } from "react-loader-spinner";
 import Image from 'next/image';
 import useContentHeight from "@/hooks/useContentHeight";
 import { downloadPhoto, getAspectRatio } from "@/helpers/image";
 import VideoAsset from "./VideoAsset";
 import _ from "lodash";
-import fetch from 'isomorphic-fetch';
-import { useState } from "react";
-import Modal from "../Modal";
 import clsx from "clsx";
 
 export default function CenteredDetailView({ asset, config, imageProps }: any) {
