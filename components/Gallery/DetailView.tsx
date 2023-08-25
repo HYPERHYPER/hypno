@@ -58,7 +58,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                     <div className='absolute w-full h-full min-h-[100px] min-w-[100px] flex itmes-center justify-center'>
                         <Spinner />
                     </div>
-                    <div className={clsx('relative backdrop-blur-[50px] w-fit transition duration-300', (isLoaded || isVideo) ? 'opacity-100' : 'opacity-0')}>
+                    <div className={clsx('relative w-fit transition duration-300', (isLoaded || isVideo) ? 'opacity-100' : 'opacity-0 backdrop-blur-[50px]')}>
                         {asset.mp4_url ? (
                             <VideoAsset src={asset.mp4_url} poster={asset.posterframe} style={isPortrait && Number(width) > 668 ? { height: 'auto', minHeight: height } : {}} />
                         ) : (
@@ -93,7 +93,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                 </div>
 
                 {(output || isLoadingGeneration) && (
-                    <div className={clsx('relative mt-4 bg-white/10 mx-auto', isLoadingGeneration ? 'w-auto aspect-square' : 'w-auto')}>
+                    <div className={clsx('relative mt-4 bg-white/10 backdrop-blur-[50px] mx-auto', isLoadingGeneration ? 'w-auto aspect-square' : 'w-auto')}>
                         {isLoadingGeneration && (
                             <div className='absolute -z-10 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
                                 <span className="loading loading-spinner text-secondary" />
