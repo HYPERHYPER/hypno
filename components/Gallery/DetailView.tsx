@@ -91,35 +91,36 @@ export default function DetailView({ asset, config, imageProps }: any) {
                         )}
                     </div>
                 </div>
-                
+
                 {(output || isLoadingGeneration) && (
-                        <div className={clsx('relative mt-4 bg-white/10 backdrop-blur-[50px] sm:h-[70vh] mx-auto', isLoadingGeneration ? 'w-auto aspect-square' : 'w-auto')}>
-                            {isLoadingGeneration && (
-                                <div className='absolute -z-10 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
-                                    <span className="loading loading-spinner text-secondary" />
-                                </div>
-                            )}
-
-                            <div className='block'>
-                                {output && !isLoadingGeneration && <img src={String(output)} alt={`output-${asset.event_id}-${asset.id}`} className='max-h-[70vh] w-auto sm:min-w-[512px] sm:h-[70vh]' />}
+                    <div className={clsx('relative mt-4 bg-white/10 mx-auto', isLoadingGeneration ? 'w-auto aspect-square' : 'w-auto')}>
+                        {isLoadingGeneration && (
+                            <div className='absolute -z-10 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
+                                <span className="loading loading-spinner text-secondary" />
                             </div>
-                        </div>
-                    )}
-
-                    <div className='hidden sm:block sm:mt-3 sm:text-center'>
-                        {((!asset.mp4_url && config?.aiGeneration && config?.aiGeneration.enabled)) ? (
-                            <button className='btn btn-secondary btn-gallery locked' onClick={handleRemix}>
-                                {isLoadingGeneration ?
-                                    <span className="loading loading-dots" />
-                                    : '✦ tap for magic ✦'}
-                            </button>
-                        ) : (
-                            downloadButton({ mobile: false })
                         )}
+
+                        <div className='block'>
+                            {output && !isLoadingGeneration && <img style={isPortrait && assetHeight > Number(outerHeight.split('px')[0]) ? { minHeight: height } : {}}
+                                src={String(output)} alt={`output-${asset.event_id}-${asset.id}`} className='w-auto' />}
+                        </div>
                     </div>
+                )}
+
+                <div className='hidden sm:block sm:mt-3 sm:text-center'>
+                    {((!asset.mp4_url && config?.aiGeneration && config?.aiGeneration.enabled)) ? (
+                        <button className='btn btn-secondary btn-gallery locked' onClick={handleRemix}>
+                            {isLoadingGeneration ?
+                                <span className="loading loading-dots" />
+                                : '✦ tap for magic ✦'}
+                        </button>
+                    ) : (
+                        downloadButton({ mobile: false })
+                    )}
+                </div>
             </div>
 
-            
+
 
             <div className='block sm:hidden'>
                 {((!asset.mp4_url && config?.aiGeneration && config?.aiGeneration.enabled)) ? (
