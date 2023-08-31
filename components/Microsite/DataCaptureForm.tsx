@@ -127,7 +127,7 @@ export default function DataCaptureForm({
                 <div className='flex flex-col text-center'>
                     <div className='mb-4 sm:mb-8 text-lg leading-5 sm:text-3xl'>
                         <h2><Balancer>{title || 'want your photos?'}</Balancer></h2>
-                        {subtitle || (!title && !subtitle) && <h2 className='text-white/50'><Balancer>{subtitle || (!title && 'add your info to continue...')}</Balancer></h2>}
+                        {(subtitle || (!title && !subtitle)) && <h2 className='text-white/50'><Balancer>{subtitle || (!title && 'add your info to continue...')}</Balancer></h2>}
                     </div>
                     <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
                         {fields?.map((v, i) => {

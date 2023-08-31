@@ -2,6 +2,13 @@ import { forwardRef, useState, InputHTMLAttributes } from "react";
 import _ from 'lodash';
 import Datepicker from "react-tailwindcss-datepicker";
 import { DateValueType } from "react-tailwindcss-datepicker/dist/types";
+import DatePicker from 'react-date-picker';
+import 'react-date-picker/dist/DatePicker.css';
+import 'react-calendar/dist/Calendar.css';
+
+
+type ValuePiece = Date | null;
+type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 interface DateInputProps extends InputHTMLAttributes<HTMLInputElement> {
     placeholder?: string;
@@ -12,11 +19,12 @@ interface DateInputProps extends InputHTMLAttributes<HTMLInputElement> {
 // const isValidDate = (value: string) => !_.isEmpty(value) && value !== 'Invalid Date'
 
 export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(({ ...rest }, ref) => {
-    const [value, setValue] = useState<DateValueType>({ startDate: null, endDate: null })
-    const handleValueChange = (newValue: DateValueType) => {
-        console.log("newValue:", newValue);
+    const [focused, setFocused] = useState<boolean>(false);
+    const [value, setValue] = useState<Value>(null)
+    const handleValueChange = (newValue: Value) => {
         setValue(newValue);
-        rest.updateValue && rest.updateValue(newValue?.startDate);
+        rest.updateValue && rest.updateValue(newValue);
+        if (_.isNil(newValue)) setFocused(false);
     }
 
     {/* <input
@@ -37,17 +45,28 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(({ ...rest
             } */}
 
     return (
-        <Datepicker
-            {...rest}
-            inputId={rest.id}
-            value={value}
-            asSingle={true}
-            placeholder={rest.placeholder}
-            onChange={handleValueChange}
-            useRange={false}
-            maxDate={new Date()}
-            inputClassName={`input data-capture w-full ${rest.error && 'error text-red-600'}`}
-        />
+        <div className="relative">
+            <DatePicker
+                calendarClassName='bg-white'
+                className={`absolute inset-0 input data-capture w-full ${rest.error && 'error text-red-600'}`}
+                onChange={handleValueChange}
+                value={value}
+                maxDate={new Date()}
+            />
+            {!focused && <input className="absolute inset-0 input data-capture cursor-pointer" placeholder="birthday" onClick={() => setFocused(true)} />}
+        </div>
+
+        // <Datepicker
+        //     {...rest}
+        //     inputId={rest.id}
+        //     value={value}
+        //     asSingle={true}
+        //     placeholder={rest.placeholder}
+        //     onChange={handleValueChange}
+        //     useRange={false}
+        //     maxDate={new Date()}
+        //     inputClassName={`input data-capture w-full ${rest.error && 'error text-red-600'}`}
+        // />
     )
 })
 
