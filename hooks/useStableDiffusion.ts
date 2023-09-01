@@ -16,6 +16,8 @@ export const useStableDiffusion = () => {
 
     const upscaleImage = ({ imageBuffer }: { imageBuffer: Buffer }) => {
         setIsLoading(true);
+        // stable-diffusion-x4-latent-upscaler
+        // esrgan-v1-x2plus
         const request = buildGenerationRequest("esrgan-v1-x2plus", {
             type: "upscaling",
             upscaler: Generation.Upscaler.UPSCALER_ESRGAN,
@@ -33,7 +35,7 @@ export const useStableDiffusion = () => {
             });
     }
 
-    const generateImgToImgREST = async ({ url, text_prompt, image_strength }: { url: string, text_prompt: string, image_strength: number }) => {
+    const generateImgToImgREST = async ({ url, text_prompt, image_strength, upscale = true }: { url: string, text_prompt: string, image_strength: number, upscale?: boolean }) => {
         setIsLoading(true);
         const response = await fetch('/api/stablediffusion', {
             method: 'POST',
@@ -49,7 +51,12 @@ export const useStableDiffusion = () => {
 
         if (response.ok) {
             const responseJSON = await response.json();
-            setOutput(`data:image/png;base64,${responseJSON.artifacts[0].base64}`);
+            const imageData = responseJSON.artifacts;
+            setOutput(`data:image/png;base64,${imageData[0].base64}`);
+            if (_.first(imageData) && upscale) {
+                const buffer = Buffer.from(imageData[0].base64 || '', "base64")
+                upscaleImage({ imageBuffer: buffer })
+            }
             setIsLoading(false);
             // responseJSON.artifacts.forEach((image: any, index: number) => {
             //     // Handle saving images here (browser-safe approach)
