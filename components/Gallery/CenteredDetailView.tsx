@@ -67,9 +67,9 @@ export default function CenteredDetailView({ asset, config, imageProps }: any) {
                 </div>
 
                 {(output || isLoadingGeneration) && (
-                    <div className={clsx('relative mt-4 bg-white/10 backdrop-blur-[50px] sm:h-[75vh] mx-auto', isLoadingGeneration ? 'w-full aspect-square' : 'w-auto')}>
+                    <div className={clsx('relative mt-4 bg-white/10 backdrop-blur-[50px] sm:h-[75vh] mx-auto', isLoadingGeneration ? 'w-full aspect-square min-w-full' : 'w-auto')}>
                         {isLoadingGeneration && (
-                            <div className='absolute -z-10 -translate-x-1/2 translate-y-1/2'>
+                            <div className='absolute top-1/2 left-1/2 -z-10 -translate-x-1/2 translate-y-1/2'>
                                 <span className="loading loading-spinner text-secondary" />
                             </div>
                         )}
