@@ -23,6 +23,7 @@ export type EventConfig = {
     terms_and_conditions?: string;
     is_private?: number; // 1 == public, 2 == private
     delivery?: string; // "qr_gallery" to show qr code to microsite, "qr" to disable
+    event_type?: string;
     metadata?: {
         ai_generation?: {
             enabled?: boolean;
