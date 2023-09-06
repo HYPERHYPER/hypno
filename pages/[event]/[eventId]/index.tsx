@@ -98,7 +98,7 @@ const SubGallery = (props: ResponseData) => {
     });
 
     const isProEvent = !_.isEmpty(gallery);
-    const showBrowseGalleryBanner = event.is_private == 1 && isProEvent && (isDetailView || (!dataCapture && !gallery.email_delivery));
+    const showBrowseGalleryBanner = event.is_private == 1 && event.event_type == 'hypno_pro' && isProEvent && (isDetailView || (!dataCapture && !gallery.email_delivery));
 
     /* MINI GALLERY ?category= */
     // No photos uploaded: loading view
@@ -112,6 +112,7 @@ const SubGallery = (props: ResponseData) => {
     /* SINGLE ASSET EMAIL DELIVERY ?slug= */
     // 1. Data capture
     // 2. Confirmation message
+
     return (
         <>
             <Head>

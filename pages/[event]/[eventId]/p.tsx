@@ -121,7 +121,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     // Event is not public if is_private !== 1
     // @ts-ignore
-    if (eventData.event.is_private != 1) {
+    if (eventData.event.is_private != 1 || eventData.event.event_type != 'hypno_pro') {
         return { notFound: true, }
     }
 
