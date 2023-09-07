@@ -42,7 +42,7 @@ const EditEventPage = (props: ResponseData) => {
     const submitForm = (changedFieldsArr: any) => {
         let payloadArr: any = [];
         let event: any = {};
-        const eventKeys = ['name', 'is_private']
+        const eventKeys = ['name', 'is_private', 'blendmode']
         let custom_frontend: any = {};
         const customFrontendKeys = ['logo_image', 'home_background_image', 'primary_color', 'data_capture', 'fields', 'data_capture_title', 'data_capture_subtitle', 'enable_legal', 'explicit_opt_in', 'terms_privacy', 'email_delivery'];
         let filter: any = {};
@@ -153,7 +153,10 @@ const EditEventPage = (props: ResponseData) => {
                     <EventForm
                         view={view}
                         changeView={(view) => setView(view)}
-                        event={props.event}
+                        event={{
+                            ...props.event,
+                            ...event
+                        }}
                         onSubmit={submitForm}
                         updateStatus={(status) => setStatus(status)}
                         status={status}
