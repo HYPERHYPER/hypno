@@ -17,9 +17,9 @@ import { AutosaveStatusText, SaveStatus } from '../Form/AutosaveStatusText';
 import useFilters from '@/hooks/useFilters';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Spinner from '../Spinner';
-import useOrganizations from '@/hooks/useOrganizations';
 import DataCaptureModal from './DataCaptureModal';
 import EffectsModal from './EffectsModal';
+import useOrgAccessStore from '@/store/orgAccessStore';
 
 interface FormData {
     event?: any;
@@ -138,7 +138,6 @@ const EventForm = (props: FormData) => {
     const config = watch();
     const watchedWatermarks = watch('watermarks');
 
-    const { organizations, isLoading: isLoadingOrgs } = useOrganizations();
     const { filters, loadMore: loadMoreFilters, meta: filterMeta } = useFilters(20);
 
     // TODO: hiding email delivery for now
@@ -182,7 +181,7 @@ const EventForm = (props: FormData) => {
                 handleSubmit(submitForm)();
                 return;
             }
-        }, 1000),
+        }, 3000),
         []
     );
 
@@ -213,6 +212,13 @@ const EventForm = (props: FormData) => {
         }
     }, [isSubmitSuccessful, isSubmitting]);
 
+    const organizations = useOrgAccessStore.useOrganizations();
+    const getOrganizations = useOrgAccessStore.useGetOrganizations();
+    const isLoadingOrgs = useOrgAccessStore.useIsLoading();
+    useEffect(() => {
+        getOrganizations();
+    }, []);
+
     const [featureAccess, setFeatureAccess] = useState<any>(null);
     // useEffect to update featureAccess whenever config.org_id changes
     useEffect(() => {
@@ -242,7 +248,7 @@ const EventForm = (props: FormData) => {
 
                             <FormControl label='organization'>
                                 {event ?
-                                    <div className='lowercase text-xl sm:text-4xl'>{event?.organization?.name}</div>
+                                    <div className='lowercase text-xl sm:text-4xl'>{isLoadingOrgs ?  <span className='loading loading-spinner loading-sm sm:loading-md' /> : _.find(organizations, (o) => o.id == config.org_id)?.name}</div>
                                     : (
                                         isLoadingOrgs ?
                                             <span className='loading loading-spinner loading-sm sm:loading-md' />
