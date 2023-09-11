@@ -69,7 +69,7 @@ export default function InfiniteMediaGrid({ next, data, assets, hasMore, detailB
 
 export const MediaGrid = ({ assets, detailBaseUrl }: { assets: AssetData[]; detailBaseUrl: string; }) => {
     return (
-        <ResponsiveMasonry columnsCountBreakPoints={assets?.length < 4 ? { 375: 2, 750: 2, 900: 2 } : { 375: 3, 750: 2, 900: 3, 1200: 4 }}>
+        <ResponsiveMasonry columnsCountBreakPoints={assets?.length < 4 ? { 375: 1, 750: 2, 900: 2 } : { 375: 1, 750: 2, 900: 3, 1200: 4 }}>
             <Masonry gutter={'10px'} >
                 {assets.map((p, i) => {
                     if (!p.posterframe) return null;
