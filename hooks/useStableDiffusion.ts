@@ -14,23 +14,67 @@ export const useStableDiffusion = () => {
     const [output, setOutput] = useState<string | string[]>();
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const upscaleImage = ({ imageBuffer } : { imageBuffer: Buffer }) => {
+    const upscaleImage = ({ imageBuffer }: { imageBuffer: Buffer }) => {
         setIsLoading(true);
+        // stable-diffusion-x4-latent-upscaler
+        // esrgan-v1-x2plus
         const request = buildGenerationRequest("esrgan-v1-x2plus", {
             type: "upscaling",
             upscaler: Generation.Upscaler.UPSCALER_ESRGAN,
             initImage: imageBuffer,
-          });
-          
-          executeGenerationRequest(client, request, metadata)
+        });
+
+        executeGenerationRequest(client, request, metadata)
             .then((res) => {
                 const imageDataUrls = onGenerationComplete(res);
                 setOutput(`data:image/png;base64,${_.first(imageDataUrls)}` || '');
                 setIsLoading(false);
             })
             .catch((error) => {
-              console.error("Failed to upscale image:", error);
+                console.error("Failed to upscale image:", error);
             });
+    }
+
+    const generateImgToImgREST = async ({ url, text_prompt, image_strength, upscale = true }: { url: string, text_prompt: string, image_strength: number, upscale?: boolean }) => {
+        setIsLoading(true);
+        const response = await fetch('/api/stablediffusion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                text_prompt,
+                init_image_url: url,
+                image_strength
+            }),
+        });
+
+        if (response.ok) {
+            const responseJSON = await response.json();
+            const imageData = responseJSON.artifacts;
+            setOutput(`data:image/png;base64,${imageData[0].base64}`);
+            if (_.first(imageData) && upscale) {
+                const buffer = Buffer.from(imageData[0].base64 || '', "base64")
+                upscaleImage({ imageBuffer: buffer })
+            }
+            setIsLoading(false);
+            // responseJSON.artifacts.forEach((image: any, index: number) => {
+            //     // Handle saving images here (browser-safe approach)
+            //     const blob = new Blob([Buffer.from(image.base64, 'base64')], {
+            //         type: 'image/png',
+            //     });
+            //     const imageURL = URL.createObjectURL(blob);
+            //     const a = document.createElement('a');
+            //     a.href = imageURL;
+            //     a.download = `img2img_${image.seed}.png`;
+            //     a.click();
+            //     URL.revokeObjectURL(imageURL);
+            // });
+            // setImageUrl(data[0]);
+        } else {
+            setIsLoading(false);
+            console.error('Error:', response.statusText);
+        }
     }
 
     const generateImgToImg = ({ imageBuffer, prompt, seed, imageStrength = 0.5, upscale = true }: { imageBuffer: Buffer, prompt: string, seed?: number, imageStrength?: number, upscale?: boolean }) => {
@@ -40,7 +84,9 @@ export const useStableDiffusion = () => {
         // and values close to 0 yield imges wildly different than the init_image. This is just another way to calculate
         // stepScheduleStart, which is done via the following formula: stepScheduleStart = 1 - imageStrength.  This means
         // an image strength of 35% would result in a stepScheduleStart of 0.65.
-        const request = buildGenerationRequest("stable-diffusion-512-v2-1", {
+        //stable-diffusion-xl-1024-v1-0
+        //stable-diffusion-512-v2-1
+        const request = buildGenerationRequest("stable-diffusion-xl-1024-v1-0", {
             type: "image-to-image",
             prompts: [
                 {
@@ -50,8 +96,8 @@ export const useStableDiffusion = () => {
             stepScheduleStart: 1 - imageStrength,
             initImage: imageBuffer,
             seed,
-            width: 512,
-            height: 512,
+            width: 1024,
+            height: 1024,
             samples: 1,
             cfgScale: 8,
             steps: 30,
@@ -64,7 +110,7 @@ export const useStableDiffusion = () => {
                 setOutput(`data:image/png;base64,${_.first(imageDataUrls)}` || '');
                 if (_.first(imageDataUrls) && upscale) {
                     const buffer = Buffer.from(_.first(imageDataUrls) || '', "base64")
-                    upscaleImage({imageBuffer: buffer})
+                    upscaleImage({ imageBuffer: buffer })
                 }
                 setIsLoading(false);
             })
@@ -78,7 +124,7 @@ export const useStableDiffusion = () => {
         setIsLoading(true);
         const b64 = arrayBufferToBase64(imageBuffer);
         const prefix = 'data:image/png;base64,'
-        const b64Url = prefix+b64;
+        const b64Url = prefix + b64;
 
         const res = await fetch("/api/hugging", {
             method: "POST",
@@ -105,7 +151,7 @@ export const useStableDiffusion = () => {
         setIsLoading(true);
         const b64 = arrayBufferToBase64(imageBuffer);
         const prefix = 'data:image/png;base64,'
-        const b64Url = prefix+b64;
+        const b64Url = prefix + b64;
         const res = await fetch("/api/hugging", {
             method: "POST",
             headers: {
@@ -130,6 +176,7 @@ export const useStableDiffusion = () => {
 
     return {
         output,
+        generateImgToImgREST,
         generateImgToImg,
         generateTextInpainting,
         generateSegmentationMask,

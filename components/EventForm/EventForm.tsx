@@ -1,10 +1,9 @@
 import { useEffect, useCallback, useState } from 'react';
 import _, { debounce } from 'lodash';
 import { useForm, FormProvider } from 'react-hook-form';
-import { ThreeDots } from 'react-loader-spinner';
 import AiPlayground from '@/components/AiPlayground/AiPlayground';
 import { replaceLinks } from '@/helpers/text';
-import axios, { AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import FormControl from '../Form/FormControl';
 import Modal from '../Modal';
 import FileInput from '../Form/FileInput';
@@ -12,14 +11,15 @@ import useUserStore from '@/store/userStore';
 import { toHexCode } from '@/helpers/color';
 import useDeepCompareEffect from "use-deep-compare-effect";
 import clsx from 'clsx';
-import { convertFieldArrayToObject, convertFieldObjectToArray, isCustomGallery } from '@/helpers/event';
+import { blendModes, convertFieldArrayToObject, convertFieldObjectToArray, isCustomGallery } from '@/helpers/event';
 import { ChromePicker } from 'react-color';
 import { AutosaveStatusText, SaveStatus } from '../Form/AutosaveStatusText';
 import useFilters from '@/hooks/useFilters';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Spinner from '../Spinner';
-import useOrganizations from '@/hooks/useOrganizations';
 import DataCaptureModal from './DataCaptureModal';
+import EffectsModal from './EffectsModal';
+import useOrgAccessStore from '@/store/orgAccessStore';
 
 interface FormData {
     event?: any;
@@ -105,6 +105,7 @@ const EventForm = (props: FormData) => {
                 '3:2': getWatermarkFromArray(event?.event_filter_watermarks, '3:2')?.url || "",
                 '16:9': getWatermarkFromArray(event?.event_filter_watermarks, '16:9')?.url || "",
             },
+            blendmode: event?.metadata?.blendmode || 'kCGBlendModeNormal',
             qr_delivery: event ? (isShowingQrCode(event.event_ipad_screens)) : true,
             custom_frontend: event ? isCustomGallery(event.custom_frontend) : false,
             logo_image: event?.custom_frontend?.logo_image || '',
@@ -122,7 +123,7 @@ const EventForm = (props: FormData) => {
             magic_button_text: event?.metadata?.magic_button?.text || '',
             magic_button_url: event?.metadata?.magic_button?.url || '',
             // email_delivery: event?.metadata?.email_delivery || false,
-            // ai_generation: event?.metadata?.ai_generation || {},
+            ai_generation: event?.metadata?.ai_generation || {},
         }
     });
 
@@ -137,7 +138,6 @@ const EventForm = (props: FormData) => {
     const config = watch();
     const watchedWatermarks = watch('watermarks');
 
-    const { organizations, isLoading: isLoadingOrgs } = useOrganizations();
     const { filters, loadMore: loadMoreFilters, meta: filterMeta } = useFilters(20);
 
     // TODO: hiding email delivery for now
@@ -181,7 +181,7 @@ const EventForm = (props: FormData) => {
                 handleSubmit(submitForm)();
                 return;
             }
-        }, 1000),
+        }, 3000),
         []
     );
 
@@ -212,6 +212,13 @@ const EventForm = (props: FormData) => {
         }
     }, [isSubmitSuccessful, isSubmitting]);
 
+    const organizations = useOrgAccessStore.useOrganizations();
+    const getOrganizations = useOrgAccessStore.useGetOrganizations();
+    const isLoadingOrgs = useOrgAccessStore.useIsLoading();
+    useEffect(() => {
+        getOrganizations();
+    }, []);
+
     const [featureAccess, setFeatureAccess] = useState<any>(null);
     // useEffect to update featureAccess whenever config.org_id changes
     useEffect(() => {
@@ -227,7 +234,6 @@ const EventForm = (props: FormData) => {
         // The dependency array ensures this effect runs whenever config.org_id changes
     }, [config.org_id, organizations]);
 
-
     return (
         <>
             <FormProvider {...methods}>
@@ -242,7 +248,7 @@ const EventForm = (props: FormData) => {
 
                             <FormControl label='organization'>
                                 {event ?
-                                    <div className='lowercase text-xl sm:text-4xl'>{event?.organization?.name}</div>
+                                    <div className='lowercase text-xl sm:text-4xl'>{isLoadingOrgs ?  <span className='loading loading-spinner loading-sm sm:loading-md' /> : _.find(organizations, (o) => o.id == config.org_id)?.name}</div>
                                     : (
                                         isLoadingOrgs ?
                                             <span className='loading loading-spinner loading-sm sm:loading-md' />
@@ -327,6 +333,13 @@ const EventForm = (props: FormData) => {
                                 }
                             >
                                 <div className='list pro'>
+                                    <div key='blendmode'>
+                                        <FormControl label='blend mode'>
+                                            <select onChange={(e) => setValue('blendmode', e.target.value, { shouldDirty: true })} value={config.blendmode} className='select pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl'>
+                                                {_.map(blendModes, ((o) => <option key={o.value} value={o.value}>{o.name}</option>))}
+                                            </select>
+                                        </FormControl>
+                                    </div>
                                     {_.map(ASPECT_RATIOS, (ar, i) => (
                                         <div className='item' key={i}>
                                             <span className={`transition ${_.get(config.watermarks, ar) ? 'text-white' : 'text-white/20'}`}>{ar}</span>
@@ -343,8 +356,13 @@ const EventForm = (props: FormData) => {
                             </Modal>
 
                             <FormControl label='effects' featureGated={featureAccess?.effects ? undefined : 'creator'}>
-                                <div className='text-xl sm:text-4xl text-white/20'>coming soon</div>
+                                {config.ai_generation.enabled && <Modal.Trigger id='effects-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
+                                <input type="checkbox" className="toggle pro toggle-lg" {...register('ai_generation.enabled')} />
                             </FormControl>
+
+                            <EffectsModal
+                                status={status}
+                            />
 
                             <FormControl label='show delivery code'>
                                 <input type="checkbox" className="toggle pro toggle-lg" {...register('qr_delivery')} />

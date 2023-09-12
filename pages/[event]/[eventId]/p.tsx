@@ -73,7 +73,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     // Fetch event config + event photos
     const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}`;
-    const photosUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}/photos?per_page=12`;
+    const photosUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}/photos?per_page=50`;
     let eventData: any = {};
     let photosData: any = {};
 
@@ -121,7 +121,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
     // Event is not public if is_private !== 1
     // @ts-ignore
-    if (eventData.event.is_private != 1) {
+    if (eventData.event.is_private != 1 || eventData.event.event_type != 'hypno_pro') {
         return { notFound: true, }
     }
 

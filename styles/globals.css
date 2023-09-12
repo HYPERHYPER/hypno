@@ -133,6 +133,23 @@
     @apply rounded-none bg-white text-black placeholder:text-black text-[16px] sm:text-xl font-normal sm:input-lg
   }
 
+  .input.data-capture .react-date-picker__wrapper {
+    @apply border-none
+  }
+
+  .input.data-capture .react-date-picker__inputGroup {
+    @apply grow-0 px-0 w-full
+  }
+
+  .input.data-capture .react-date-picker__inputGroup__input:invalid {
+    @apply bg-white
+  }
+
+  .input.data-capture .react-date-picker__button:enabled:hover .react-date-picker__button__icon,
+    .input.data-capture .react-date-picker__button:enabled:focus .react-date-picker__button__icon {
+    @apply stroke-black
+  }
+
   .input.error, .select.error {
     @apply placeholder:text-red-600 text-red-600
   }

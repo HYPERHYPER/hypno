@@ -98,7 +98,7 @@ const SubGallery = (props: ResponseData) => {
     });
 
     const isProEvent = !_.isEmpty(gallery);
-    const showBrowseGalleryBanner = event.is_private == 1 && isProEvent && (isDetailView || (!dataCapture && !gallery.email_delivery));
+    const showBrowseGalleryBanner = event.is_private == 1 && event.event_type == 'hypno_pro' && isProEvent && (isDetailView || (!dataCapture && !gallery.email_delivery));
 
     /* MINI GALLERY ?category= */
     // No photos uploaded: loading view
@@ -112,6 +112,7 @@ const SubGallery = (props: ResponseData) => {
     /* SINGLE ASSET EMAIL DELIVERY ?slug= */
     // 1. Data capture
     // 2. Confirmation message
+
     return (
         <>
             <Head>
@@ -124,7 +125,7 @@ const SubGallery = (props: ResponseData) => {
 
             <CustomGallery event={event} galleryBanner={showBrowseGalleryBanner}>
                 {isDetailView ? (
-                    <DetailView asset={photo} config={{ aiGeneration: gallery.ai_generation, color: gallery.primary_color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
+                    <DetailView asset={photo} config={{ aiGeneration: event?.metadata?.ai_generation, color: gallery.primary_color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
                 ) : (
                     <div
                         style={{ height: outerHeight }}
@@ -133,7 +134,7 @@ const SubGallery = (props: ResponseData) => {
                             <div className='fixed hero top-0 left-0 h-screen p-10'>
                                 <div className='hero-content max-w-[24rem] sm:max-w-2xl flex flex-row gap-4 items-center justify-center bg-white/10 backdrop-blur-[50px] p-8'>
                                     <Spinner />
-                                    <p className='text-white/50'>Your photos are processing, come back later...</p>
+                                    <p className='text-white/50'>Your content is processing, come back later...</p>
                                 </div>
                             </div>
                         ) : (
@@ -197,7 +198,7 @@ const SubGallery = (props: ResponseData) => {
                                     gallery.email_delivery ? (
                                         <SingleAssetDeliveryConfirmation />
                                     ) : (
-                                        <DetailView asset={_.first(photos)} config={{ aiGeneration: gallery.ai_generation, color: gallery.primary_color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64, width: _.first(photos)?.width, height: _.first(photos)?.height }} />
+                                        <DetailView asset={_.first(photos)} config={{ aiGeneration: event?.metadata?.ai_generation, color: gallery.primary_color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64, width: _.first(photos)?.width, height: _.first(photos)?.height }} />
                                     )
                                 ))
                         }
@@ -293,6 +294,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 id: eventData.id,
                 party_slug: eventData.party_slug,
                 is_private: eventData.is_private,
+                metadata: eventData.metadata || {},  
                 custom_frontend: {
                     ...eventData.custom_frontend,
                     ...(deliverySlug && { email_delivery: true })

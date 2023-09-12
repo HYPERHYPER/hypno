@@ -4,12 +4,14 @@ import path from 'path';
 import sharp from "sharp";
 
 
-export async function loadImageFromURL(url: string) {
+export async function loadImageFromURL(url: string, width?: number, height?: number) {
+    const w = width || 512;
+    const h = height || 512;
     const response = await fetch(url);
     const data = await response.arrayBuffer();
     const buffer = Buffer.from(data);    
     const compressedBuffer = await sharp(buffer)
-      .resize(512, 512, { fit: 'contain' })
+      .resize(w, h, { fit: 'contain' })
       .jpeg({ quality: 80 })
       .toBuffer();
       return compressedBuffer;

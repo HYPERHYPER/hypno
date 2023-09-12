@@ -95,14 +95,14 @@ const PLAN_TYPES: PlanType = {
     }
 }
 
-const CREATOR_PLAN = 'price_1NT8F8A3gTSa41Ce8riWJDJw'
-const CREATOR_PLAN_DISCOUNTED = 'price_1NQxqWA3gTSa41Ce2ofRCgn4'
+const CREATOR_PLAN = process.env.NEXT_PUBLIC_CREATOR_PLAN
+const CREATOR_PLAN_DISCOUNTED = process.env.NEXT_PUBLIC_CREATOR_PLAN_DISCOUNTED
 
-const STUDIO_PLAN = 'price_1NT8G6A3gTSa41CeZ2XYleYk'
-const STUDIO_PLAN_DISCOUNTED = 'price_1NQxrDA3gTSa41CeORPpKPGl'
+const STUDIO_PLAN = process.env.NEXT_PUBLIC_STUDIO_PLAN
+const STUDIO_PLAN_DISCOUNTED = process.env.NEXT_PUBLIC_STUDIO_PLAN_DISCOUNTED
 
-const BRAND_PLAN = 'price_1NT8HLA3gTSa41CeELa2qyxq'
-const BRAND_PLAN_DISCOUNTED = 'price_1NQxrWA3gTSa41Ce8cmJ1j77'
+const BRAND_PLAN = process.env.NEXT_PUBLIC_BRAND_PLAN
+const BRAND_PLAN_DISCOUNTED = process.env.NEXT_PUBLIC_BRAND_PLAN_DISCOUNTED
 
 const getProductId = (plan_type: string, subscription: 'annual' | 'monthly') => {
     switch (plan_type) {

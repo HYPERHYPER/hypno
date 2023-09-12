@@ -33,7 +33,8 @@ const nextConfig = {
         port: '',
         pathname: '**'
       },
-    ]
+    ],
+    minimumCacheTTL: 31536000,
   },
   webpack: (config) => {
     config.module.rules.push({
