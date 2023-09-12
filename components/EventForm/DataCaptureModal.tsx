@@ -40,7 +40,7 @@ export default function DataCaptureModal({
     }
 
     return (
-        <Modal title='data capture' id='data-modal' menu={status && AutosaveStatusText(status)}>
+        <Modal title='data/legal' id='data-modal' menu={status && AutosaveStatusText(status)}>
             <div className='border-t-2 border-white/20'>
                 {children}
 
