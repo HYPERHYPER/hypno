@@ -125,9 +125,9 @@ export default function DataCaptureForm({
             className={`min-h-[calc(100vh-85px-48px-30px-env(safe-area-inset-bottom))] overflow-auto flex items-center px-6`}>
             <div className='sm:max-w-2xl pt-9 sm:pt-[72px] pb-[72px] sm:px-10 mx-auto'>
                 <div className='flex flex-col text-center'>
-                    <div className='mb-4 sm:mb-8 text-lg leading-5 sm:text-3xl'>
-                        <h2><Balancer>{title || 'want your photos?'}</Balancer></h2>
-                        {(subtitle || (!title && !subtitle)) && <h2 className='text-white/50'><Balancer>{subtitle || (!title && 'add your info to continue...')}</Balancer></h2>}
+                    <div className='mb-4 sm:mb-8 text-lg sm:text-3xl'>
+                        <h2 className='leading-[120%]'><Balancer>{title || 'want your photos?'}</Balancer></h2>
+                        {(subtitle || (!title && !subtitle)) && <h2 className='text-white/50 leading-[120%]'><Balancer>{subtitle || (!title && 'add your info to continue...')}</Balancer></h2>}
                     </div>
                     <form onSubmit={handleSubmit(submitDataCapture)} className='space-y-2 flex flex-col'>
                         {fields?.map((v, i) => {
