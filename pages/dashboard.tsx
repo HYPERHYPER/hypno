@@ -36,7 +36,8 @@ function DashboardPage(props: ResponseData) {
     const token = useUserStore.useToken();
     const { query } = useRouter();
     const sort_order = query.order || 'desc';
-    const sort_by = query.by || 'updated_at';
+    const sort_by = query.by || 'last_uploaded_at';
+    const sort_by_name = _.split(String(sort_by), '_')[0];
 
     const getKey = (pageIndex: number, previousPageData: any) => {
         if (previousPageData && pageIndex == previousPageData.pages) return null; // reached the end
@@ -67,12 +68,11 @@ function DashboardPage(props: ResponseData) {
                     <Link href='/e/new' className='text-primary'><h2>new event</h2></Link>
                     <div className='text-primary flex items-center gap-1 sm:gap-3'>
                         <div className="dropdown">
-                            <label tabIndex={0} className='cursor-pointer'><h2>{_.split(String(sort_by), '_')[0]}</h2></label>
+                            <label tabIndex={0} className='cursor-pointer'><h2>{sort_by_name == 'last' ? 'updated' : sort_by_name}</h2></label>
                             <ul tabIndex={0} className="dropdown-content sm:text-lg z-[1] menu p-2 shadow bg-black/20 backdrop-blur rounded-box w-32 sm:w-52">
                                 <li className='disabled'><a>sort by</a></li>
                                 <li><Link href={`/dashboard?by=created_at&order=${sort_order}`}>created at</Link></li>
-                                <li><Link href={`/dashboard?by=updated_at&order=${sort_order}`}>updated at</Link></li>
-                                <li><Link href={`/dashboard?by=last_uploaded_at&order=${sort_order}`}>last uploaded at</Link></li>
+                                <li><Link href={`/dashboard?by=last_uploaded_at&order=${sort_order}`}>updated at</Link></li>
                                 <li><Link href={`/dashboard?by=name&order=${sort_order}`}>name</Link></li>
                             </ul>
                         </div>
