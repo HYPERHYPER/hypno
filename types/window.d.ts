@@ -9,5 +9,6 @@ declare global {
             right: number;
         };
         payment_plans_modal?: DialogHTMLAttributes;
+        text_prompt_editor_modal?: DialogHTMLAttributes;
     }
 }

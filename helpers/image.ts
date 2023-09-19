@@ -14,6 +14,19 @@ export function getAspectRatio(width?: number, height?: number) {
     return `${ratio}`;
 }
 
+export function calculateAspectRatioString(width: number, height: number): string {
+    // Calculate the greatest common divisor (GCD) of width and height
+    const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
+    const divisor: number = gcd(width, height);
+  
+    // Calculate the aspect ratio
+    const aspectWidth: number = width / divisor;
+    const aspectHeight: number = height / divisor;
+  
+    // Return the aspect ratio as a string
+    return `${aspectWidth}:${aspectHeight}`;
+  }
+
 /**
  * It converts an array of numbers to a base64 string for image buffer converstion
  * @param {number[]} buffer - the array buffer you want to convert to base64

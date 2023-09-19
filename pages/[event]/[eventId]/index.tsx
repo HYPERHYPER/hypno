@@ -123,9 +123,9 @@ const SubGallery = (props: ResponseData) => {
                 <meta name="og:video:type" content='video/mp4' />
             </Head>
 
-            <CustomGallery event={event} galleryBanner={showBrowseGalleryBanner}>
+            <CustomGallery event={event} galleryBanner={showBrowseGalleryBanner} defaultBackground={isDetailView ? photo.posterframe : _.first(photos)?.posterframe}>
                 {isDetailView ? (
-                    <DetailView asset={photo} config={{ aiGeneration: event?.metadata?.ai_generation, color: gallery.primary_color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
+                    <DetailView asset={photo} config={{ ai_generation: event?.metadata?.ai_generation, color: gallery.primary_color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
                 ) : (
                     <div
                         style={{ height: outerHeight }}

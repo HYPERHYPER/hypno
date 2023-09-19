@@ -1,7 +1,6 @@
-import { useStableDiffusion } from "@/hooks/useStableDiffusion";
 import Spinner from "../Spinner";
 import Image from 'next/image';
-import { useState } from "react";
+import { useRef, useState } from "react";
 import clsx from "clsx";
 import VideoAsset from "./VideoAsset";
 import useContentHeight from "@/hooks/useContentHeight";
@@ -9,6 +8,9 @@ import _ from 'lodash';
 import { toTextColor } from "@/helpers/color";
 import useWidth from "@/hooks/useWidth";
 import { downloadPhoto } from "@/helpers/image";
+import useMagic from "@/hooks/useMagic";
+import EditTextPrompt from "../ImageGeneration/EditTextPrompt";
+import ImageAsset from "../ImageGeneration/ImageAsset";
 
 export default function DetailView({ asset, config, imageProps }: any) {
     // const footer = Boolean(config.aiGeneration?.enabled || asset.mp4_url);
@@ -16,14 +18,23 @@ export default function DetailView({ asset, config, imageProps }: any) {
     const [assetHeight, setAssetHeight] = useState<number>(0);
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
-    const { output, generateImgToImgREST, isLoading: isLoadingGeneration } = useStableDiffusion();
+    const { images, isLoading: isLoadingGeneration, textPrompt, editTextPrompt, generateMidjourneyImage } = useMagic(config.ai_generation, asset);
+    // const containerRef = useRef<HTMLDivElement | null>(null);
+
     const handleRemix = async (e: any) => {
-        // window.ai_generation_modal.showModal();
-        generateImgToImgREST({
-            url: asset.urls.url,
-            text_prompt: config.aiGeneration.text_prompt,
-            image_strength: Number(config.aiGeneration.image_strength) / 100
-        })
+        // generateImgToImgREST({
+        //     url: asset.urls.url,
+        //     text_prompt: config.aiGeneration.text_prompt,
+        //     image_strength: Number(config.aiGeneration.image_strength) / 100
+        // })
+        // const scrollToBottom = () => {
+        //     if (containerRef.current) {
+        //         containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        //     }
+        // }
+
+        generateMidjourneyImage();
+        // scrollToBottom();
     };
 
     const isPortrait = asset.height > asset.width;
@@ -50,11 +61,11 @@ export default function DetailView({ asset, config, imageProps }: any) {
     return (
         <>
             <div
-                style={output ? {} : (!isVideo && isPortrait) ? { minHeight: isPortrait ? Math.max(Number(height.split('px')[0]), assetHeight) + 'px' : height } : (!isVideo && Number(width) < 668 ? { minHeight: '55vh' } : {})}
+                style={!_.isEmpty(images) ? {} : (!isVideo && isPortrait) ? { minHeight: isPortrait ? Math.max(Number(height.split('px')[0]), assetHeight) + 'px' : height } : (!isVideo && Number(width) < 668 ? { minHeight: '55vh' } : {})}
                 className={clsx(`inline-flex px-[25px] items-center flex-col mx-auto w-full`, isPortrait && assetHeight > Number(height.split('px')[0]) ? 'justify-between' : (!isPortrait ? 'justify-center' : 'justify-start pb-[30px]'), footer ? 'mb-[72px]' : '')}>
                 {/* className={clsx(`
                 max-w-none sm:max-h-[80vh] sm:w-auto sm:flex sm:items-center sm:justify-center sm:mx-auto px-[25px]`, footer ? 'mb-[72px]': 'mb-6')}> */}
-                <div className={clsx('relative', isPortrait && 'md:max-w-lg sm:mb-0', isPortrait && !isVideo && !output && assetHeight > Number(height.split('px')[0]) && "mb-[72px]")}>
+                <div className={clsx('relative', isPortrait && 'md:max-w-lg sm:mb-0', isPortrait && !isVideo && _.isEmpty(images) && assetHeight > Number(height.split('px')[0]) && "mb-[72px]")}>
                     <div className='absolute w-full h-full min-h-[100px] min-w-[100px] flex itmes-center justify-center'>
                         <Spinner />
                     </div>
@@ -92,27 +103,26 @@ export default function DetailView({ asset, config, imageProps }: any) {
                     </div>
                 </div>
 
-                {(output || isLoadingGeneration) && (
-                    <div className={clsx('relative mt-4 bg-white/10 backdrop-blur-[50px] mx-auto', isLoadingGeneration ? 'w-auto aspect-square min-w-full' : 'w-auto')}>
-                        {isLoadingGeneration && (
-                            <div className='absolute -z-10 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
-                                <span className="loading loading-spinner text-secondary" />
-                            </div>
-                        )}
+                {(!_.isEmpty(images)) && (
+                    _.map(images, (img, i) => (
+                        <ImageAsset src={img} key={i} />
+                    ))
+                )}
 
-                        <div className='block'>
-                            {output && !isLoadingGeneration && <img style={isPortrait && assetHeight > Number(outerHeight.split('px')[0]) ? { minHeight: height } : {}}
-                                src={String(output)} alt={`output-${asset.event_id}-${asset.id}`} className='w-auto' />}
-                        </div>
+                {!isLoadingGeneration && !_.isEmpty(images) && (
+                    <div className="text-center mt-3 px-2">
+                        <h3 className="text-white/50 mb-4">{textPrompt}</h3>
+                        <EditTextPrompt onChange={editTextPrompt} textPrompt={textPrompt} generateImage={handleRemix} />
                     </div>
                 )}
 
                 <div className='hidden sm:block sm:mt-3 sm:text-center'>
-                    {((!asset.mp4_url && config?.aiGeneration && config?.aiGeneration.enabled)) ? (
-                        <button className='btn btn-secondary btn-gallery locked' onClick={handleRemix}>
+                    {((!asset.mp4_url && config?.ai_generation && config?.ai_generation.enabled)) ? (
+                        <button className='btn btn-info btn-gallery locked' onClick={handleRemix}>
                             {isLoadingGeneration ?
-                                <span className="loading loading-dots" />
-                                : '✦ tap for magic ✦'}
+                                'one m☻ment'
+                                : 'tap for magic'
+                            }
                         </button>
                     ) : (
                         downloadButton({ mobile: false })
@@ -123,14 +133,12 @@ export default function DetailView({ asset, config, imageProps }: any) {
 
 
             <div className='block sm:hidden'>
-                {((!asset.mp4_url && config?.aiGeneration && config?.aiGeneration.enabled)) ? (
-                    <button className='btn btn-secondary btn-gallery locked overflow-hidden relative' onClick={handleRemix}>
+                {((!asset.mp4_url && config?.ai_generation && config?.ai_generation.enabled)) ? (
+                    <button className='btn btn-info btn-gallery locked overflow-hidden relative' onClick={handleRemix}>
                         {isLoadingGeneration ?
-                            <span className="loading loading-dots" />
-                            : <div className="block absolute overflow-hidden animate-marquee whitespace-nowrap w-[207%]">
-                                <span className="float-left w-1/2">tap for magic ✺︎ tap for magic ✦ tap for magic ✶︎ tap for magic ❊</span>
-                                <span className="float-left w-1/2">tap for magic ✺︎ tap for magic ✦ tap for magic ✶︎</span>
-                            </div>}
+                            'one m☻ment'
+                            : 'tap for magic'
+                        }
                     </button>
                 ) :
                     downloadButton({ mobile: true })

@@ -10,23 +10,28 @@ interface CustomGalleryProps {
     children: React.ReactNode;
     logoSize?: 'sm' | 'lg';
     galleryBanner?: boolean;
+    defaultBackground?: string; // image url of gallery image
 }
 
-export function CustomGallery({ event, children, logoSize = 'sm', galleryBanner }: CustomGalleryProps) {
+export function CustomGallery({ event, children, logoSize = 'sm', galleryBanner, defaultBackground }: CustomGalleryProps) {
     const windowHeight = useHeight();
     const { custom_frontend: gallery } = event;
+
+    const backgroundImage = gallery?.home_background_image || defaultBackground; // default is blurred photo from gallery
+
     return (
         <section className={`text-white min-h-screen relative`} style={{ minHeight: windowHeight }}>
             <div
                 className='fixed bg-black top-0 bottom-0 left-0 w-screen h-screen'
-                style={gallery?.home_background_image ? {
-                    background: `url(${gallery.home_background_image}) no-repeat center center fixed`,
+                style={{
+                    background: `url(${backgroundImage}) no-repeat center center fixed`,
                     backgroundSize: 'cover',
                     WebkitBackgroundSize: 'cover',
                     MozBackgroundSize: 'cover',
                     OBackgroundSize: 'cover',
                     height: windowHeight,
-                } : {}}
+                    filter: gallery?.home_background_image ? 'none' : 'blur(30px)'
+                }}
             />
 
             {galleryBanner && <Link href={`/pro/${event.id}/p`} className='absolute top-0 left-0 right-0 p-2 w-full bg-black/10 backdrop-blur-[30px] z-10 text-center transition hover:bg-black/[.08]'><h3 className='font-medium'>browse the gallery →</h3></Link>}

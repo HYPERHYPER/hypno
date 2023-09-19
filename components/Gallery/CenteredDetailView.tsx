@@ -82,10 +82,11 @@ export default function CenteredDetailView({ asset, config, imageProps }: any) {
 
                 <div className='hidden sm:mt-3 sm:flex sm:justify-center'>
                     {((!asset.mp4_url && config?.aiGeneration && config?.aiGeneration.enabled)) ? (
-                        <button className='btn btn-secondary btn-gallery locked' onClick={handleRemix}>
+                        <button className='btn btn-info btn-gallery locked' onClick={handleRemix}>
                             {isLoadingGeneration ?
-                                <span className="loading loading-dots" />
-                                : '✦ tap for magic ✦'}
+                                'one m☻ment'
+                                : 'tap for magic'
+                            }
                         </button>
                     ) : (
                         downloadButton({ mobile: false })
@@ -95,13 +96,11 @@ export default function CenteredDetailView({ asset, config, imageProps }: any) {
 
             <div className='block sm:hidden'>
                 {((!asset.mp4_url && config?.aiGeneration && config?.aiGeneration.enabled)) ? (
-                    <button className='btn btn-secondary btn-gallery locked overflow-hidden relative' onClick={handleRemix}>
+                    <button className='btn btn-info btn-gallery locked overflow-hidden relative' onClick={handleRemix}>
                         {isLoadingGeneration ?
-                            <span className="loading loading-dots" />
-                            : <div className="block absolute overflow-hidden animate-marquee whitespace-nowrap w-[207%]">
-                                <span className="float-left w-1/2">tap for magic ✺︎ tap for magic ✦ tap for magic ✶︎ tap for magic ❊</span>
-                                <span className="float-left w-1/2">tap for magic ✺︎ tap for magic ✦ tap for magic ✶︎</span>
-                            </div>}
+                            'one m☻ment'
+                            : 'tap for magic'
+                        }
                     </button>
                 ) :
                     downloadButton({ mobile: true })

@@ -1,3 +1,12 @@
+export type AiConfig = {
+    enabled?: boolean;
+    type?: 'midjourney' | 'stable diffusion';
+    text_prompt?: string;
+    prompt_strength?: number;
+    img_prompt?: string[];
+    midjourney_parameters?: string;
+}
+
 export type EventMicrosite = {
     logo_image?: string;
     home_background_image?: string;
@@ -11,7 +20,7 @@ export type EventMicrosite = {
     explicit_opt_in?: boolean;
     terms_privacy?: string;
     email_delivery?: boolean;
-    ai_generation?: any;
+    ai_generation?: AiConfig | null;
 } | any;
 type EventMicrositeKey = keyof EventMicrosite;
 
@@ -25,11 +34,7 @@ export type EventConfig = {
     delivery?: string; // "qr_gallery" to show qr code to microsite, "qr" to disable
     event_type?: string;
     metadata?: {
-        ai_generation?: {
-            enabled?: boolean;
-            text_prompt?: string;
-            image_strength?: any;
-        }
+        ai_generation?: AiConfig | null;
     }
     custom_frontend?: EventMicrosite | null;
 }

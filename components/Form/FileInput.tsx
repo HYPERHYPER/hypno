@@ -15,7 +15,7 @@ interface UploaderProps {
   value?: string;
   disabled?: boolean;
   validateAspectRatio?: AspectRatio;
-  uploadCategory: 'watermark' | 'logo' | 'background' | 'filter' | 'user';
+  uploadCategory: 'watermark' | 'logo' | 'background' | 'filter' | 'user' | 'ai';
 }
 
 export default function FileInput(props: UploaderProps) {
