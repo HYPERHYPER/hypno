@@ -12,7 +12,7 @@ export default function MagicButton({ isLoading, mobile, onClick }: MagicButtonP
     const [loadedGlitch, setLoadedGlitch] = useState<boolean>(false);
     const [state, setState] = useState<any>();
 
-    const loadingTexts = ['one m☻ment', 'just a sec', 'b right there', 'pls hold'];
+    const loadingTexts = ['one m☻ment', 'dont go anywhere', 'just a sec', 'cooking...', 'b right there', 'pls hold'];
     const [textIdx, setTextIdx] = useState<number>(0);
     const [loadingText, setLoadingText] = useState<string>(loadingTexts[0]);
 

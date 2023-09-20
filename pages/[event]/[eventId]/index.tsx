@@ -198,7 +198,7 @@ const SubGallery = (props: ResponseData) => {
                                     gallery.email_delivery ? (
                                         <SingleAssetDeliveryConfirmation />
                                     ) : (
-                                        <DetailView asset={_.first(photos)} config={{ aiGeneration: event?.metadata?.ai_generation, color: gallery.primary_color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64, width: _.first(photos)?.width, height: _.first(photos)?.height }} />
+                                        <DetailView asset={_.first(photos)} config={{ ai_generation: event?.metadata?.ai_generation, color: gallery.primary_color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64, width: _.first(photos)?.width, height: _.first(photos)?.height }} />
                                     )
                                 ))
                         }
