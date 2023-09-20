@@ -1,6 +1,6 @@
 import Spinner from "../Spinner";
 import Image from 'next/image';
-import { useRef, useState } from "react";
+import { useState } from "react";
 import clsx from "clsx";
 import VideoAsset from "./VideoAsset";
 import useContentHeight from "@/hooks/useContentHeight";
@@ -9,9 +9,9 @@ import { toTextColor } from "@/helpers/color";
 import useWidth from "@/hooks/useWidth";
 import { downloadPhoto } from "@/helpers/image";
 import useMagic from "@/hooks/useMagic";
-import EditTextPrompt from "../ImageGeneration/EditTextPrompt";
-import ImageAsset from "../ImageGeneration/ImageAsset";
 import MagicButton from "../ImageGeneration/MagicButton";
+import MagicImageItem from "../ImageGeneration/ImageAsset";
+import { TextPromptEditor } from "../ImageGeneration/EditTextPrompt";
 
 export default function DetailView({ asset, config, imageProps }: any) {
     // const footer = Boolean(config.aiGeneration?.enabled || asset.mp4_url);
@@ -104,17 +104,16 @@ export default function DetailView({ asset, config, imageProps }: any) {
                     </div>
                 </div>
 
-                {(!_.isEmpty(images)) && (
-                    _.map(images, (img, i) => (
-                        <ImageAsset src={img} key={i} />
-                    ))
-                )}
+                <div className="mt-7">
+                    {(!_.isEmpty(images)) && (
+                        _.map(images, (img, i) => (
+                            <MagicImageItem image={img} key={i} updateEditorPrompt={editTextPrompt} />
+                        ))
+                    )}
+                </div>
 
-                {!isLoadingGeneration && !_.isEmpty(images) && (
-                    <div className="text-center mt-3 px-2">
-                        <h3 className="text-white/50 mb-4">{textPrompt}</h3>
-                        <EditTextPrompt onChange={editTextPrompt} textPrompt={textPrompt} generateImage={handleRemix} />
-                    </div>
+                {(!asset.mp4_url && config?.ai_generation && config?.ai_generation.enabled) && (
+                    <TextPromptEditor onChange={editTextPrompt} textPrompt={textPrompt} generateImage={handleRemix} />
                 )}
 
                 <div className='hidden sm:block sm:mt-3 sm:text-center'>

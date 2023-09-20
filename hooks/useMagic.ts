@@ -3,9 +3,15 @@ import { useState } from "react";
 import _ from 'lodash';
 import { calculateAspectRatioString } from "@/helpers/image";
 
-export default function useMagic(config: AiConfig, asset: any) {
+export interface MagicImage {
+    src?: string;
+    status?: string;
+    textPrompt?: string;
+}
 
-    const [images, setImages] = useState<string[]>([]); // array of generated image urls, if still loading will be empty string
+
+export default function useMagic(config: AiConfig, asset: any) {
+    const [images, setImages] = useState<MagicImage[]>([]); // array of generated image urls, if still loading will be empty string
     const [textPrompt, setTextPrompt] = useState<string>(config?.text_prompt || '');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<boolean>(false);
@@ -20,7 +26,13 @@ export default function useMagic(config: AiConfig, asset: any) {
     // Midjourney
     async function generateMidjourneyImage() {
         setIsLoading(true);
-        setImages((prev) => [...prev, '']) // image generating in progress
+
+        const defaultMagicImage = {
+            src: '',
+            status: 'pending',
+            textPrompt
+        }
+        setImages((prev) => [...prev, defaultMagicImage]) // image generating in progress
 
         const img_prompts = _.join(config?.img_prompt, " ");
         const imgAspectRatioParam = `--ar ${calculateAspectRatioString(asset?.width, asset?.height)}`
@@ -59,7 +71,12 @@ export default function useMagic(config: AiConfig, asset: any) {
                         const imageGrid = responseData.data.url;
                         const upscaledImage = _.first(responseData.data.upscaled_urls);
                         const image = upscaledImage || imageGrid;
-                        setImages((prev) => [...prev.slice(0, -1), image]); // replace with loaded url
+                        const magicImage = {
+                            src: image,
+                            status: responseData.data.status,
+                            textPrompt,
+                        }
+                        setImages((prev) => [...prev.slice(0, -1), magicImage]); // replace with loaded url
                         setIsLoading(false);
                         console.log('Completed image details', responseData.data);
                       } else {
