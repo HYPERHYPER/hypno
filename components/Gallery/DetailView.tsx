@@ -104,7 +104,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                     </div>
                 </div>
 
-                <div className="mt-7">
+                <div className="mt-7 w-full">
                     {(!_.isEmpty(images)) && (
                         _.map(images, (img, i) => (
                             <MagicImageItem image={img} key={i} updateEditorPrompt={editTextPrompt} />
