@@ -11,6 +11,7 @@ import { downloadPhoto } from "@/helpers/image";
 import useMagic from "@/hooks/useMagic";
 import EditTextPrompt from "../ImageGeneration/EditTextPrompt";
 import ImageAsset from "../ImageGeneration/ImageAsset";
+import MagicButton from "../ImageGeneration/MagicButton";
 
 export default function DetailView({ asset, config, imageProps }: any) {
     // const footer = Boolean(config.aiGeneration?.enabled || asset.mp4_url);
@@ -118,12 +119,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
 
                 <div className='hidden sm:block sm:mt-3 sm:text-center'>
                     {((!asset.mp4_url && config?.ai_generation && config?.ai_generation.enabled)) ? (
-                        <button className='btn btn-info btn-gallery locked' onClick={handleRemix}>
-                            {isLoadingGeneration ?
-                                'one m☻ment'
-                                : 'tap for magic'
-                            }
-                        </button>
+                        <MagicButton isLoading={isLoadingGeneration} onClick={handleRemix} />
                     ) : (
                         downloadButton({ mobile: false })
                     )}
@@ -134,12 +130,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
 
             <div className='block sm:hidden'>
                 {((!asset.mp4_url && config?.ai_generation && config?.ai_generation.enabled)) ? (
-                    <button className='btn btn-info btn-gallery locked overflow-hidden relative' onClick={handleRemix}>
-                        {isLoadingGeneration ?
-                            'one m☻ment'
-                            : 'tap for magic'
-                        }
-                    </button>
+                    <MagicButton isLoading={isLoadingGeneration} onClick={handleRemix} />
                 ) :
                     downloadButton({ mobile: true })
                 }
