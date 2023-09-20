@@ -7,6 +7,7 @@ export interface MagicImage {
     src?: string;
     status?: string;
     textPrompt?: string;
+    urls?: string[];
 }
 
 
@@ -75,6 +76,7 @@ export default function useMagic(config: AiConfig, asset: any) {
                             src: image,
                             status: responseData.data.status,
                             textPrompt,
+                            urls: responseData.data.upscaled_urls,
                         }
                         setImages((prev) => [...prev.slice(0, -1), magicImage]); // replace with loaded url
                         setIsLoading(false);
