@@ -54,7 +54,7 @@
     "react-infinite-scroll-component": "^6.1.0",
     "react-loader-spinner": "^5.3.4",
     "react-responsive-masonry": "^2.1.7",
-    "react-scramble": "^0.5.1",
+    "react-scramble": "github:sessex/react-scramble#master",
     "react-slide-fade-in": "^1.0.9",
     "react-tailwindcss-datepicker": "^1.6.1",
     "react-wrap-balancer": "^0.5.0",
