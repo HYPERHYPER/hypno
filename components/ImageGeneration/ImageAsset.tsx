@@ -47,7 +47,7 @@ export default function MagicImageItem({ image, updateEditorPrompt }: {
     }
 
     return (
-        <>
+        <div className='w-full'>
             <ImageAsset src={src} />
             {status != 'pending' && (
                 <div className="text-center mt-5 mb-7 px-2">
@@ -55,6 +55,6 @@ export default function MagicImageItem({ image, updateEditorPrompt }: {
                     <EditTextPrompt onClick={handleEditTextPromptClick} />
                 </div>
             )}
-        </>
+        </div>
     )
 }
