@@ -19,6 +19,7 @@ export default function useMagic(config: AiConfig, asset: any) {
 
     const editTextPrompt = (updatedText: string) => setTextPrompt(updatedText);
 
+
     // Stable diffusion
     async function generateStableDiffusionImage() {
 
@@ -37,8 +38,9 @@ export default function useMagic(config: AiConfig, asset: any) {
 
         const img_prompts = _.join(config?.img_prompt, " ");
         const imgAspectRatioParam = `--ar ${calculateAspectRatioString(asset?.width, asset?.height)}`
+        const parameters = _.isNil(config?.midjourney_parameters) ? '' : config?.midjourney_parameters;
         const data = {
-            prompt: `${asset.urls.url} ${img_prompts} ${textPrompt} ${imgAspectRatioParam} ${config?.midjourney_parameters}`
+            prompt: `${asset.urls.url} ${img_prompts} ${textPrompt} ${imgAspectRatioParam} ${parameters}`
         };
 
         let promptResponseData: any;
