@@ -24,7 +24,7 @@ export function TextPromptEditor({ onChange, textPrompt, generateImage, isGenera
     const adjustTextareaHeight = () => {
         if (textareaRef.current) {
             textareaRef.current.style.height = 'auto';
-            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+            textareaRef.current.style.height = `${(textareaRef.current.scrollHeight)*1.2}px`;
         }
     };
 
@@ -58,6 +58,19 @@ export function TextPromptEditor({ onChange, textPrompt, generateImage, isGenera
     useEffect(() => {
         if (loadedGlitch && isGenerating && glitchState.start) {
             glitchState.start();
+
+            const glitchText = () => {
+                setTextIdx((prevTextIdx) => {
+                    const newIdx = (prevTextIdx + 1) % loadingTexts.length;
+                    setLoadingText(loadingTexts[newIdx]);
+                    return newIdx;
+                });
+                glitchState.restart();
+            }
+
+            const intervalId = setInterval(glitchText, 6000);
+
+            return () => { clearInterval(intervalId) }
         }
     }, [loadedGlitch, textPrompt, isGenerating]);
 
@@ -88,34 +101,30 @@ export function TextPromptEditor({ onChange, textPrompt, generateImage, isGenera
                 className={clsx("absolute bottom-0 left-0 right-0 btn btn-gallery text-black bg-white border-white disabled:text-black disabled:bg-white", isGenerating ? 'cursor-disabled' : '')}
                 disabled={isGenerating}
             >
-                {isGenerating ?
-                    <Scramble
-                        autoStart
-                        text={loadingText}
-                        steps={[
-                            {
-                                roll: 8,
-                                action: '+',
-                                type: 'all',
-                            },
-                            {
-                                action: '-',
-                                type: 'all',
-                                text: loadingText
-                            },
-                        ]}
-                        speed='fast'
-                        bindMethod={c => {
-                            setGlitchState({
-                                restart: c.restart,
-                                start: c.start,
-                            })
-                            setLoadedGlitch(true);
-                        }}
-                    />
-                    :
-                    'ok'
-                }
+                <Scramble
+                    autoStart
+                    text={isGenerating ? loadingText : 'ok'}
+                    steps={isGenerating ? [
+                        {
+                            roll: 8,
+                            action: '+',
+                            type: 'all',
+                        },
+                        {
+                            action: '-',
+                            type: 'all',
+                            text: loadingText
+                        },
+                    ] : []}
+                    speed='fast'
+                    bindMethod={c => {
+                        setGlitchState({
+                            restart: c.restart,
+                            start: c.start,
+                        })
+                        setLoadedGlitch(true);
+                    }}
+                />
             </button>
         </dialog>
     )
