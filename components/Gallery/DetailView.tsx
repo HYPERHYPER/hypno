@@ -25,12 +25,11 @@ export default function DetailView({ asset, config, imageProps }: any) {
     const scrollToBottom = useCallback(() => {
         if (containerRef.current) {
             // console.log('height', containerRef.current.scrollHeight)
-            // console.log('top', containerRef.current.scrollTop)
             // Scroll to the element
             containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
             // Calculate the desired additional scroll amount
-            const additionalScrollAmount = 200;
+            const additionalScrollAmount = 300;
 
             // Scroll further by the desired amount
             containerRef.current.scrollTo({
@@ -82,10 +81,8 @@ export default function DetailView({ asset, config, imageProps }: any) {
                 className={clsx(
                     `inline-flex px-[25px] items-center flex-col mx-auto w-full`,
                     isPortrait && assetHeight > Number(height.split('px')[0]) ? 'justify-between' : (!isPortrait ? 'justify-center' : 'justify-start pb-[30px]'),
-                    footer ? 'mb-[72px]' : '')
-                }>
-                {/* className={clsx(`
-                max-w-none sm:max-h-[80vh] sm:w-auto sm:flex sm:items-center sm:justify-center sm:mx-auto px-[25px]`, footer ? 'mb-[72px]': 'mb-6')}> */}
+                    footer && _.isEmpty(images) ? 'mb-[72px]' : ''
+                )}>
                 <div className={clsx('relative', isPortrait && 'md:max-w-lg sm:mb-0', isPortrait && !isVideo && _.isEmpty(images) && assetHeight > Number(height.split('px')[0]) && "mb-[72px]")}>
                     <div className='absolute w-full h-full min-h-[100px] min-w-[100px] flex itmes-center justify-center'>
                         <Spinner />
