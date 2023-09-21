@@ -80,8 +80,8 @@ export default function DetailView({ asset, config, imageProps }: any) {
                 style={!_.isEmpty(images) ? {} : (!isVideo && isPortrait) ? { minHeight: isPortrait ? Math.max(Number(height.split('px')[0]), assetHeight) + 'px' : height } : (!isVideo && Number(width) < 668 ? { minHeight: '55vh' } : {})}
                 className={clsx(
                     `inline-flex px-[25px] items-center flex-col mx-auto w-full`,
-                    isPortrait && assetHeight > Number(height.split('px')[0]) ? 'justify-between' : (!isPortrait ? 'justify-center' : 'justify-start pb-[30px]'),
-                    footer && _.isEmpty(images) ? 'mb-[72px]' : ''
+                    _.isEmpty(images) && (isPortrait && assetHeight > Number(height.split('px')[0]) ? 'justify-between' : (!isPortrait ? 'justify-center' : 'justify-start pb-[30px]')),
+                    footer ? (_.isEmpty(images) ? 'mb-[72px]' : 'mb-[24px]') : ''
                 )}>
                 <div className={clsx('relative', isPortrait && 'md:max-w-lg sm:mb-0', isPortrait && !isVideo && _.isEmpty(images) && assetHeight > Number(height.split('px')[0]) && "mb-[72px]")}>
                     <div className='absolute w-full h-full min-h-[100px] min-w-[100px] flex itmes-center justify-center'>
