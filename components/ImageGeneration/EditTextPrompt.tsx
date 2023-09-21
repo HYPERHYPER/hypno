@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Scramble from "react-scramble";
+import Close from '../../assets/icons/close.svg';
 
 // Each photo asset should have an edit text prompt button
 export default function EditTextPrompt({ onClick }: { onClick: any }) {
@@ -80,7 +81,7 @@ export function TextPromptEditor({ onChange, textPrompt, generateImage, isGenera
                 autoFocus={false}
                 tabIndex={-1}
             >
-                <div className="bg-white w-[30px] sm:w-[60px] h-1 rounded-sm" />
+                <Close />
             </button>
             <button
                 onClick={() => confirmNewTextPrompt()}
