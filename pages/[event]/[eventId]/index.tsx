@@ -98,7 +98,7 @@ const SubGallery = (props: ResponseData) => {
     });
 
     const isProEvent = !_.isEmpty(gallery);
-    const showBrowseGalleryBanner = event.is_private == 1 && event.event_type == 'hypno_pro' && isProEvent && (isDetailView || (!dataCapture && !gallery.email_delivery));
+    const showBrowseGalleryBanner = event.is_private == 1 && event.event_type == 'hypno_pro' && (isDetailView || (!dataCapture && !gallery.email_delivery));
 
     /* MINI GALLERY ?category= */
     // No photos uploaded: loading view
@@ -295,6 +295,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 party_slug: eventData.party_slug,
                 is_private: eventData.is_private,
                 metadata: eventData.metadata || {},  
+                event_type: eventData.event_type || '',
                 custom_frontend: {
                     ...eventData.custom_frontend,
                     ...(deliverySlug && { email_delivery: true })
