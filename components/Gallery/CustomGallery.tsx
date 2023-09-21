@@ -39,7 +39,7 @@ export function CustomGallery({ event, children, logoSize = 'sm', galleryBanner,
             <div id='custom-gallery-parent' className={clsx('absolute pb-6 sm:pb-6 top-0 bottom-0 left-0 right-0 flex flex-col overflow-x-hidden overflow-y-scroll', galleryBanner && 'pt-6')}>
                 <div className='w-full'>
                     <div className='flex justify-center'>
-                        <Image className={clsx('w-auto py-[25px] transition', logoSize == 'sm' ? 'max-h-[50vw] sm:max-h-[22vw] max-w-[33vw]' : 'max-h-[60vw] sm:max-h-[22vw]')} src={gallery?.logo_image ? gallery.logo_image : 'https://hypno-web-assets.s3.amazonaws.com/hypno-logo-white-drop.png'} alt={event.name + " logo"} width={150} height={25} priority />
+                        <Image className={clsx('w-auto py-[25px] transition', logoSize == 'sm' ? 'max-h-[50vw] sm:max-h-[22vw] max-w-[33vw]' : 'max-h-[60vw] sm:max-h-[22vw]')} src={gallery?.logo_image ? gallery.logo_image : 'https://admin-web-assets.s3.amazonaws.com/8755/logo/hypno-logo-9754808.svg'} alt={event.name + " logo"} width={150} height={25} priority />
                     </div>
                 </div>
 
