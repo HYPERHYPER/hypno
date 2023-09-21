@@ -30,7 +30,8 @@ export function CustomGallery({ event, children, logoSize = 'sm', galleryBanner,
                     MozBackgroundSize: 'cover',
                     OBackgroundSize: 'cover',
                     height: windowHeight,
-                    filter: gallery?.home_background_image ? 'none' : 'blur(30px)'
+                    filter: gallery?.home_background_image ? 'none' : 'blur(30px)',
+                    opacity: gallery?.home_background_image ? '100%' : '50%',
                 }}
             />
 
