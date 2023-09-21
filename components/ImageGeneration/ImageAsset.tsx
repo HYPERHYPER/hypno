@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import EditTextPrompt from './EditTextPrompt';
 import { MagicImage } from '@/hooks/useMagic';
 import Carousel from "nuka-carousel"
+import ArrowNext from '../../assets/icons/arrow-next.svg';
+import ArrowBack from '../../assets/icons/arrow-back.svg';
 
 export function ImageAsset({ src, error }: { src?: string, error?: boolean }) {
     const isGenerating = _.isEmpty(src);
@@ -18,7 +20,7 @@ export function ImageAsset({ src, error }: { src?: string, error?: boolean }) {
 
     return (
         <div
-            className={clsx('relative bg-black/50 backdrop-blur-[50px] mx-auto', isGenerating ? 'w-auto aspect-square min-w-full' : 'w-auto')}>
+            className={clsx('relative bg-black/50 mx-auto', isGenerating ? 'w-auto aspect-square min-w-full' : 'w-auto')}>
             {(isGenerating || error) && (
                 <div className='absolute -z-10 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
                     {error ? 
@@ -48,11 +50,13 @@ export const ImageCarousel = ({ urls }: { urls?: string[] }) => {
     }, [])
     return (
         <Carousel
-            className='bg-black/50 backdrop-blur-[50px]'
+            className='bg-black/50'
             wrapAround={true}
             defaultControlsConfig={{
-                nextButtonStyle: { opacity: 0, padding: '100px 30px' },
-                prevButtonStyle: { opacity: 0, padding: '100px 30px' },
+                nextButtonStyle: { padding: '8px', background: 'none' },
+                nextButtonText: <span className='carousel-arrow'><ArrowNext /></span>,
+                prevButtonStyle: { padding: '8px', background: 'none' },
+                prevButtonText: <span className='carousel-arrow'><ArrowBack /></span>,
                 pagingDotsStyle: { fill: 'white', scale: '125%', borderRadius: '100%' },
                 pagingDotsContainerClassName: 'space-x-3',
             }}

@@ -210,6 +210,10 @@
     @apply stroke-white/30
   }
 
+  .carousel-arrow svg {
+    @apply scale-[1.75]
+  }
+
 }
 
 @supports (font: -apple-system-body) and (-webkit-appearance: none) { img[loading="lazy"] { clip-path: inset(0.6px) } }
