@@ -24,18 +24,8 @@ export default function DetailView({ asset, config, imageProps }: any) {
 
     const scrollToBottom = useCallback(() => {
         if (containerRef.current) {
-            // console.log('height', containerRef.current.scrollHeight)
             // Scroll to the element
             containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-
-            // Calculate the desired additional scroll amount
-            const additionalScrollAmount = 300;
-
-            // Scroll further by the desired amount
-            containerRef.current.scrollTo({
-                top: containerRef.current.scrollTop + additionalScrollAmount,
-                behavior: 'smooth',
-            });
         }
     }, [containerRef.current])
 
@@ -81,7 +71,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                 className={clsx(
                     `inline-flex px-[25px] items-center flex-col mx-auto w-full`,
                     _.isEmpty(images) && (isPortrait && assetHeight > Number(height.split('px')[0]) ? 'justify-between' : (!isPortrait ? 'justify-center' : 'justify-start pb-[30px]')),
-                    footer ? (_.isEmpty(images) ? 'mb-[72px]' : 'mb-[24px]') : ''
+                    footer ? (_.isEmpty(images) ? 'mb-[72px]' : '') : ''
                 )}>
                 <div className={clsx('relative', isPortrait && 'md:max-w-lg sm:mb-0', isPortrait && !isVideo && _.isEmpty(images) && assetHeight > Number(height.split('px')[0]) && "mb-[72px]")}>
                     <div className='absolute w-full h-full min-h-[100px] min-w-[100px] flex itmes-center justify-center'>
@@ -121,7 +111,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                     </div>
                 </div>
 
-                <div ref={containerRef} className="mt-7 w-full h-auto">
+                <div ref={containerRef} className="mt-7 w-full h-auto pb-[36px]">
                     {(!_.isEmpty(images)) && (
                         _.map(images, (img, i) => (
                             <MagicImageItem image={img} key={i} updateEditorPrompt={editTextPrompt} />
