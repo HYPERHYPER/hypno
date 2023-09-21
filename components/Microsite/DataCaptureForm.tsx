@@ -165,7 +165,7 @@ export default function DataCaptureForm({
                         })}
                         {!_.isEmpty(terms_privacy) && (
                             <div className={clsx('flex flex-row gap-4 p-4 items-start justify-center')}>
-                                <p className='text-xs sm:text-lg text-white'>
+                                <p className='text-xs sm:text-lg text-white/50'>
                                     <Balancer>{replaceLinks(terms_privacy || '')}</Balancer>
                                 </p>
                             </div>
