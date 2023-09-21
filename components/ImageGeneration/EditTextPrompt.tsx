@@ -36,6 +36,7 @@ export function TextPromptEditor({ onChange, textPrompt, generateImage }: { onCh
                 onClick={() => window.text_prompt_editor_modal.close()}
                 className="absolute top-0 right-0 p-6 cursor-pointer"
                 autoFocus={false}
+                tabIndex={-1}
             >
                 <div className="bg-white w-[30px] sm:w-[60px] h-1 rounded-sm" />
             </button>
