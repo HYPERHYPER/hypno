@@ -31,15 +31,7 @@ export function TextPromptEditor({ onChange, textPrompt, generateImage }: { onCh
     }, [generateImage])
 
     return (
-        <dialog id="text_prompt_editor_modal" className="modal bg-[#333333]/50 backdrop-blur-[20px] cursor-pointer mt-0">
-            <button
-                onClick={() => window.text_prompt_editor_modal.close()}
-                className="absolute top-0 right-0 p-6 cursor-pointer"
-                autoFocus={false}
-                tabIndex={-1}
-            >
-                <div className="bg-white w-[30px] sm:w-[60px] h-1 rounded-sm" />
-            </button>
+        <dialog id="text_prompt_editor_modal" className="modal bg-[#333333]/50 backdrop-blur-[20px] cursor-pointer mt-0" >
             <div className="w-full p-7">
                 <textarea
                     ref={textareaRef}
@@ -49,8 +41,17 @@ export function TextPromptEditor({ onChange, textPrompt, generateImage }: { onCh
                     onInput={adjustTextareaHeight}
                     rows={1}
                     placeholder="your magic text prompt"
+                    tabIndex={1}
                 />
             </div>
+            <button
+                onClick={() => window.text_prompt_editor_modal.close()}
+                className="absolute top-0 right-0 p-6 cursor-pointer"
+                autoFocus={false}
+                tabIndex={-1}
+            >
+                <div className="bg-white w-[30px] sm:w-[60px] h-1 rounded-sm" />
+            </button>
             <button
                 onClick={() => confirmNewTextPrompt()}
                 className="absolute bottom-0 left-0 right-0 btn btn-gallery text-black bg-white border-white">
