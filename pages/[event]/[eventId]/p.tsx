@@ -52,8 +52,8 @@ const PublicGallery = (props: ResponseData) => {
                 <meta name="description" content="Taken with HYPNO: The animated, social photo booth" />
             </Head>
 
-            <CustomGallery event={event}>
-                <section className={`text-white mt-3 sm:mt-8 mb-[35px] lg:px-[90px]`}>
+            <CustomGallery event={event} defaultBackground={_.first(paginatedPhotos)?.urls?.url}>
+                <section className={`text-white px-[25px] mt-3 sm:mt-8 mb-[35px] lg:px-[90px]`}>
                     <InfiniteMediaGrid
                         next={() => setSize(size + 1)}
                         assets={paginatedPhotos}

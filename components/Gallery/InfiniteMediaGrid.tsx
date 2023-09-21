@@ -70,7 +70,7 @@ export default function InfiniteMediaGrid({ next, data, assets, hasMore, detailB
 export const MediaGrid = ({ assets, detailBaseUrl }: { assets: AssetData[]; detailBaseUrl: string; }) => {
     return (
         <ResponsiveMasonry columnsCountBreakPoints={assets?.length < 4 ? { 375: 1, 750: 2, 900: 2 } : { 375: 1, 750: 2, 900: 3, 1200: 4 }}>
-            <Masonry gutter={'10px'} >
+            <Masonry gutter={'28px'} >
                 {assets.map((p, i) => {
                     if (!p.posterframe) return null;
                     return (
@@ -79,7 +79,7 @@ export const MediaGrid = ({ assets, detailBaseUrl }: { assets: AssetData[]; deta
                             <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
                                 <Spinner />
                             </div>
-                            <div className='hover:scale-105 transition'>
+                            <div className='sm:hover:scale-105 transition'>
                                 <AutosizeImage
                                     src={p.posterframe}
                                     alt={`${p.event_id}-${p.id}`}
