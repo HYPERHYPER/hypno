@@ -121,7 +121,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                     </div>
                 </div>
 
-                <div ref={containerRef} className="mt-7 w-full">
+                <div ref={containerRef} className="mt-7 w-full h-auto">
                     {(!_.isEmpty(images)) && (
                         _.map(images, (img, i) => (
                             <MagicImageItem image={img} key={i} updateEditorPrompt={editTextPrompt} />
@@ -130,7 +130,12 @@ export default function DetailView({ asset, config, imageProps }: any) {
                 </div>
 
                 {(!asset.mp4_url && config?.ai_generation && config?.ai_generation.enabled) && (
-                    <TextPromptEditor onChange={editTextPrompt} textPrompt={textPrompt} generateImage={handleRemix} />
+                    <TextPromptEditor 
+                        onChange={editTextPrompt} 
+                        textPrompt={textPrompt} 
+                        generateImage={handleRemix} 
+                        isGenerating={isLoadingGeneration}
+                        />
                 )}
 
                 <div className='hidden sm:block sm:mt-3 sm:text-center'>

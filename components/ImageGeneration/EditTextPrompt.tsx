@@ -1,4 +1,6 @@
-import { useCallback, useRef } from "react";
+import clsx from "clsx";
+import { useCallback, useEffect, useRef, useState } from "react";
+import Scramble from "react-scramble";
 
 // Each photo asset should have an edit text prompt button
 export default function EditTextPrompt({ onClick }: { onClick: any }) {
@@ -15,7 +17,7 @@ export default function EditTextPrompt({ onClick }: { onClick: any }) {
 }
 
 // Only 1 modal should exist on page and will be updated with prompt
-export function TextPromptEditor({ onChange, textPrompt, generateImage }: { onChange: any, textPrompt: string, generateImage: any }) {
+export function TextPromptEditor({ onChange, textPrompt, generateImage, isGenerating }: { onChange: any, textPrompt: string, generateImage: any, isGenerating: boolean }) {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
     const adjustTextareaHeight = () => {
@@ -29,6 +31,34 @@ export function TextPromptEditor({ onChange, textPrompt, generateImage }: { onCh
         generateImage && generateImage();
         window.text_prompt_editor_modal.close()
     }, [generateImage])
+
+    const [loadedGlitch, setLoadedGlitch] = useState<boolean>(false);
+    const [glitchState, setGlitchState] = useState<any>();
+    const loadingTexts = ['one at a time pls', 'hold ur horses', 'ur already in line', 'magic takes a min',];
+    const [textIdx, setTextIdx] = useState<number>(0);
+    const [loadingText, setLoadingText] = useState<string>(loadingTexts[0]);
+    useEffect(() => {
+        if (loadedGlitch && glitchState?.restart) {
+            const glitchText = () => {
+                setTextIdx((prevTextIdx) => {
+                    const newIdx = (prevTextIdx + 1) % loadingTexts.length;
+                    setLoadingText(loadingTexts[newIdx]);
+                    return newIdx;
+                });
+                glitchState.restart();
+            }
+
+            const intervalId = setInterval(glitchText, 6000);
+
+            return () => { clearInterval(intervalId) }
+        }
+    }, [loadedGlitch])
+
+    useEffect(() => {
+        if (loadedGlitch && isGenerating && glitchState.start) {
+            glitchState.start();
+        }
+    }, [loadedGlitch, textPrompt, isGenerating]);
 
     return (
         <dialog id="text_prompt_editor_modal" className="modal bg-[#333333]/50 backdrop-blur-[20px] cursor-pointer mt-0" >
@@ -54,8 +84,37 @@ export function TextPromptEditor({ onChange, textPrompt, generateImage }: { onCh
             </button>
             <button
                 onClick={() => confirmNewTextPrompt()}
-                className="absolute bottom-0 left-0 right-0 btn btn-gallery text-black bg-white border-white">
-                ok
+                className={clsx("absolute bottom-0 left-0 right-0 btn btn-gallery text-black bg-white border-white disabled:text-black disabled:bg-white", isGenerating ? 'cursor-disabled' : '')}
+                disabled={isGenerating}
+            >
+                {isGenerating ?
+                    <Scramble
+                        autoStart
+                        text={loadingText}
+                        steps={[
+                            {
+                                roll: 8,
+                                action: '+',
+                                type: 'all',
+                            },
+                            {
+                                action: '-',
+                                type: 'all',
+                                text: loadingText
+                            },
+                        ]}
+                        speed='fast'
+                        bindMethod={c => {
+                            setGlitchState({
+                                restart: c.restart,
+                                start: c.start,
+                            })
+                            setLoadedGlitch(true);
+                        }}
+                    />
+                    :
+                    'ok'
+                }
             </button>
         </dialog>
     )

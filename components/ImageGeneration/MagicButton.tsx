@@ -36,7 +36,7 @@ export default function MagicButton({ isLoading, mobile, onClick }: MagicButtonP
     return (
         <>
             <button
-                className={clsx('btn btn-info btn-gallery locked overflow-hidden relative disabled:text-black disabled:bg-white', isLoading ? 'cursor-disabled' : '')}
+                className={clsx('z-20 btn btn-info btn-gallery locked disabled:text-black disabled:bg-white', isLoading ? 'cursor-disabled' : '')}
                 onClick={onClick}
                 disabled={isLoading}
             >
