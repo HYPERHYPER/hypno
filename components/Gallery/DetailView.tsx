@@ -1,6 +1,6 @@
 import Spinner from "../Spinner";
 import Image from 'next/image';
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import VideoAsset from "./VideoAsset";
 import useContentHeight from "@/hooks/useContentHeight";
@@ -20,7 +20,25 @@ export default function DetailView({ asset, config, imageProps }: any) {
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
     const { images, isLoading: isLoadingGeneration, textPrompt, editTextPrompt, generateMidjourneyImage } = useMagic(config.ai_generation, asset);
-    // const containerRef = useRef<HTMLDivElement | null>(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
+
+    const scrollToBottom = useCallback(() => {
+        if (containerRef.current) {
+            // console.log('height', containerRef.current.scrollHeight)
+            // console.log('top', containerRef.current.scrollTop)
+            // Scroll to the element
+            containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+            // Calculate the desired additional scroll amount
+            const additionalScrollAmount = 200;
+
+            // Scroll further by the desired amount
+            containerRef.current.scrollTo({
+                top: containerRef.current.scrollTop + additionalScrollAmount,
+                behavior: 'smooth',
+            });
+        }
+    }, [containerRef.current])
 
     const handleRemix = async (e: any) => {
         // generateImgToImgREST({
@@ -28,15 +46,13 @@ export default function DetailView({ asset, config, imageProps }: any) {
         //     text_prompt: config.aiGeneration.text_prompt,
         //     image_strength: Number(config.aiGeneration.image_strength) / 100
         // })
-        // const scrollToBottom = () => {
-        //     if (containerRef.current) {
-        //         containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        //     }
-        // }
-
         generateMidjourneyImage();
-        // scrollToBottom();
     };
+
+    const imagesLength = _.size(images);
+    useEffect(() => {
+        scrollToBottom();
+    }, [imagesLength])
 
     const isPortrait = asset.height > asset.width;
     const isVideo = !_.isEmpty(asset.mp4_url);
@@ -63,7 +79,11 @@ export default function DetailView({ asset, config, imageProps }: any) {
         <>
             <div
                 style={!_.isEmpty(images) ? {} : (!isVideo && isPortrait) ? { minHeight: isPortrait ? Math.max(Number(height.split('px')[0]), assetHeight) + 'px' : height } : (!isVideo && Number(width) < 668 ? { minHeight: '55vh' } : {})}
-                className={clsx(`inline-flex px-[25px] items-center flex-col mx-auto w-full`, isPortrait && assetHeight > Number(height.split('px')[0]) ? 'justify-between' : (!isPortrait ? 'justify-center' : 'justify-start pb-[30px]'), footer ? 'mb-[72px]' : '')}>
+                className={clsx(
+                    `inline-flex px-[25px] items-center flex-col mx-auto w-full`,
+                    isPortrait && assetHeight > Number(height.split('px')[0]) ? 'justify-between' : (!isPortrait ? 'justify-center' : 'justify-start pb-[30px]'),
+                    footer ? 'mb-[72px]' : '')
+                }>
                 {/* className={clsx(`
                 max-w-none sm:max-h-[80vh] sm:w-auto sm:flex sm:items-center sm:justify-center sm:mx-auto px-[25px]`, footer ? 'mb-[72px]': 'mb-6')}> */}
                 <div className={clsx('relative', isPortrait && 'md:max-w-lg sm:mb-0', isPortrait && !isVideo && _.isEmpty(images) && assetHeight > Number(height.split('px')[0]) && "mb-[72px]")}>
@@ -104,7 +124,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                     </div>
                 </div>
 
-                <div className="mt-7 w-full">
+                <div ref={containerRef} className="mt-7 w-full">
                     {(!_.isEmpty(images)) && (
                         _.map(images, (img, i) => (
                             <MagicImageItem image={img} key={i} updateEditorPrompt={editTextPrompt} />
