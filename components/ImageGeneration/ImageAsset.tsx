@@ -6,7 +6,7 @@ import EditTextPrompt from './EditTextPrompt';
 import { MagicImage } from '@/hooks/useMagic';
 import Carousel from "nuka-carousel"
 
-export function ImageAsset({ src }: { src?: string }) {
+export function ImageAsset({ src, error }: { src?: string, error?: boolean }) {
     const isGenerating = _.isEmpty(src);
 
     const [loadImage, setLoadImage] = useState<boolean>(false);
@@ -19,9 +19,12 @@ export function ImageAsset({ src }: { src?: string }) {
     return (
         <div
             className={clsx('relative bg-black/50 backdrop-blur-[50px] mx-auto', isGenerating ? 'w-auto aspect-square min-w-full' : 'w-auto')}>
-            {isGenerating && (
+            {(isGenerating || error) && (
                 <div className='absolute -z-10 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
-                    <DotsSpinner />
+                    {error ? 
+                        <h2 className='text-white text-4xl tracking-wider'>{':('}</h2>
+                        : <DotsSpinner />
+                    }
                 </div>
             )}
 
@@ -77,10 +80,10 @@ export default function MagicImageItem({ image, updateEditorPrompt }: {
 
     const hasUpscaledImages = _.size(image.urls) > 1;
     return (
-        <div className='w-full'>
-            {status == 'completed' && hasUpscaledImages ? <ImageCarousel urls={image?.urls} /> : <ImageAsset src={src} />}
+        <div className='w-full mb-7'>
+            {status == 'completed' && hasUpscaledImages ? <ImageCarousel urls={image?.urls} /> : <ImageAsset src={src} error={status == 'failed'} />}
             {status != 'pending' && (
-                <div className="text-center mt-5 mb-7 px-2">
+                <div className="text-center mt-5 px-2">
                     <h3 className="text-white/50 mb-4">{textPrompt}</h3>
                     <EditTextPrompt onClick={handleEditTextPromptClick} />
                 </div>
