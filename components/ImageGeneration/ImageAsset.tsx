@@ -22,7 +22,7 @@ export function ImageAsset({ src, error }: { src?: string, error?: boolean }) {
         <div
             className={clsx('relative bg-black/50 mx-auto', isGenerating ? 'w-auto aspect-square min-w-full' : 'w-auto')}>
             {(isGenerating || error) && (
-                <div className='absolute -z-10 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
+                <div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
                     {error ? 
                         <h2 className='text-white text-4xl tracking-wider'>{':('}</h2>
                         : <DotsSpinner />
