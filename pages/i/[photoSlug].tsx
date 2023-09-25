@@ -135,7 +135,7 @@ function DetailGallery(props: ResponseData) {
                 <GlobalLayout.Content>
                     <CenteredDetailView
                         asset={photo}
-                        config={{ aiGeneration }} 
+                        config={{ aiGeneration, qr_asset_download: eventData?.metadata?.qr_asset_download }} 
                         imageProps={imageProps} />
                 </GlobalLayout.Content>
             </GlobalLayout>

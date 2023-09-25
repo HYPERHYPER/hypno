@@ -125,7 +125,7 @@ const SubGallery = (props: ResponseData) => {
 
             <CustomGallery event={event} galleryBanner={showBrowseGalleryBanner} defaultBackground={isDetailView ? photo.posterframe : _.first(photos)?.posterframe}>
                 {isDetailView ? (
-                    <DetailView asset={photo} config={{ ai_generation: event?.metadata?.ai_generation, color: gallery.primary_color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
+                    <DetailView asset={photo} config={{ ai_generation: event?.metadata?.ai_generation, color: gallery.primary_color, qr_asset_download: event?.metadata?.qr_asset_download }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
                 ) : (
                     <div
                         style={{ height: outerHeight }}
@@ -198,7 +198,7 @@ const SubGallery = (props: ResponseData) => {
                                     gallery.email_delivery ? (
                                         <SingleAssetDeliveryConfirmation />
                                     ) : (
-                                        <DetailView asset={_.first(photos)} config={{ ai_generation: event?.metadata?.ai_generation, color: gallery.primary_color }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64, width: _.first(photos)?.width, height: _.first(photos)?.height }} />
+                                        <DetailView asset={_.first(photos)} config={{ ai_generation: event?.metadata?.ai_generation, color: gallery.primary_color, qr_asset_download: event?.metadata?.qr_asset_download }} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64, width: _.first(photos)?.width, height: _.first(photos)?.height }} />
                                     )
                                 ))
                         }

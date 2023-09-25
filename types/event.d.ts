@@ -35,6 +35,7 @@ export type EventConfig = {
     event_type?: string;
     metadata?: {
         ai_generation?: AiConfig | null;
+        qr_asset_download?: string;
     }
     custom_frontend?: EventMicrosite | null;
 }
