@@ -48,7 +48,7 @@ export default function Modal({ title, id, children, onDone, menu, actionBtn }: 
                         </label>
                     </div>
 
-                    <div className={`mt-5 sm:mt-10 mb-9 max-h-[50vh] overflow-scroll ${actionBtn && actionBtn.hidden ? 'mb-0' : 'mb-9'}`}>
+                    <div className={`mt-5 sm:mt-10 mb-9 max-h-[50vh] overflow-y-scroll ${actionBtn && actionBtn.hidden ? 'mb-0' : 'mb-9'}`}>
                         {children}
                     </div>
 
