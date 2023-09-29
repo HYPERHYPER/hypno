@@ -33,6 +33,7 @@ import { PrivilegeContext, PrivilegeProvider } from '@/components/PrivilegeConte
 import { getEventPrivileges } from '@/helpers/user-privilege';
 import ArchiveEventModal from '@/components/Events/ArchiveEventModal';
 import { downloadPhoto } from '@/helpers/image';
+import ContentDownloadModal from '@/components/Events/ContentDownloadModal';
 
 type PhotosResponse = {
     photos: any;
@@ -258,12 +259,14 @@ function EventPage(props: ResponseData) {
                         {/* <Link href=''><h2 className='text-primary'>favorites</h2></Link> */}
                         {isProEvent(event.event_type) && event.is_private == 1 && <Link href={`/pro/${id}/p`}><h2 className='text-primary'>gallery</h2></Link>}
                         {isProEvent(event.event_type) && userEventPrivileges?.canDownloadData && <Modal.Trigger id='data-download-modal'><h2 className='text-primary'>data</h2></Modal.Trigger>}
+                        {isProEvent(event.event_type) && userEventPrivileges?.canDownloadContent && <Modal.Trigger id='content-download-modal'><h2 className='text-primary'>download</h2></Modal.Trigger>}
                         {isProEvent(event.event_type) && userEventPrivileges?.canEditEvent && <Link href={`/e/${id}/edit`}><h2 className='text-primary'>edit</h2></Link>}
                         {isProEvent(event.event_type) && userEventPrivileges?.canArchiveEvent && <Modal.Trigger id='archive-event-modal'><h2 className='text-primary'>archive</h2></Modal.Trigger>}
                     </GlobalLayout.Header>
 
                     <ScanQRModal eventId={id} eventName={name} modalId='scan-qr-modal' />
                     {userEventPrivileges?.canDownloadData && <DataDownloadModal modalId='data-download-modal' eventId={id} />}
+                    {userEventPrivileges?.canDownloadContent && <ContentDownloadModal modalId='content-download-modal' eventId={id} />}
                     {userEventPrivileges?.canArchiveEvent && <ArchiveEventModal modalId='archive-event-modal' eventId={id} />}
                     <GlobalLayout.Content>
                         <div className='divider' />
