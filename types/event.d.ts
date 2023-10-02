@@ -33,6 +33,7 @@ export type EventConfig = {
     is_private?: number; // 1 == public, 2 == private
     delivery?: string; // "qr_gallery" to show qr code to microsite, "qr" to disable
     event_type?: string;
+    custom_gallery_assigned?: string; // 1 == custom frontend enabled, 0 == default 
     metadata?: {
         ai_generation?: AiConfig | null;
         qr_asset_download?: string;
@@ -45,6 +46,7 @@ export type EventPayload = {
         id?: number;
         name?: string;
         client_id?: number;
+        custom_gallery_assigned?: string;
     };
     custom_frontend?: EventMicrosite;
     filter?: { id: number };

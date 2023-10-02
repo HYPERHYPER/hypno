@@ -59,7 +59,8 @@ const toExpectedValue = (key: string, value: any) => {
     switch (key) {
         case 'primary_color': return toHexCode(value);
         case 'fields': return convertFieldArrayToObject(value);
-        case 'qr_delivery': return value ? 'qr_gallery' : 'qr'
+        case 'qr_delivery': return value ? 'qr_gallery' : 'qr';
+        case 'custom_gallery_assigned': return value ? '1' : '0';
         default: return value;
     }
 }
@@ -107,7 +108,7 @@ const EventForm = (props: FormData) => {
             },
             blendmode: event?.metadata?.blendmode || 'kCGBlendModeNormal',
             qr_delivery: event ? (isShowingQrCode(event.event_ipad_screens)) : true,
-            custom_frontend: event ? isCustomGallery(event.custom_frontend) : false,
+            custom_gallery_assigned: event ? isCustomGallery(event.custom_gallery_assigned) : false,
             logo_image: event?.custom_frontend?.logo_image || '',
             home_background_image: event?.custom_frontend?.home_background_image || '',
             primary_color: event?.custom_frontend?.primary_color || '#00FF99',
@@ -374,7 +375,7 @@ const EventForm = (props: FormData) => {
                         view == 'default' && (
                             <div className='lg:border-t-2 lg:border-white/20'>
                                 <FormControl label='branded gallery' featureGated={featureAccess?.custom_branding ? undefined : 'creator'}>
-                                    <input type="checkbox" className="toggle pro toggle-lg" {...register('custom_frontend')} />
+                                    <input type="checkbox" className="toggle pro toggle-lg" {...register('custom_gallery_assigned')} />
                                 </FormControl>
 
                                 {/* <div className='form-control '>
@@ -397,40 +398,40 @@ const EventForm = (props: FormData) => {
                                         {...register('gallery_subtitle')} />
                                 </div> */}
 
-                                <FormControl label='logo' nested={true} disabled={!config.custom_frontend}>
+                                <FormControl label='logo' nested={true} disabled={!config.custom_gallery_assigned}>
                                     <FileInput
                                         inputId='logo'
                                         onInputChange={(value: string) => setValue('logo_image', value, { shouldDirty: true })}
                                         value={config.logo_image}
-                                        disabled={!config.custom_frontend}
+                                        disabled={!config.custom_gallery_assigned}
                                         uploadCategory='logo'
                                     />
                                 </FormControl>
 
-                                <FormControl label='background' nested={true} disabled={!config.custom_frontend}>
+                                <FormControl label='background' nested={true} disabled={!config.custom_gallery_assigned}>
                                     <FileInput
                                         inputId='background'
                                         onInputChange={(value: string) => setValue('home_background_image', value, { shouldDirty: true })}
                                         value={config.home_background_image}
-                                        disabled={!config.custom_frontend}
+                                        disabled={!config.custom_gallery_assigned}
                                         uploadCategory='background'
                                     />
                                 </FormControl>
 
-                                <FormControl label='color' nested={true} disabled={!config.custom_frontend}>
+                                <FormControl label='color' nested={true} disabled={!config.custom_gallery_assigned}>
                                     <input
                                         className='input pro disabled:text-white/20 transition-colors'
                                         placeholder='# hex code'
-                                        disabled={!config.custom_frontend}
+                                        disabled={!config.custom_gallery_assigned}
                                         {...register('primary_color')} />
                                     <div className="dropdown dropdown-top dropdown-end">
                                         <label
                                             className='w-full'
-                                            tabIndex={config.custom_frontend ? 0 : undefined}>
-                                            <span className={clsx("inline-flex h-10 w-10 rounded-full border-4 border-white/20 cursor-pointer", !config.custom_frontend && 'opacity-50 cursor-not-allowed')} style={{ backgroundColor: `${_.startsWith(config.primary_color, '#') ? "" : "#"}${config.primary_color}` }} />
+                                            tabIndex={config.custom_gallery_assigned ? 0 : undefined}>
+                                            <span className={clsx("inline-flex h-10 w-10 rounded-full border-4 border-white/20 cursor-pointer", !config.custom_gallery_assigned && 'opacity-50 cursor-not-allowed')} style={{ backgroundColor: `${_.startsWith(config.primary_color, '#') ? "" : "#"}${config.primary_color}` }} />
                                         </label>
                                         <div
-                                            tabIndex={config.custom_frontend ? 0 : undefined}
+                                            tabIndex={config.custom_gallery_assigned ? 0 : undefined}
                                             className='dropdown-content shadow mb-2 p-2 rounded-full'>
                                             <ChromePicker color={config.primary_color || '#000000'} onChange={(color: any, e: any) => { e.preventDefault(); setValue('primary_color', color.hex, { shouldDirty: true }) }} disableAlpha={true} />
                                         </div>
@@ -442,16 +443,16 @@ const EventForm = (props: FormData) => {
                                 <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('enable_magic_button')} />
                             </FormControl> */}
 
-                                <FormControl label='private' nested={true} disabled={!config.custom_frontend}>
-                                    <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_frontend} {...register('is_private')} />
+                                <FormControl label='private' nested={true} disabled={!config.custom_gallery_assigned}>
+                                    <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery_assigned} {...register('is_private')} />
                                 </FormControl>
 
-                                <FormControl label='data/legal' nested={true} disabled={!config.custom_frontend} featureGated={featureAccess?.data_capture ? undefined : 'brand'}>
-                                    {config.data_capture && config.custom_frontend && <Modal.Trigger id='data-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
-                                    <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_frontend} {...register('data_capture')} />
+                                <FormControl label='data/legal' nested={true} disabled={!config.custom_gallery_assigned} featureGated={featureAccess?.data_capture ? undefined : 'brand'}>
+                                    {config.data_capture && config.custom_gallery_assigned && <Modal.Trigger id='data-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
+                                    <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery_assigned} {...register('data_capture')} />
                                 </FormControl>
 
-                                <FormControl label='domain' nested={true} disabled={!config.custom_frontend} featureGated={featureAccess?.custom_domain ? undefined : 'brand'}>
+                                <FormControl label='domain' nested={true} disabled={!config.custom_gallery_assigned} featureGated={featureAccess?.custom_domain ? undefined : 'brand'}>
                                     <div className='text-xl sm:text-4xl text-white/20'>coming soon</div>
                                 </FormControl>
                                 {/* <FormControl label='legal' nested={true} disabled={!config.custom_frontend}>

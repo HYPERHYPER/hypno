@@ -42,12 +42,11 @@ const EditEventPage = (props: ResponseData) => {
     const submitForm = (changedFieldsArr: any) => {
         let payloadArr: any = [];
         let event: any = {};
-        const eventKeys = ['name', 'is_private', 'blendmode']
+        const eventKeys = ['name', 'is_private', 'blendmode', 'custom_gallery_assigned']
         let custom_frontend: any = {};
         const customFrontendKeys = ['logo_image', 'home_background_image', 'primary_color', 'data_capture', 'fields', 'data_capture_title', 'data_capture_subtitle', 'enable_legal', 'explicit_opt_in', 'terms_privacy', 'email_delivery'];
         let filter: any = {};
         let delivery: string = '';
-        let enable_custom_frontend = isCustomGallery(initialCustomFrontend);
         let metadata: any = {};
 
         // Build event payload - any field that's not watermark
@@ -69,25 +68,11 @@ const EditEventPage = (props: ResponseData) => {
                 if (key == 'watermark') {
                     payloadArr.push(field);
                 }
-                if (key == 'custom_frontend') {
-                    enable_custom_frontend = field[key];
-                }
                 if (key == 'ai_generation') {
                     metadata = { ai_generation: { ...field[key]} }
                 }
             }
         })
-
-        if (!enable_custom_frontend) {
-            custom_frontend = {
-                logo_image: '',
-                home_background_image: '',
-                primary_color: '',
-                enable_legal: false,
-                data_capture: false,
-                fields: {},
-            }
-        }
 
         const eventPayload = {
             ...(!_.isEmpty(event) && { event }),
@@ -135,6 +120,7 @@ const EditEventPage = (props: ResponseData) => {
             </div>
         )
     }
+
     return (
         <>
             <Head>

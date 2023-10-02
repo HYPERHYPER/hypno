@@ -1,13 +1,10 @@
-import { EventMicrosite } from "@/types/event";
 import _ from "lodash";
 
-export const isCustomGallery = (custom_frontend: EventMicrosite) => {
-    const { logo_image, primary_color, home_background_image, enable_legal, data_capture } = custom_frontend;
-    const customGalleryConfig = {
-        logo_image, home_background_image, enable_legal, data_capture
-    }
-
-    return _.some(customGalleryConfig, _.identity) || (primary_color != '#00FF99' && !_.isEmpty(primary_color));
+export const isCustomGallery = (custom_gallery_assigned: string) => {
+    // custom_gallery_assigned = '0' | '1' | null
+    // 1 -> true
+    // 0 -> false
+    return custom_gallery_assigned == '1';
 }
 
 interface FieldItem {

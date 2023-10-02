@@ -55,6 +55,7 @@ function NewEventPage(props: ResponseData) {
                 client_id: eventData.org_id,
                 is_private: eventData.is_private,
                 blendmode: eventData.blendmode,
+                custom_gallery_assigned: eventData.custom_gallery_assigned ? '1' : '0',
                 ...(eventData.ai_generation?.enabled && { metadata: { ai_generation: { ...eventData.ai_generation }} })
             },
             custom_frontend: {
