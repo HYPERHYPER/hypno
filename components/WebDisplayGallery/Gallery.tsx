@@ -2,6 +2,16 @@ import _ from "lodash";
 import { motion, AnimatePresence } from 'framer-motion';
 import useWidth from "@/hooks/useWidth";
 
+const ImageAsset = ({ asset }: { asset?: any }) => {
+    return (
+        <img
+            className="w-full h-auto"
+            src={asset.urls.url}
+            alt={`hypno-${asset.id}`}
+        />
+    )
+}
+
 const GifAsset = ({ asset }: { asset?: any }) => {
     return (
         <div className="relative w-full h-auto">
@@ -20,7 +30,7 @@ const GifAsset = ({ asset }: { asset?: any }) => {
 const VideoAsset = ({ asset }: { asset?: any }) => {
     return (
         <video
-            className="'w-full h-auto"
+            className="w-full h-auto"
             src={asset.mp4_url}
             autoPlay
             loop
@@ -43,11 +53,9 @@ const AssetContainer = ({ asset, width, type, transitionDuration }: { asset?: an
                     transition={{ duration: transitionDuration }}
                     className={`absolute flex h-screen w-full items-center justify-center`}
                 >
-                    {type == 'video' ?
-                        <VideoAsset asset={asset} />
-                        :
-                        <GifAsset asset={asset} />
-                    }
+                    {type == 'video' && <VideoAsset asset={asset} />}
+                    {type == 'image' && <ImageAsset asset={asset} />}
+                    {type == 'gif' && <GifAsset asset={asset} />}
                 </motion.div>
             </AnimatePresence>
             }
