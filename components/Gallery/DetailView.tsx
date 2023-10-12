@@ -49,6 +49,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
     const outerHeight = useContentHeight({ footer: false });
     const width = useWidth();
     const btnColor = config?.color === '#00FF99' ? null : config.color;
+    const enableAiMagic = !asset.mp4_url && config?.ai_generation && config?.ai_generation.enabled;
     // portrait
     // mobile
     // desktop
@@ -56,7 +57,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
     // landscape
     // fill width
     // centered
-    
+
     const downloadButton = ({ mobile }: { mobile: boolean }) => {
         const className = `btn btn-primary btn-gallery locked ${!mobile ? 'sm:max-w-sm' : ''}`;
         const style = btnColor ? { backgroundColor: btnColor, borderColor: btnColor, color: toTextColor(btnColor) } : {};
@@ -67,19 +68,27 @@ export default function DetailView({ asset, config, imageProps }: any) {
     return (
         <>
             <div
-                style={!_.isEmpty(images) ? {} : (!isVideo && isPortrait) ? { minHeight: isPortrait ? Math.max(Number(height.split('px')[0]), assetHeight) + 'px' : height } : (!isVideo && Number(width) < 668 ? { minHeight: '55vh' } : {})}
+                style={!_.isEmpty(images) ? {} : (isPortrait) ? { minHeight: isPortrait ? Math.max(Number(height.split('px')[0]), assetHeight) + 'px' : height } : (!isVideo && Number(width) < 668 ? { minHeight: '55vh' } : {})}
                 className={clsx(
                     `inline-flex px-[25px] items-center flex-col mx-auto w-full`,
-                    _.isEmpty(images) && (isPortrait && assetHeight > Number(height.split('px')[0]) ? 'justify-between' : (!isPortrait ? 'justify-center' : 'justify-start pb-[30px]')),
+                    _.isEmpty(images) && (isPortrait && assetHeight > Number(height.split('px')[0]) ? 'justify-between sm:justify-start' : (!isPortrait ? 'justify-center' : 'justify-start pb-[30px]')),
                     footer ? (_.isEmpty(images) ? 'mb-[72px]' : '') : ''
                 )}>
-                <div className={clsx('relative', isPortrait && 'md:max-w-lg sm:mb-0', isPortrait && !isVideo && _.isEmpty(images) && assetHeight > Number(height.split('px')[0]) && "mb-[72px]")}>
+                <div className={clsx(
+                    'relative',
+                    isPortrait && 'md:max-w-lg sm:mb-0',
+                    isPortrait && !isVideo && _.isEmpty(images) && assetHeight > Number(height.split('px')[0]) && "mb-[72px]",
+                )}>
                     <div className='absolute w-full h-full min-h-[100px] min-w-[100px] flex itmes-center justify-center'>
                         <Spinner />
                     </div>
-                    <div className={clsx('relative w-fit transition duration-300', (isLoaded || isVideo) ? 'opacity-100' : 'opacity-0 backdrop-blur-[50px]')}>
+                    <div className={clsx(
+                        'relative w-fit transition duration-300',
+                        (isLoaded || isVideo) ? 'opacity-100' : 'opacity-0 backdrop-blur-[50px]',
+                        isVideo && 'sm:mt-7'
+                    )}>
                         {asset.mp4_url ? (
-                            <VideoAsset src={asset.mp4_url} poster={asset.posterframe} style={isPortrait && Number(width) > 668 ? { height: 'auto', minHeight: height } : {}} />
+                            <VideoAsset src={asset.mp4_url} poster={asset.posterframe} />
                         ) : (
                             <div className='block'>
                                 {/* <img
@@ -111,21 +120,23 @@ export default function DetailView({ asset, config, imageProps }: any) {
                     </div>
                 </div>
 
-                <div ref={containerRef} className="mt-7 w-full h-auto pb-[36px]">
-                    {(!_.isEmpty(images)) && (
-                        _.map(images, (img, i) => (
-                            <MagicImageItem image={img} key={i} updateEditorPrompt={editTextPrompt} />
-                        ))
-                    )}
-                </div>
+                {enableAiMagic && (
+                    <div ref={containerRef} className="mt-7 w-full h-auto pb-[36px]">
+                        {(!_.isEmpty(images)) && (
+                            _.map(images, (img, i) => (
+                                <MagicImageItem image={img} key={i} updateEditorPrompt={editTextPrompt} />
+                            ))
+                        )}
+                    </div>
+                )}
 
-                {(!asset.mp4_url && config?.ai_generation && config?.ai_generation.enabled) && (
-                    <TextPromptEditor 
-                        onChange={editTextPrompt} 
-                        textPrompt={textPrompt} 
-                        generateImage={handleRemix} 
+                {enableAiMagic && (
+                    <TextPromptEditor
+                        onChange={editTextPrompt}
+                        textPrompt={textPrompt}
+                        generateImage={handleRemix}
                         isGenerating={isLoadingGeneration}
-                        />
+                    />
                 )}
 
                 <div className='hidden sm:block sm:mt-3 sm:text-center'>

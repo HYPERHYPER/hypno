@@ -13,7 +13,7 @@ export default function VideoAsset({ src, poster, style }: { src?: string; poste
     }, [vidRef]);
     
     return (
-        <div className='block relative' style={style}>
+        <div className='relative' style={style}>
             {muted && (
                 <div className="absolute top-[10px] left-[10px] z-10">
                     <button onClick={unmuteVideo} className="cursor-pointer flex items-center justify-center"><span className="scale-50 -translate-x-1/4 -translate-y-1/4"><Sound /></span></button>
