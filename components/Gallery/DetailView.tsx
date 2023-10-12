@@ -68,7 +68,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
     return (
         <>
             <div
-                style={!_.isEmpty(images) ? {} : (isPortrait) ? { minHeight: isPortrait ? Math.max(Number(height.split('px')[0]), assetHeight) + 'px' : height } : (!isVideo && Number(width) < 668 ? { minHeight: '55vh' } : {})}
+                style={!_.isEmpty(images) ? {} : (isPortrait && !isVideo) ? { minHeight: isPortrait ? Math.max(Number(height.split('px')[0]), assetHeight) + 'px' : height } : (!isVideo && Number(width) < 668 ? { minHeight: '55vh' } : {})}
                 className={clsx(
                     `inline-flex px-[25px] items-center flex-col mx-auto w-full`,
                     _.isEmpty(images) && (isPortrait && assetHeight > Number(height.split('px')[0]) ? 'justify-between sm:justify-start' : (!isPortrait ? 'justify-center' : 'justify-start pb-[30px]')),
