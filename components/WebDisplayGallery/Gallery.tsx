@@ -1,6 +1,8 @@
 import _ from "lodash";
 import { motion, AnimatePresence } from 'framer-motion';
 import useWidth from "@/hooks/useWidth";
+import { useEffect, useState } from "react";
+import useDeepCompareEffect from "use-deep-compare-effect";
 
 const ImageAsset = ({ asset }: { asset?: any }) => {
     return (
@@ -47,9 +49,9 @@ const AssetContainer = ({ asset, width, type, transitionDuration }: { asset?: an
             {asset && <AnimatePresence>
                 <motion.div
                     key={asset.id}
-                    initial={{ x: '-100%' }}
+                    initial={{ x: '-100%'}}
                     animate={{ x: 0, opacity: 100 }}
-                    exit={{ x: '100%' }}
+                    exit={{ x: '100%', opacity: 0 }}
                     transition={{ duration: transitionDuration }}
                     className={`absolute flex h-screen w-full items-center justify-center`}
                 >
@@ -63,16 +65,16 @@ const AssetContainer = ({ asset, width, type, transitionDuration }: { asset?: an
     )
 }
 
-export default function WebDisplayGallery({ assets, displayCount, assetType, transitionDuration }: { 
-    assets?: any, 
-    displayCount: number, 
+export default function WebDisplayGallery({ assets, displayCount, assetType, transitionDuration }: {
+    assets?: any,
+    displayCount: number,
     assetType?: string,
-    transitionDuration?: number 
+    transitionDuration?: number
 }) {
     const width = useWidth();
-    const assetWidth = (width || window.innerWidth) / displayCount;
+    const assetWidth = (width || window?.innerWidth) / displayCount;
 
-    const placeholderCount = displayCount - _.size(assets); // if less assets exist than length of display row
+    const placeholderCount = Math.max(displayCount - _.size(assets), 0); // if less assets exist than length of display row
 
     return (
         <>
@@ -91,10 +93,10 @@ export default function WebDisplayGallery({ assets, displayCount, assetType, tra
                     />
                 ))}
                 {_.map(Array.from(Array(placeholderCount).keys()), (i) => (
-                    <div 
+                    <div
                         key={i}
-                        className="relative flex h-screen w-screen items-center overflow-hidden bg-black" 
-                        style={{ width: `calc[100vw - ${width}` }}/>
+                        className="relative flex h-screen w-screen items-center overflow-hidden bg-black"
+                        style={{ width: `calc[100vw - ${width}` }} />
                 ))}
             </motion.div>
         </>
