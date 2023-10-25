@@ -32,7 +32,7 @@ import useSWR from 'swr';
 import { PrivilegeContext, PrivilegeProvider } from '@/components/PrivilegeContext/PrivilegeContext';
 import { getEventPrivileges } from '@/helpers/user-privilege';
 import ArchiveEventModal from '@/components/Events/ArchiveEventModal';
-import { downloadPhoto } from '@/helpers/image';
+import { downloadPhoto, getAspectRatio } from '@/helpers/image';
 import ContentDownloadModal from '@/components/Events/ContentDownloadModal';
 
 type PhotosResponse = {
@@ -95,7 +95,7 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
 
     return (
         <>
-            <div className='group relative rounded-box bg-white/10 w-full aspect-[2/3] overflow-hidden'>
+            <div className='group relative rounded-box bg-white/10 w-full overflow-hidden' style={{ aspectRatio: getAspectRatio(asset.width, asset.height) || 0.666 }}>
                 <Link href={`/i/${asset.id}`} className={clsx('absolute inset-0 hover:scale-105 transition rounded-box duration-300', isLoaded ? 'opacity-100' : 'opacity-0')}>
                     {asset.posterframe && <Image
                         className='absolute top-0 left-0 w-full h-full rounded-box object-cover transition'
