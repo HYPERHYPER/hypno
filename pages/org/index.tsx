@@ -32,6 +32,12 @@ function OrganizationSettingsPage(props: ResponseData) {
 
     const organization = orgData?.organization || user.organization;
 
+    const userUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/users?per_page=1`;
+    const { data: userData, isValidating: isValidatingUserData, error: userError } = useSWR([userUrl, token.access_token],
+        ([url, token]) => axiosGetWithToken(url, token))
+    //@ts-ignore
+    const userCount = userData?.meta?.total_count || 0;
+
     const [saveStatus, setSaveStatus] = useState<SaveStatus>('ready');
     const {
         register,
@@ -121,7 +127,7 @@ function OrganizationSettingsPage(props: ResponseData) {
                             <Item name='org name' value={organization.name} />
                         )}
                         {/* <Item name='org events' value={'#'} /> */}
-                        {userOrgPrivileges?.canViewUsers && <Item name='org users' value={String(props.user_count || 0)} href='/org/users' />}
+                        {userOrgPrivileges?.canViewUsers && <Item name='org users' value={String(userCount)} href='/org/users' />}
                         {/* <Item name='next payment' value={user.organization_id} /> */}
                         {/* <Item name='payment method' value={'update'} /> */}
                         {/* <Item name='subscription' value={'enterprise'} /> */}
@@ -157,33 +163,3 @@ const Item = ({ name, value, href }: { name: string, value: string, href?: strin
         </div>
     )
 }
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-    // Fetch organization users
-    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/users?per_page=1`;
-    const token = nookies.get(context).hypno_token;
-    let data: any = {};
-
-    await axios.get(url, {
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + token,
-        },
-    }).then(async (res) => {
-        if (res.status === 200) {
-            data = res.data;
-        }
-    }).catch((e) => {
-        console.log(e);
-        return {
-            notFound: true,
-        }
-    })
-
-    return {
-        props: {
-            user_count: data?.meta?.total_count || null,
-        }
-    };
-};
-

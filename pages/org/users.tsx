@@ -53,7 +53,7 @@ function OrganizationUsersPage(props: ResponseData) {
 
     const getKey = (pageIndex: number, previousPageData: any) => {
         if (previousPageData && pageIndex == previousPageData.pages) return null; // reached the end
-        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/users?per_page=${meta.per_page || 30}`;
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/users?per_page=30`;
         if (pageIndex === 0) return [url, token.access_token];
         const pageIdx = previousPageData.meta.next_page;
         return [`${url}&page=${pageIdx}`, token.access_token];
@@ -79,7 +79,7 @@ function OrganizationUsersPage(props: ResponseData) {
                         title='users'
                         returnLink={{ slug: '/org', name: 'organization' }}
                     >
-                        <h2>{meta?.total_count || 0} users</h2>
+                        <h2>{_.first(data)?.meta.total_count || 0} users</h2>
                         {(userOrgPrivileges?.canInviteMember || userOrgPrivileges?.canInviteAdmin) && <Modal.Trigger id='new-user-modal'><h2 className='text-primary cursor-pointer'>new user</h2></Modal.Trigger>}
                     </GlobalLayout.Header>
 
