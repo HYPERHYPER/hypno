@@ -236,14 +236,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         setCookie('hypno_microsite', token, { req, res });
 
         // Load custom frontend based on event
-        const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}/custom_frontend`;
-        let eventRes = await axios.get(eventUrl, {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token,
-            },
-        });
-        eventData = eventRes.data?.event;
+        if (eventId) {
+            const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}/custom_frontend`;
+            let eventRes = await axios.get(eventUrl, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + token,
+                },
+            });
+            eventData = eventRes.data?.event;
+        }
 
         // Fetch subset of photos to be displayed in subgallery
         if (category) {
@@ -294,7 +296,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 id: eventData.id,
                 party_slug: eventData.party_slug,
                 is_private: eventData.is_private,
-                metadata: eventData.metadata || {},  
+                metadata: eventData.metadata || {},
                 event_type: eventData.event_type || '',
                 custom_frontend: {
                     ...eventData.custom_frontend,
