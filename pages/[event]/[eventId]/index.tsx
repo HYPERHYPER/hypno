@@ -168,7 +168,7 @@ const SubGallery = (props: ResponseData) => {
                                                             </div>
                                                             <div className='transition'>
                                                                 <AutosizeImage
-                                                                    src={p.urls.gif ? p.urls.posterframe : p.urls.jpeg_thumb_url}
+                                                                    src={p.urls.gif ? p.urls.posterframe : p.urls.url}
                                                                     alt={`${p.event_id}-${p.id}`}
                                                                     width={p.width}
                                                                     height={p.height}
@@ -236,7 +236,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         setCookie('hypno_microsite', token, { req, res });
 
         // Load custom frontend based on event
-        if (eventId) {
+        if (!_.isNil(eventId)) {
             const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}/custom_frontend`;
             let eventRes = await axios.get(eventUrl, {
                 headers: {
