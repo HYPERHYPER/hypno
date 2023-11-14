@@ -92,7 +92,6 @@ export default function DataCaptureForm({
         /* Save data capture to metadata field of first photo in category */
         /* unless is just email delivery */
         const photoSlug = asset.slug;
-        let metadata = asset.metadata;
 
         let formattedData: any = data;
         // Format the date for keys containing "birthday"
@@ -101,14 +100,13 @@ export default function DataCaptureForm({
             formattedData[key] = formattedValue;
         });
 
-        metadata = {
-            ...metadata,
+        let dataCapture = {
             ...formattedData,
         }
 
         const token = String(getCookie('hypno_microsite'));
         const url = email_delivery ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/deliver/${photoSlug}.json` : `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/photos/${photoSlug}/data_capture`;
-        const payload = email_delivery ? { email: data.email } : { metadata };
+        const payload = email_delivery ? { email: data.email } : { dataCapture };
         let resp = await axios.put(url, payload, {
             headers: {
                 'Content-Type': 'application/json',
