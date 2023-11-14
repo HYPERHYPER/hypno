@@ -12,6 +12,8 @@ import useMagic from "@/hooks/useMagic";
 import MagicButton from "../ImageGeneration/MagicButton";
 import MagicImageItem from "../ImageGeneration/ImageAsset";
 import { TextPromptEditor } from "../ImageGeneration/EditTextPrompt";
+import { getCookie } from "cookies-next";
+import axios from "axios";
 
 export default function DetailView({ asset, config, imageProps }: any) {
     // const footer = Boolean(config.aiGeneration?.enabled || asset.mp4_url);
@@ -62,7 +64,40 @@ export default function DetailView({ asset, config, imageProps }: any) {
         const className = `btn btn-primary btn-gallery locked ${!mobile ? 'sm:max-w-sm' : ''}`;
         const style = btnColor ? { backgroundColor: btnColor, borderColor: btnColor, color: toTextColor(btnColor) } : {};
         const text = 'download ↓'
-        return (asset.mp4_url && config.qr_asset_download !== 'posterframe') ? <a className={className} href={asset.download_url} style={style}>{text}</a> : <button style={style} className={className} onClick={() => downloadPhoto(asset, config.qr_asset_download == 'posterframe')}>{text}</button>
+        const updateDownloadedMetadata = async () => {
+            const token = String(getCookie('hypno_microsite'));
+            if (token) {
+                const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/photos/${asset.id}/downloaded`;
+                try {
+                    await axios.put(url, null, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: 'Bearer ' + token,
+                        },
+                    }).then(res => console.log(res.data));
+                } catch (e) {
+                    console.log('Error updating downloaded metadata', e)
+                }
+            }
+        }
+
+        return (asset.mp4_url && config.qr_asset_download !== 'posterframe') ?
+            <a
+                className={className}
+                href={asset.download_url}
+                onClick={updateDownloadedMetadata}
+                style={style}>
+                {text}
+            </a>
+            :
+            <button
+                style={style}
+                className={className}
+                onClick={() => {
+                    downloadPhoto(asset, config.qr_asset_download == 'posterframe');
+                    updateDownloadedMetadata();
+                }}
+            >{text}</button>
     }
 
     return (
