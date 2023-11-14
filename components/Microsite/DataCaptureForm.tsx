@@ -106,7 +106,7 @@ export default function DataCaptureForm({
 
         const token = String(getCookie('hypno_microsite'));
         const url = email_delivery ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/photos/deliver/${photoSlug}.json` : `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/photos/${photoSlug}/data_capture`;
-        const payload = email_delivery ? { email: data.email } : { dataCapture };
+        const payload = email_delivery ? { email: data.email } : { metadata: dataCapture };
         let resp = await axios.put(url, payload, {
             headers: {
                 'Content-Type': 'application/json',
