@@ -38,10 +38,12 @@ function DashboardPage(props: ResponseData) {
     const sort_order = query.order || 'desc';
     const sort_by = query.by || 'last_uploaded_at';
     const sort_by_name = _.split(String(sort_by), '_')[0];
+    const event_type = query.type || '';
+    const event_type_code = _.isEmpty(event_type) ? '' : (event_type == 'pro' ? '100' : '102')
 
     const getKey = (pageIndex: number, previousPageData: any) => {
         if (previousPageData && pageIndex == previousPageData.pages) return null; // reached the end
-        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events?include_last_photo=true&per_page=25&sort_by=${sort_by}&sort_order=${sort_order}`;
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events?include_last_photo=true&per_page=25&sort_by=${sort_by}&sort_order=${sort_order}&event_type=${event_type_code}`;
         if (pageIndex === 0) return [url, token.access_token];
         const pageIdx = previousPageData.meta.next_page;
         return [`${url}&page=${pageIdx}`, token.access_token];
@@ -53,6 +55,7 @@ function DashboardPage(props: ResponseData) {
     });
 
     const paginatedEvents = _.map(data, (v) => v.events).flat();
+
     return (
         <>
             <Head>
@@ -66,6 +69,17 @@ function DashboardPage(props: ResponseData) {
                     title='dashboard'
                 >
                     <Link href='/e/new' className='text-primary'><h2>new event</h2></Link>
+                    
+                    <div className="dropdown text-primary">
+                        <label tabIndex={0} className='cursor-pointer'><h2>{_.isEmpty(event_type) ? 'all' : event_type} events</h2></label>
+                        <ul tabIndex={0} className="dropdown-content sm:text-lg z-[1] menu p-2 shadow bg-black/20 backdrop-blur rounded-box w-32 sm:w-52">
+                            <li className='disabled'><a>filter by</a></li>
+                            <li><Link href={`/dashboard?by=${sort_by}&order=${sort_order}`}>none</Link></li>
+                            <li><Link href={`/dashboard?by=${sort_by}&order=${sort_order}&type=pro`}>pro events</Link></li>
+                            <li><Link href={`/dashboard?by=${sort_by}&order=${sort_order}&type=ipad`}>ipad events</Link></li>
+                        </ul>
+                    </div>
+
                     <div className='text-primary flex items-center gap-1 sm:gap-3'>
                         <div className="dropdown">
                             <label tabIndex={0} className='cursor-pointer'><h2>{sort_by_name == 'last' ? 'updated' : sort_by_name}</h2></label>
