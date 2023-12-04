@@ -117,7 +117,7 @@ const SubGallery = (props: ResponseData) => {
         ai_generation: event?.metadata?.ai_generation, 
         color: gallery.primary_color, 
         qr_asset_download: event?.metadata?.qr_asset_download,
-        displayFileType: gallery.filetype_download,
+        displayFileType: event?.filetype_download,
     }
 
     return (
@@ -305,6 +305,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 is_private: eventData.is_private,
                 metadata: eventData.metadata || {},
                 event_type: eventData.event_type || '',
+                filetype_download: eventData.filetype_download || '',
                 custom_frontend: {
                     ...eventData.custom_frontend,
                     // ...(eventData.custom_gallery_assigned == '1' && { ...eventData.custom_frontend }),
