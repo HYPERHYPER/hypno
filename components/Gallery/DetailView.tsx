@@ -46,7 +46,10 @@ export default function DetailView({ asset, config, imageProps }: any) {
     }, [imagesLength])
 
     const isPortrait = asset.height > asset.width;
-    const isVideo = !_.isEmpty(asset.mp4_url);
+    const displayFileType = config.displayFileType;
+    const displayUrl = displayFileType ? asset.urls[displayFileType] : asset.urls.url;
+    const isVideo = !_.isEmpty(asset.mp4_url) && (displayFileType ? _.includes(displayFileType, 'mp4') : true);
+
     const height = useContentHeight({ footer });
     const outerHeight = useContentHeight({ footer: false });
     const width = useWidth();
@@ -81,7 +84,8 @@ export default function DetailView({ asset, config, imageProps }: any) {
             }
         }
 
-        return (asset.mp4_url && config.qr_asset_download !== 'posterframe') ?
+        const downloadFiletype = config.qr_asset_download == 'posterframe' ? 'posterframe' : (displayFileType || '')
+        return (isVideo && config.qr_asset_download !== 'posterframe') ?
             <a
                 className={className}
                 href={asset.download_url}
@@ -94,12 +98,12 @@ export default function DetailView({ asset, config, imageProps }: any) {
                 style={style}
                 className={className}
                 onClick={() => {
-                    downloadPhoto(asset, config.qr_asset_download == 'posterframe');
+                    downloadPhoto(asset, downloadFiletype);
                     updateDownloadedMetadata();
                 }}
             >{text}</button>
     }
-
+    
     return (
         <>
             <div
@@ -122,7 +126,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                         (isLoaded || isVideo) ? 'opacity-100' : 'opacity-0 backdrop-blur-[50px]',
                         isVideo && 'sm:mt-7'
                     )}>
-                        {asset.mp4_url ? (
+                        {isVideo ? (
                             <VideoAsset src={asset.mp4_url} poster={asset.posterframe} />
                         ) : (
                             <div className='block'>
@@ -145,7 +149,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                                     onResize={(e) => setAssetHeight(e.target.height)}
                                     priority
                                     fill={!imageProps.width}
-                                    src={asset.urls.url}
+                                    src={displayUrl}
                                     alt={`${asset.event_id}-${asset.id}`}
                                     placeholder={imageProps?.blurDataURL ? 'blur' : 'empty'}
                                     style={isPortrait && assetHeight > Number(outerHeight.split('px')[0]) ? { minHeight: height } : {}}

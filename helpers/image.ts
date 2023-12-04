@@ -79,8 +79,8 @@ export function isValidAspectRatio(imageWidth: number, imageHeight: number, aspe
     return Math.abs(actualAspectRatio - targetAspectRatio) <= tolerance;
 }
 
-export function downloadPhoto(asset: any, posterframe?: boolean) {
-    const assetUrl = posterframe ? asset.posterframe : asset.urls.url;
+export function downloadPhoto(asset: any, filetype?: string) {
+    const assetUrl = filetype ? asset.urls[filetype] : asset.urls.url;
     const fileName = `hypno-${asset.event_id}-${asset.id}`;
     saveAs(assetUrl, fileName);
 }
