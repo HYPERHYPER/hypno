@@ -165,11 +165,11 @@ const EditCustomFrontendPage = (props: ResponseData) => {
                                     <div className="dropdown dropdown-top dropdown-end">
                                         <label
                                             className='w-full'
-                                            tabIndex={config.custom_frontend ? 0 : undefined}>
-                                            <span className={clsx("inline-flex h-10 w-10 rounded-full border-4 border-white/20 cursor-pointer", !config.custom_frontend && 'opacity-50 cursor-not-allowed')} style={{ backgroundColor: `${_.startsWith(config.primary_color, '#') ? "" : "#"}${config.primary_color}` }} />
+                                            tabIndex={0}>
+                                            <span className={clsx("inline-flex h-10 w-10 rounded-full border-4 border-white/20 cursor-pointer")} style={{ backgroundColor: `${_.startsWith(config.primary_color, '#') ? "" : "#"}${config.primary_color}` }} />
                                         </label>
                                         <div
-                                            tabIndex={config.custom_frontend ? 0 : undefined}
+                                            tabIndex={0}
                                             className='dropdown-content shadow mb-2 p-2 rounded-full'>
                                             <ChromePicker color={config.primary_color || '#000000'} onChange={(color: any, e: any) => { e.preventDefault(); setValue('primary_color', color.hex, { shouldDirty: true }) }} disableAlpha={true} />
                                         </div>
