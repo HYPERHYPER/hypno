@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import useUserStore from "@/store/userStore";
+import _ from 'lodash';
 
 export interface WithAuthProps {
   // isLoggedIn: boolean;
@@ -51,6 +52,7 @@ export default function withAuth<T>(
     const login = useUserStore.useLogin();
     const logout = useUserStore.useLogout();
     const user = useUserStore.useUser();
+    const isProUser = useUserStore.useIsProUser() || !_.isEmpty(user?.username);
     const hasHydrated = useUserStore.use_hasHydrated();
     //*=========== STORE END ===========
 
@@ -75,12 +77,17 @@ export default function withAuth<T>(
     useEffect(() => {
       if (hasHydrated) {
         if (isLoggedIn) {
-          // Prevent authenticated user from accessing auth or other role pages
-          if (routeRole === 'auth') {
-            if (query?.redirect) {
-              router.replace(query.redirect as string);
-            } else {
-              router.replace(HOME_ROUTE);
+          if (!isProUser) {
+            // Redirect to finish pro user registration
+            router.replace('/finish');
+          } else {
+            // Prevent authenticated user from accessing auth or other role pages
+            if (routeRole === 'auth' || router.pathname === '/finish') {
+              if (query?.redirect) {
+                router.replace(query.redirect as string);
+              } else {
+                router.replace(HOME_ROUTE);
+              }
             }
           }
         } else {

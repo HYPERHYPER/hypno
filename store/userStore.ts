@@ -10,6 +10,7 @@ type UserState = {
   token: any;
   error: string;
   isLoading: boolean;
+  isProUser: boolean;
   isLoggedIn: boolean;
   _hasHydrated: boolean;
 }
@@ -19,6 +20,7 @@ type UserAction = {
   login: (email: string, password: string) => void;
   logout: () => void;
   signup: (user: NewUser, invite?: UserInvite) => void;
+  finishProSignup: (first_name: string, last_name: string, username: string) => void;
   stopLoading: () => void;
   setHasHydrated: (state: any) => void;
 }
@@ -31,13 +33,19 @@ const useUserStoreBase = create<UserState & UserAction>()(
       error: '',
       isLoggedIn: false,
       isLoading: false,
+      isProUser: false,
       _hasHydrated: false,
       updateUser: (updatedUser) => set(() => ({ user: { ...get().user, ...updatedUser } })),
       login: async (email, password) => {
         try {
           // call your authentication API and set the user state
           const authenticatedUser = await authenticateUser(email, password);
-          set({ ...authenticatedUser, isLoggedIn: true, error: '' });
+          const token = authenticatedUser.token.access_token;
+
+          const checkUserProRegistration = await checkExistingUser(email);
+          const isProUser = checkUserProRegistration.already_pro;
+          console.log('checkUser',checkUserProRegistration)
+          set({ ...authenticatedUser, isLoggedIn: true, isProUser, error: '' });
         } catch (error: any) {
           set({ error: error.message });
         }
@@ -46,7 +54,7 @@ const useUserStoreBase = create<UserState & UserAction>()(
         // clear the user state
         try {
           await logoutUser(get().token);
-          set({ user: null, token: null, isLoggedIn: false, error: '' });
+          set({ user: null, token: null, isLoggedIn: false, isProUser: false, error: '' });
         } catch (error: any) {
           set({ error: error.message });
         }
@@ -59,12 +67,29 @@ const useUserStoreBase = create<UserState & UserAction>()(
           try {
             // login user after successful account creation
             const authenticatedUser = await authenticateUser(newUser.email, newUser.password);
-            set({ ...authenticatedUser, isLoggedIn: true, error: '' });
+            set({ ...authenticatedUser, isLoggedIn: true, isProUser: true, error: '' });
           } catch (error: any) {
             set({ error: error.messsage });
           }
         } catch (error: any) {
           set({ error: error.message });
+        }
+      },
+      finishProSignup: async (first_name, last_name, username) => {
+        // user must be logged in
+        if (!(get().isLoggedIn)) return;
+        const user = get().user;
+        const token = get().token.access_token;
+        try {
+          const proUser = await completeProRegistration({
+            email: user.email,
+            first_name,
+            last_name,
+            username,
+          }, token);
+          set({ user: proUser, isProUser: true });
+        } catch (error: any) {
+          set({error: error.message});
         }
       },
       stopLoading: () => set(() => ({ isLoading: false })),
@@ -145,6 +170,62 @@ async function authenticateUser(email: string, password: string) {
       organization: data.organization
     }
   }
+}
+
+async function checkExistingUser(email: string) {
+  const payload = {
+    user: {
+      email
+    }
+  }
+
+  const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/existing_user`;
+  const response = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: { 'Content-Type': 'application/json' }
+  });
+
+  if (!response.ok) {
+    throw new Error('Something went wrong, please try again later');
+  }
+
+  const data = await response.json();
+  // Resonse example -> { user_exists: true, already_pro: true }
+  return data;
+}
+
+async function completeProRegistration({ email, first_name, last_name, username } : {
+  email: string;
+  first_name: string;
+  last_name: string;
+  username: string;
+}, token: string) {
+  const payload = {
+    user: {
+      email,
+      first_name,
+      last_name,
+      username,
+    }
+  }
+
+  const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/complete_pro_registration`;
+  const response = await fetch(url, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  })
+
+  if (!response.ok) {
+    throw new Error('Something went wrong complete pro registration');
+  }
+
+  const data = await response.json(); // user object
+  return data;
 }
 
 async function signupUser(user: NewUser, invite?: UserInvite) {
