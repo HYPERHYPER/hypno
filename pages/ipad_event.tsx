@@ -3,15 +3,11 @@ import type { GetServerSideProps } from 'next';
 import { useCallback, useEffect, useState } from 'react';
 import Head from 'next/head';
 import _, { debounce } from 'lodash';
-import EventForm from '@/components/EventForm/EventForm';
 import GlobalLayout from '@/components/GlobalLayout';
 import withAuth from '@/components/hoc/withAuth';
 import { convertFieldArrayToObject, convertFieldObjectToArray, isCustomGallery } from '@/helpers/event';
 import { AutosaveStatusText, SaveStatus } from '@/components/Form/AutosaveStatusText';
-import useUserStore from '@/store/userStore';
-import useSWR from 'swr';
 import { useRouter } from 'next/router';
-import { axiosGetWithToken } from '@/lib/fetchWithToken';
 import { FormProvider, useForm } from 'react-hook-form';
 import FormControl from '@/components/Form/FormControl';
 import FileInput from '@/components/Form/FileInput';
@@ -34,7 +30,6 @@ const EditCustomFrontendPage = (props: ResponseData) => {
     const custom_frontend = props.custom_frontend;
     const methods = useForm({
         defaultValues: {
-            custom_frontend: custom_frontend ? isCustomGallery(custom_frontend) : false,
             logo_image: custom_frontend?.logo_image || '',
             home_background_image: custom_frontend?.home_background_image || '',
             primary_color: custom_frontend?.primary_color || '#00FF99',
@@ -60,7 +55,6 @@ const EditCustomFrontendPage = (props: ResponseData) => {
 
     // Provided array of changed fields [{field_name: value}]
     const submitForm = async (data: any) => {
-        console.log(data)
         let custom_frontend_payload = {
             logo_image: data.logo_image,
             home_background_image: data.home_background_image,
@@ -74,17 +68,17 @@ const EditCustomFrontendPage = (props: ResponseData) => {
             terms_privacy: data.terms_privacy
         };
 
-        if (!data.custom_frontend) {
-            custom_frontend_payload = {
-                ...custom_frontend_payload,
-                logo_image: '',
-                home_background_image: '',
-                primary_color: '',
-                enable_legal: false,
-                data_capture: false,
-                fields: {},
-            }
-        }
+        // if (!data.custom_frontend) {
+        //     custom_frontend_payload = {
+        //         ...custom_frontend_payload,
+        //         logo_image: '',
+        //         home_background_image: '',
+        //         primary_color: '',
+        //         enable_legal: false,
+        //         data_capture: false,
+        //         fields: {},
+        //     }
+        // }
 
         const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/custom_frontends/${customFrontendId}`;
         const token = String(query.token);
@@ -128,7 +122,6 @@ const EditCustomFrontendPage = (props: ResponseData) => {
         }
     }, [isSubmitSuccessful, isSubmitting]);
 
-
     return (
         <>
             <Head>
@@ -145,37 +138,29 @@ const EditCustomFrontendPage = (props: ResponseData) => {
                     <FormProvider {...methods}>
                         <form onSubmit={handleSubmit(submitForm)} className={`grid grid-cols-1 gap-x-14}`}>
 
-                            <div className='lg:border-t-2 lg:border-white/20'>
-                                <FormControl label='branded gallery'>
-                                    <input type="checkbox" className="toggle pro toggle-lg" {...register('custom_frontend')} />
-                                </FormControl>
-
-
-                                <FormControl label='logo' nested={true} disabled={!config.custom_frontend}>
+                            <div className='border-t-2 border-white/20'>
+                                <FormControl label='logo'>
                                     <FileInput
                                         inputId='logo'
                                         onInputChange={(value: string) => setValue('logo_image', value, { shouldDirty: true })}
                                         value={config.logo_image}
-                                        disabled={!config.custom_frontend}
                                         uploadCategory='logo'
                                     />
                                 </FormControl>
 
-                                <FormControl label='background' nested={true} disabled={!config.custom_frontend}>
+                                <FormControl label='background'>
                                     <FileInput
                                         inputId='background'
                                         onInputChange={(value: string) => setValue('home_background_image', value, { shouldDirty: true })}
                                         value={config.home_background_image}
-                                        disabled={!config.custom_frontend}
                                         uploadCategory='background'
                                     />
                                 </FormControl>
 
-                                <FormControl label='color' nested={true} disabled={!config.custom_frontend}>
+                                <FormControl label='color'>
                                     <input
                                         className='input pro disabled:text-white/20 transition-colors'
                                         placeholder='# hex code'
-                                        disabled={!config.custom_frontend}
                                         {...register('primary_color')} />
                                     <div className="dropdown dropdown-top dropdown-end">
                                         <label
@@ -191,13 +176,12 @@ const EditCustomFrontendPage = (props: ResponseData) => {
                                     </div>
                                 </FormControl>
 
-                                <FormControl label='data/legal' nested={true} disabled={!config.custom_frontend}>
-                                    {config.data_capture && config.custom_frontend && <Modal.Trigger id='data-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
-                                    <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_frontend} {...register('data_capture')} />
+                                <FormControl label='data/legal'>
+                                    {config.data_capture && <Modal.Trigger id='data-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
+                                    <input type="checkbox" className="toggle pro toggle-lg" {...register('data_capture')} />
                                 </FormControl>
 
                             </div>
-
 
                             <DataCaptureModal status={status}>
                                 <FormControl label='headline'>
@@ -215,7 +199,6 @@ const EditCustomFrontendPage = (props: ResponseData) => {
                                         disabled={!config.data_capture}
                                         {...register('data_capture_subtitle')} />
                                 </FormControl>
-
                             </DataCaptureModal>
                         </form >
                     </FormProvider>
