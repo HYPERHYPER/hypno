@@ -27,11 +27,11 @@ function SettingsPage() {
     const updateUser = useUserStore.useUpdateUser();
     const token = useUserStore.useToken();
 
-    const orgUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${user.organization.id}`;
+    const orgUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${user?.organization?.id}`;
     const { data: orgData, isValidating: isValidatingOrgData, error: orgError } = useSWR([orgUrl, token.access_token],
         ([url, token]) => axiosGetWithToken(url, token))
 
-    const orgTier = orgData?.organization.metadata.hypno_pro.current_tier;
+    const orgTier = orgData?.organization?.metadata?.hypno_pro?.current_tier;
         
     const [saveStatus, setSaveStatus] = useState<SaveStatus>('ready');
     const {
@@ -116,7 +116,7 @@ function SettingsPage() {
     };
 
     const handleBillingRedirect = async () => {
-        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${user.organization.id}/billing_portal`;
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${user?.organization?.id}/billing_portal`;
         await axios.get(url, {
             headers: {
                 'Content-Type': 'application/json',
@@ -167,7 +167,7 @@ function SettingsPage() {
                         <Item name='name' value={`${user.first_name} ${user.last_name}` || ''} modalId='name-modal' />
                         <Item name='email' value={user.email} modalId='email-modal' />
                         <Item name='password' value={'change'} modalId='password-modal' />
-                        <Item name='organization' value={user.organization.name} href='/org' />
+                        {user.organization && <Item name='organization' value={user.organization?.name} href='/org' /> }
                         <Item name='plan' value={
                             <>{orgData?.organization && <span className='cursor-pointer' onClick={() => window.payment_plans_modal.showModal()}>{orgTier}</span>}</>
                         } />
