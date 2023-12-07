@@ -253,5 +253,5 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
 };
 
-export default withAuth(EditCustomFrontendPage, 'optional');
+export default withAuth(EditCustomFrontendPage, 'admin');
 
