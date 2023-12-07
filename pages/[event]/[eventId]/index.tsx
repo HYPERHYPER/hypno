@@ -307,8 +307,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 event_type: eventData.event_type || '',
                 filetype_download: eventData.filetype_download || '',
                 custom_frontend: {
-                    ...eventData.custom_frontend,
-                    // ...(eventData.custom_gallery_assigned == '1' && { ...eventData.custom_frontend }),
+                    ...(eventData.custom_gallery_assigned == '1' && { ...eventData.custom_frontend }),
                     ...(deliverySlug && { email_delivery: true })
                 }
             }
