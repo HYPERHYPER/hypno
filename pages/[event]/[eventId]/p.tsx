@@ -8,7 +8,6 @@ import { fetchWithToken } from '@/lib/fetchWithToken';
 import { CustomGallery } from '@/components/Gallery/CustomGallery';
 import InfiniteMediaGrid from '@/components/Gallery/InfiniteMediaGrid';
 import { EventConfig } from '@/types/event';
-import { getPlaiceholder } from 'plaiceholder';
 
 type PhotosResponse = {
     photos: any;
@@ -21,24 +20,24 @@ type PhotosResponse = {
 
 interface ResponseData {
     event: EventConfig;
-    photos: PhotosResponse;
+    // photos: PhotosResponse;
 }
 
 const PublicGallery = (props: ResponseData) => {
     const { query } = useRouter();
-    const { photos, event } = props;
+    const { event } = props;
     const { name, id } = event;
 
     const getKey = (pageIndex: number, previousPageData: any) => {
-        if ((_.isNil(previousPageData) && pageIndex > 0) || (previousPageData && !previousPageData?.meta.next_page)) return null; // reached the end
-        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${query.eventId}/photos?per_page=${photos.meta.per_page}`;
+        if ((_.isNil(previousPageData) && pageIndex > 0) || (previousPageData && !previousPageData?.meta?.next_page)) return null; // reached the end
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${query.eventId}/photos?per_page=30`;
         if (pageIndex === 0) return [url, process.env.NEXT_PUBLIC_AUTH_TOKEN];
-        return [`${previousPageData.meta.next_page}`, process.env.NEXT_PUBLIC_AUTH_TOKEN];
+        return [`${previousPageData?.meta?.next_page}`, process.env.NEXT_PUBLIC_AUTH_TOKEN];
     }
 
     const { data, size, setSize, error, isValidating } = useSWRInfinite(getKey,
         ([url, token]) => fetchWithToken(url, token), {
-        fallbackData: [{ photos }],
+        fallbackData: [{ photos: [] }],
     });
 
     const paginatedPhotos = !_.isEmpty(_.first(data)?.photos) ? _.map(data, (v) => v.photos).flat() : [];
@@ -71,43 +70,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     const { eventId } = context.query;
     const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
 
-    // Fetch event config + event photos
+    // Fetch event config
     const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}`;
-    const photosUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}/photos?per_page=50`;
     let eventData: any = {};
-    let photosData: any = {};
 
     try {
-        const [eventRes, photosRes] = await Promise.all([
-            axios.get(eventUrl, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: 'Bearer ' + token,
-                }
-            }),
-            axios.get(photosUrl, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: 'Bearer ' + token,
-                }
-            })
-        ])
+        const eventRes = await axios.get(eventUrl, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
+            }
+        });
 
         if (eventRes.status === 200) {
             eventData = eventRes.data;
-        }
-
-        if (photosRes.status === 200) {
-            const photos = await Promise.all(
-                photosRes.data.photos.map(async (photo: any) => {
-                    const placeholder = await getPlaiceholder(photo.posterframe);
-                    return {
-                        ...photo,
-                        blurDataURL: placeholder.base64,
-                    };
-                })
-            );
-            photosData = { ...photosRes.data, photos };
         }
     } catch (e) {
         console.log(e);
@@ -128,9 +104,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
         props: {
             ...eventData,
-            photos: {
-                ...photosData,
-            }
         }
     };
 };
