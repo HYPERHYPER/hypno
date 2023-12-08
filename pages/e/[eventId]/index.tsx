@@ -258,8 +258,8 @@ function EventPage(props: ResponseData) {
                         {/* <Link href={`/e/${id}`}><h2 className='text-white'>all</h2></Link> */}
                         {/* <Link href=''><h2 className='text-primary'>favorites</h2></Link> */}
                         {isProEvent(event.event_type) && event.is_private == 1 && <Link href={`/pro/${id}/p`}><h2 className='text-primary'>gallery</h2></Link>}
-                        {isProEvent(event.event_type) && userEventPrivileges?.canDownloadData && <Modal.Trigger id='data-download-modal'><h2 className='text-primary'>data</h2></Modal.Trigger>}
-                        {isProEvent(event.event_type) && userEventPrivileges?.canDownloadContent && <Modal.Trigger id='content-download-modal'><h2 className='text-primary'>download</h2></Modal.Trigger>}
+                        {userEventPrivileges?.canDownloadData && <Modal.Trigger id='data-download-modal'><h2 className='text-primary'>data</h2></Modal.Trigger>}
+                        {userEventPrivileges?.canDownloadContent && <Modal.Trigger id='content-download-modal'><h2 className='text-primary'>download</h2></Modal.Trigger>}
                         {isProEvent(event.event_type) && userEventPrivileges?.canEditEvent && <Link href={`/e/${id}/edit`}><h2 className='text-primary'>edit</h2></Link>}
                         {isProEvent(event.event_type) && userEventPrivileges?.canArchiveEvent && <Modal.Trigger id='archive-event-modal'><h2 className='text-primary'>archive</h2></Modal.Trigger>}
                     </GlobalLayout.Header>
