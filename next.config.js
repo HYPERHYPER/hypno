@@ -111,6 +111,11 @@ const nextConfig = {
           destination: process.env.NEXT_PUBLIC_EYE_URL,
           basePath: false,
         },
+        {
+          source: '/miami',
+          destination: process.env.NEXT_PUBLIC_MIAMI_URL,
+          basePath: false,
+        },
       ]
     }
   }
