@@ -75,7 +75,7 @@ interface ResponseData {
 //     )
 // }
 
-const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void; }) => {
+const AdminAsset = ({ asset, onSuccess, filetypeDownload }: { asset?: any, onSuccess?: () => void; filetypeDownload?: string }) => {
     const {
         isFavorited,
         isHidden,
@@ -108,7 +108,7 @@ const AdminAsset = ({ asset, onSuccess }: { asset?: any, onSuccess?: () => void;
                         onLoadingComplete={() => setIsLoaded(true)}
                     />
                     }
-                    {asset.gif || asset.mp4_url &&
+                    {((asset.gif || asset.mp4_url) && filetypeDownload !== 'posterframe') &&
                         <div
                             className='absolute top-0 left-0 w-full h-full animate-jpeg-strip'
                             style={{ backgroundImage: `url(${asset.urls.jpeg_url})`, backgroundSize: '100% 500%' }}
@@ -280,8 +280,11 @@ function EventPage(props: ResponseData) {
                             <div className='grid grid-cols-2 sm:grid-cols-3 gap-5 lg:grid-cols-4 lg:gap-10 xl:grid-cols-5 3xl:grid-cols-6'>
                                 {_.map(paginatedPhotos, (p, i) => {
                                     if (p.slug) {
-                                        return <div key={i}><AdminAsset asset={p} onSuccess={() => onArchive(p.id)} /></div>
-                                    }
+                                        return (
+                                            <div key={i}>
+                                                <AdminAsset asset={p} onSuccess={() => onArchive(p.id)} filetypeDownload={event.metadata.filetype_download} />
+                                            </div>
+                                    )}
                                 }
                                 )}
                                 {(isValidating && hasMorePhotos) && <LoadingGrid count={_.min([_.first(data)?.meta?.per_page || 0, totalCount]) || 0} />}
