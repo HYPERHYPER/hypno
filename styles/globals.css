@@ -166,6 +166,10 @@
     @apply h-auto bg-transparent active:border-none outline-none min-h-fit
   }
 
+  .select.pro-form {
+    @apply pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent focus:bg-transparent focus:outline-none text-xl sm:text-4xl
+  }
+
   .tab {
     @apply opacity-30 hover:opacity-100 transition-opacity
   }

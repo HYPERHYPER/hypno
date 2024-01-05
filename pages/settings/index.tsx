@@ -18,6 +18,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { axiosGetWithToken } from '@/lib/fetchWithToken';
 import useSWR from 'swr';
+import { isHypnoUser } from '@/helpers/user-privilege';
 
 export default withAuth(SettingsPage, 'protected');
 function SettingsPage() {
@@ -33,6 +34,7 @@ function SettingsPage() {
 
     const orgTier = orgData?.organization?.metadata?.hypno_pro?.current_tier;
         
+    
     const [saveStatus, setSaveStatus] = useState<SaveStatus>('ready');
     const {
         register,
@@ -174,6 +176,7 @@ function SettingsPage() {
                         <Item name='billing' value={
                             <>{orgTier && orgTier == 'custom' ? <span className='text-white/20'>contact sales</span>: orgTier == 'free' ? <span className='text-white/20'>none</span> : <span className='cursor-pointer' onClick={handleBillingRedirect}>manage →</span>}</>
                         } />
+                        {isHypnoUser({organization_id: user.organization_id, role: user.role}) && <Item name='' value={'global invite'} href='/settings/invite' /> }
                     </div>
                 </GlobalLayout.Content>
 

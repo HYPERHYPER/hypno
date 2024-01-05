@@ -1,5 +1,9 @@
 import _ from "lodash";
 
+export const isHypnoUser = ({organization_id, role} : {organization_id: number, role: string}) => {
+    return organization_id === 1 && role === "admin";
+}
+
 export const getEventPrivileges =  (userPrivileges: { 
     download?: Privilege, 
     event?: Privilege, 

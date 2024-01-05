@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import useUserStore from "@/store/userStore";
 import _ from 'lodash';
+import { isHypnoUser } from "@/helpers/user-privilege";
 
 export interface WithAuthProps {
   // isLoggedIn: boolean;
@@ -31,6 +32,10 @@ const ROUTE_ROLES = [
    * For pages that are extensions of admin
    */
     'admin',
+    /**
+   * For hypno users only
+   */
+      'hypno',
 ] as const;
 type RouteRole = (typeof ROUTE_ROLES)[number];
 
@@ -60,6 +65,8 @@ export default function withAuth<T>(
     const hasHydrated = useUserStore.use_hasHydrated();
     //*=========== STORE END ===========
 
+    let isHypnoAdmin = isHypnoUser({organization_id: user?.organization_id, role: user?.role});
+    
     const checkAuth = useCallback(() => {
       if (!user) {
         isLoggedIn && logout();
@@ -93,6 +100,9 @@ export default function withAuth<T>(
                 } else {
                   router.replace(HOME_ROUTE);
                 }
+              }
+              if (routeRole === 'hypno' && !isHypnoAdmin) {
+                router.replace(HOME_ROUTE);
               }
             }
           } else {
