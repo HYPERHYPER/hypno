@@ -116,6 +116,11 @@ const nextConfig = {
           destination: process.env.NEXT_PUBLIC_MIAMI_URL,
           basePath: false,
         },
+        {
+          source: '/skims',
+          destination: process.env.NEXT_PUBLIC_SKIMS_URL,
+          basePath: false,
+        },
       ]
     }
   }
