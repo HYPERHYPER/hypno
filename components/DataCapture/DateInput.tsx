@@ -46,7 +46,8 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(({ ...rest
                 onChange={handleValueChange}
                 value={value}
                 max="9999-12-31"
-                />
+                pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"
+            />
             {!focused && <input className="absolute inset-0 input data-capture cursor-pointer" placeholder="birthday" onClick={() => setFocused(true)} />}
         </div>
     )
