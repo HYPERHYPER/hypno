@@ -13,6 +13,16 @@ interface DateInputProps extends InputHTMLAttributes<HTMLInputElement> {
 export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(({ ...rest }, ref) => {
     const [focused, setFocused] = useState<boolean>(false);
     const [value, setValue] = useState<string>('')
+
+    // const formatDate = (dateString: string): string => {
+    //     const date = new Date(dateString);
+    //     if (isNaN(date.getTime())) return ''; // If date is invalid, return empty string
+    //     const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    //     const day = date.getDate().toString().padStart(2, '0');
+    //     const year = date.getFullYear().toString();
+    //     return `${month}/${day}/${year}`;
+    // };
+
     const handleValueChange = (e: any) => {
         const value = e.target.value
         setValue(value);
@@ -21,7 +31,15 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(({ ...rest
     }
 
     return (
-        <div className="relative input data-capture">
+        <div className="relative sm:h-[4rem]">
+            {/* <input
+                type="text" // Use text type instead of date
+                className={`absolute inset-0 input data-capture w-full ${rest.error && 'error text-red-600'}`}
+                onChange={handleValueChange}
+                value={formatDate(value)} // Format the value before rendering
+                maxLength={10} // Enforce maximum length for MM/DD/YYYY format
+                placeholder="mm/dd/yyyy"
+            /> */}
             <input 
                 type="date" 
                 className={`absolute inset-0 input data-capture w-full ${rest.error && 'error text-red-600'}`}
