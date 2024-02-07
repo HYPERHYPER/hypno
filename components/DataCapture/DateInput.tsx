@@ -76,8 +76,6 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(({ ...rest
 })
 
 
-
-
 // import { forwardRef, useState, InputHTMLAttributes } from "react";
 // import _ from 'lodash';
 // import 'react-date-picker/dist/DatePicker.css';
@@ -136,4 +134,4 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(({ ...rest
 //     )
 // })
 
-// DateInput.displayName = "DateInput";
+DateInput.displayName = "DateInput";
