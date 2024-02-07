@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import Script from 'next/script';
 const TRACKING_ID = "G-93Y5N61TVT"; // OUR_TRACKING_ID
 // ReactGA.initialize(TRACKING_ID);
+import '../components/DataCapture/DatePicker.css';
 
 const stripePromise = loadStripe(
   `${process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}` as string
