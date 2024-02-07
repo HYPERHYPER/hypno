@@ -21,12 +21,13 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(({ ...rest
     }
 
     return (
-        <div className="relative">
+        <div className="relative input data-capture">
             <input 
                 type="date" 
                 className={`absolute inset-0 input data-capture w-full ${rest.error && 'error text-red-600'}`}
                 onChange={handleValueChange}
                 value={value}
+                max="9999-12-31"
                 />
             {!focused && <input className="absolute inset-0 input data-capture cursor-pointer" placeholder="birthday" onClick={() => setFocused(true)} />}
         </div>
