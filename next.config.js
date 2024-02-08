@@ -121,6 +121,11 @@ const nextConfig = {
           destination: process.env.NEXT_PUBLIC_SKIMS_URL,
           basePath: false,
         },
+        {
+          source: '/terms-img',
+          destination: "https://app-a4a1ff.webflow.io/terms-img",
+          basePath: false,
+        },
       ]
     }
   }
