@@ -127,8 +127,8 @@ const nextConfig = {
           basePath: false,
         },
         {
-          source: '/spec',
-          destination: "https://app-a4a1ff.webflow.io/spec",
+          source: '/specs',
+          destination: "https://app-a4a1ff.webflow.io/specs",
           basePath: false,
         },
       ]
