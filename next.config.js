@@ -126,6 +126,11 @@ const nextConfig = {
           destination: "https://app-a4a1ff.webflow.io/terms-img",
           basePath: false,
         },
+        {
+          source: '/spec',
+          destination: "https://app-a4a1ff.webflow.io/spec",
+          basePath: false,
+        },
       ]
     }
   }
