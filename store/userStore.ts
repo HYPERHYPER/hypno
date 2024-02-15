@@ -220,8 +220,10 @@ async function completeProRegistration({ email, first_name, last_name, username 
     }
   })
 
-  if (!response.ok) {
-    throw new Error('Something went wrong complete pro registration');
+  if (response.status === 422) {
+    throw new Error(response.statusText);
+  } else if (!response.ok) {
+    throw new Error('Something went wrong, please try again later');
   }
 
   const data = await response.json(); // user object
