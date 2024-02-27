@@ -78,17 +78,17 @@ const PLAN_TYPES: PlanType = {
     },
     studio: {
         tagline: 'canon capture',
-        annualPrice: 999,
-        monthlyPrice: 1250,
+        annualPrice: 99,
+        monthlyPrice: 125,
         users: 1,
-        additionalPrice: 999,
+        additionalPrice: 99,
         uploads: 'unlimited'
 
     },
     brand: {
         tagline: 'enterprise data/legal',
-        annualPrice: 4999,
-        monthlyPrice: 6250,
+        annualPrice: 999,
+        monthlyPrice: 1250,
         users: 5,
         additionalPrice: 999,
         uploads: 'unlimited'
