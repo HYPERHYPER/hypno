@@ -41,7 +41,6 @@ interface ResponseData {
 
 export default withAuth(OrganizationUsersPage, 'protected');
 function OrganizationUsersPage(props: ResponseData) {
-    const { users: initialUsers, meta } = props;
     const user = useUserStore.useUser();
     const org_id = user.organization.id;
 
@@ -123,28 +122,28 @@ const Item = ({ user, orgId }: { user: OrgUser; orgId: number }) => {
     )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-    // Fetch organization users
-    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/users?per_page=30`;
-    const token = nookies.get(context).hypno_token;
-    let data: any = {};
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//     // Fetch organization users
+//     const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/users?per_page=30`;
+//     const token = nookies.get(context).hypno_token;
+//     let data: any = {};
 
-    await axios.get(url, {
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + token,
-        },
-    }).then(async (res) => {
-        if (res.status === 200) {
-            data = res.data;
-        }
-    }).catch((e) => {
-        console.log(e);
-    })
+//     await axios.get(url, {
+//         headers: {
+//             'Content-Type': 'application/json',
+//             Authorization: 'Bearer ' + token,
+//         },
+//     }).then(async (res) => {
+//         if (res.status === 200) {
+//             data = res.data;
+//         }
+//     }).catch((e) => {
+//         console.log(e);
+//     })
 
-    return {
-        props: {
-            ...data,
-        }
-    };
-};
+//     return {
+//         props: {
+//             ...data,
+//         }
+//     };
+// };

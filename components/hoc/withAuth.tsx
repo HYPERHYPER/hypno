@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import useUserStore from "@/store/userStore";
 import _ from 'lodash';
 import { isHypnoUser } from "@/helpers/user-privilege";
+import LoadingView from "../LoadingView";
 
 export interface WithAuthProps {
   // isLoggedIn: boolean;
@@ -124,9 +125,7 @@ export default function withAuth<T>(
       routeRole !== 'auth' &&
       routeRole !== 'optional'))
       return (
-        <div className='flex min-h-screen flex-col items-center justify-center'>
-          <span className="loading loading-ring loading-lg sm:w-[200px] text-primary"></span>
-        </div>
+        <LoadingView />
       )
     // if (
     //   // If unauthenticated user want to access protected pages
