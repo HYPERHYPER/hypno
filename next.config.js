@@ -131,6 +131,11 @@ const nextConfig = {
           destination: "https://app-a4a1ff.webflow.io/specs",
           basePath: false,
         },
+        {
+          source: '/agreement',
+          destination: "https://app-a4a1ff.webflow.io/agreement",
+          basePath: false,
+        },
       ]
     }
   }
