@@ -1,7 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-// const apiHost = 'https://demo.imagineapi.dev' // demo account
-// const apiHost = 'https://cl-82.imagineapi.dev' // startup account
 const apiHost = 'https://cl.imagineapi.dev' // new startup account
 const apiKey = process.env.IMAGINE_API_TOKEN
 
@@ -16,7 +14,6 @@ const handler = async (
         const data = {
             prompt
         }
-
         try {
             const response = await fetch(
                 `${apiHost}/items/images/`,
