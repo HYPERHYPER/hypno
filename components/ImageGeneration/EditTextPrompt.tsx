@@ -79,7 +79,7 @@ export function TextPromptEditor({ onChange, textPrompt, generateImage, isGenera
             <div className="w-full p-7">
                 <textarea
                     ref={textareaRef}
-                    className="textarea focus:outline-none focus:bg-transparent textarea-lg text-xl bg-transparent text-center leading-[1.2] p-0 resize-none overflow-y-hidden w-full min-h-[40px] font-normal tracking-tight"
+                    className="textarea focus:outline-none focus:bg-transparent textarea-lg text-xl bg-transparent text-center leading-[1.2] p-0 resize-none overflow-y-hidden w-full font-normal tracking-tight"
                     value={textPrompt}
                     onChange={(e) => onChange(e.target.value)}
                     onInput={adjustTextareaHeight}
