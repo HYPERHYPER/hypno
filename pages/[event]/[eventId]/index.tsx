@@ -141,7 +141,10 @@ const SubGallery = (props: ResponseData) => {
                             <div className='fixed hero top-0 left-0 h-screen p-10'>
                                 <div className='hero-content max-w-[24rem] sm:max-w-2xl flex flex-row gap-4 items-center justify-center bg-black/20 backdrop-blur-[50px] p-8'>
                                     <Spinner />
-                                    <p className='text-white'>Your content is processing, come back later...</p>
+                                    <div>
+                                        <p className='text-white'>your content is processing</p>
+                                        <p className='text-white/50'>this usually takes 60 seconds</p>
+                                    </div>
                                 </div>
                             </div>
                         ) : (
