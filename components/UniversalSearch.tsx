@@ -1,21 +1,37 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/router'; // Import useRouter
 import useUserStore from '@/store/userStore';
 import debounce from 'lodash/debounce';
 
+interface UserResult {
+  avatar: string;
+  id: number;
+  first_name: string;
+  last_name: string;
+  username: string;
+  email: string;
+}
+
+interface OrganizationResult {
+  id: number;
+  name: string;
+  metadata: object;
+}
+
+interface EventResult {
+  id: number;
+  name: string;
+  event_type: string;
+}
 interface SearchResults {
-  users: Array<{
-    avatar: string;
-    id: number;
-    first_name: string;
-    last_name: string;
-    username: string;
-    email: string;
-  }>;
-  organizations: Array<{ name: string; id: number; metadata: object }>;
-  events: Array<{ name: string; id: number; event_type: string }>;
+  users: Array<UserResult>;
+  organizations: Array<OrganizationResult>;
+  events: Array<EventResult>;
 }
 
 export default function UniversalSearch() {
+  const router = useRouter();
   const { access_token: token } = useUserStore.useToken();
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -25,7 +41,8 @@ export default function UniversalSearch() {
     events: [],
   });
   const [isChecked, setIsChecked] = useState(false);
-  const searchInputRef = useRef(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
 
   const clearInputAndResults = () => {
     setInput('');
@@ -74,6 +91,20 @@ export default function UniversalSearch() {
     setIsChecked(true);
   };
 
+  const handleClick = (route: string, id: number) => {
+    router.push(`/${route}/${id}`); // Use router.push to navigate
+  };
+
+  function isEventResult(item: any): item is EventResult {
+    return (item as EventResult).id !== undefined;
+  }
+  function isOrganizationResult(item: any): item is OrganizationResult {
+    return (item as OrganizationResult).id !== undefined;
+  }
+  function isUserResult(item: any): item is UserResult {
+    return (item as UserResult).id !== undefined;
+  }
+
   const renderCategory = (category: keyof SearchResults) => {
     return (
       <>
@@ -86,81 +117,88 @@ export default function UniversalSearch() {
         </thead>
         <tbody>
           {searchResults[category].length > 0 &&
-            searchResults[category].map((item, index) =>
-              category === 'events' ? (
-                <tr
-                  key={category + index}
-                  className='cursor-pointer bg-base-100 hover:bg-neutral-800'
-                >
-                  <td>
-                    <span className='text-sm'>{`${item.name}`}</span>
-                    <br />
-                    <span
-                      className={
-                        item.event_type == 'hypno'
-                          ? 'badge badge-sm badge-outline'
-                          : 'badge badge-sm badge-outline badge-primary'
-                      }
-                    >
-                      {item.event_type === 'hypno' ? 'iPad' : 'iPhone'}
-                    </span>
-                  </td>
-                </tr>
-              ) : category === 'organizations' ? (
-                <tr
-                  key={category + index}
-                  className='cursor-pointer bg-base-100 hover:bg-neutral-800'
-                >
-                  <td>
-                    <div className='flex items-center gap-3'>
-                      <div className='avatar placeholder'>
-                        <div className='bg-neutral text-neutral-content rounded-full w-6'>
-                          <span className='text-xs'>
-                            {item.name.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                      </div>
-                      <div>
-                        <div className='text-sm font-bold'>{`${item.name}`}</div>
-                        <div className='text-xs opacity-50'>{item.id}</div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                <tr
-                  key={category + index}
-                  className='cursor-pointer bg-base-100 hover:bg-neutral-800'
-                >
-                  <td>
-                    <div className='flex items-center gap-3'>
-                      {item.avatar === null ? (
+            searchResults[category].map(
+              (item: UserResult | OrganizationResult | EventResult, index) =>
+                category === 'events' && isEventResult(item) ? (
+                  <tr
+                    key={category + index}
+                    className='cursor-pointer bg-base-100 hover:bg-neutral-800'
+                    onClick={() => handleClick('e', item.id)}
+                  >
+                    <td>
+                      <span className='text-sm'>{`${item.name}`}</span>
+                      <br />
+                      <span
+                        className={
+                          item.event_type == 'hypno'
+                            ? 'badge badge-sm badge-outline'
+                            : 'badge badge-sm badge-outline badge-primary'
+                        }
+                      >
+                        {item.event_type === 'hypno' ? 'iPad' : 'iPhone'}
+                      </span>
+                    </td>
+                  </tr>
+                ) : category === 'organizations' &&
+                  isOrganizationResult(item) ? (
+                  <tr
+                    key={category + index}
+                    className='cursor-pointer bg-base-100 hover:bg-neutral-800'
+                  >
+                    <td>
+                      <div className='flex items-center gap-3'>
                         <div className='avatar placeholder'>
                           <div className='bg-neutral text-neutral-content rounded-full w-6'>
-                            <span className='text-xs'>{`${
-                              item.first_name.charAt(0).toUpperCase() +
-                              item.last_name.charAt(0).toUpperCase()
-                            }`}</span>
+                            <span className='text-xs'>
+                              {item.name.charAt(0).toUpperCase()}
+                            </span>
                           </div>
                         </div>
-                      ) : (
-                        <div className='avatar'>
-                          <div className='mask mask-squircle w-6 h-6'>
-                            <img src={item.avatar} alt='avatar' />
-                          </div>
+                        <div>
+                          <div className='text-sm font-bold'>{`${item.name}`}</div>
+                          <div className='text-xs opacity-50'>{item.id}</div>
                         </div>
-                      )}
-                      <div>
-                        <div className='text-sm font-bold'>{`${item.first_name} ${item.last_name}`}</div>
-                        <div className='text-xs opacity-50'>
-                          {item.username}
-                        </div>
-                        <div className='text-xs opacity-50'>{item.email}</div>
                       </div>
-                    </div>
-                  </td>
-                </tr>
-              )
+                    </td>
+                  </tr>
+                ) : (
+                  isUserResult(item) && (
+                    <tr
+                      key={category + index}
+                      className='cursor-pointer bg-base-100 hover:bg-neutral-800'
+                    >
+                      <td>
+                        <div className='flex items-center gap-3'>
+                          {item.avatar === null ? (
+                            <div className='avatar placeholder'>
+                              <div className='bg-neutral text-neutral-content rounded-full w-6'>
+                                <span className='text-xs'>{`${
+                                  item.first_name.charAt(0).toUpperCase() +
+                                  item.last_name.charAt(0).toUpperCase()
+                                }`}</span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className='avatar'>
+                              <div className='mask mask-squircle w-6 h-6'>
+                                <img src={item.avatar} alt='avatar' />
+                              </div>
+                            </div>
+                          )}
+                          <div>
+                            <div className='text-sm font-bold'>{`${item.first_name} ${item.last_name}`}</div>
+                            <div className='text-xs opacity-50'>
+                              {item.username}
+                            </div>
+                            <div className='text-xs opacity-50'>
+                              {item.email}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                )
             )}
         </tbody>
       </>
@@ -189,7 +227,7 @@ export default function UniversalSearch() {
             <input
               type='text'
               className='grow block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:border-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-			  placeholder="Search..." 
+              placeholder='Search...'
               id='search_input'
               ref={searchInputRef}
               value={input}
