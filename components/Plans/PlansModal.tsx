@@ -89,7 +89,7 @@ const PLAN_TYPES: PlanType = {
         tagline: 'enterprise data/legal',
         annualPrice: 999,
         monthlyPrice: 1250,
-        users: 5,
+        users: 1,
         additionalPrice: 999,
         uploads: 'unlimited'
     }
@@ -122,7 +122,7 @@ const PlanCard = ({ type, current, billingFrequency, onPlanSelect }: { type: str
         </div>
 
         <div className='font-thin space-y-1'>
-            <h4>{PLAN_TYPES[type].users} {PLAN_TYPES[type].users > 1 ? 'users' : 'user'}</h4>
+            {/* <h4>{PLAN_TYPES[type].users} {PLAN_TYPES[type].users > 1 ? 'users' : 'user'}</h4> */}
             <h4>each add&apos;l  user ${billingFrequency == 'annual' ? PLAN_TYPES[type].annualPrice : PLAN_TYPES[type].monthlyPrice}/mo</h4>
             <h4>{PLAN_TYPES[type].uploads != 'unlimited' ? '100 uploads/mo' : 'unlimited uploads'}</h4>
         </div>
