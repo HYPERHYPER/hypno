@@ -1,77 +1,94 @@
 @font-face {
-  font-family: 'NB Akademie Std';
-  src: url('../assets/fonts/NBAkademieStd/NBAkademieStd-Regular.woff2') format('woff2'),
-      url('../assets/fonts/NBAkademieStd/NBAkademieStd-Regular.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+    font-family: "NB Akademie Std";
+    src:
+        url("../assets/fonts/NBAkademieStd/NBAkademieStd-Regular.woff2")
+            format("woff2"),
+        url("../assets/fonts/NBAkademieStd/NBAkademieStd-Regular.woff")
+            format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'NB Akademie Std';
-  src: url('../assets/fonts/NBAkademieStd/NBAkademieStdLight.woff2') format('woff2'),
-      url('../assets/fonts/NBAkademieStd/NBAkademieStdLight.woff') format('woff');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
+    font-family: "NB Akademie Std";
+    src:
+        url("../assets/fonts/NBAkademieStd/NBAkademieStdLight.woff2")
+            format("woff2"),
+        url("../assets/fonts/NBAkademieStd/NBAkademieStdLight.woff")
+            format("woff");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'NB Akademie Std';
-  src: url('../assets/fonts/NBAkademieStd/NB_Akademie_Std_Medium.otf') format('opentype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
+    font-family: "NB Akademie Std";
+    src: url("../assets/fonts/NBAkademieStd/NB_Akademie_Std_Medium.otf")
+        format("opentype");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'NB Akademie Std';
-  src: url('../assets/fonts/NBAkademieStd/NB_Akademie_Std_Bold.otf') format('opentype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
+    font-family: "NB Akademie Std";
+    src: url("../assets/fonts/NBAkademieStd/NB_Akademie_Std_Bold.otf")
+        format("opentype");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'NB Akademie Std';
-  src: url('../assets/fonts/NBAkademieStd/NBAkademieStd-Regular.woff2') format('woff2'),
-      url('../assets/fonts/NBAkademieStd/NBAkademieStd-Regular.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
+    font-family: "NB Akademie Std";
+    src:
+        url("../assets/fonts/NBAkademieStd/NBAkademieStd-Regular.woff2")
+            format("woff2"),
+        url("../assets/fonts/NBAkademieStd/NBAkademieStd-Regular.woff")
+            format("woff");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'NB Akademie Std';
-  src: url('../assets/fonts/NBAkademieStd/NBAkademieStdLight.woff2') format('woff2'),
-      url('../assets/fonts/NBAkademieStd/NBAkademieStdLight.woff') format('woff');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
+    font-family: "NB Akademie Std";
+    src:
+        url("../assets/fonts/NBAkademieStd/NBAkademieStdLight.woff2")
+            format("woff2"),
+        url("../assets/fonts/NBAkademieStd/NBAkademieStdLight.woff")
+            format("woff");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'NB Akademie Std';
-  src: url('../assets/fonts/NBAkademieStd/NB_Akademie_Std_Medium.otf') format('opentype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
+    font-family: "NB Akademie Std";
+    src: url("../assets/fonts/NBAkademieStd/NB_Akademie_Std_Medium.otf")
+        format("opentype");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'NB Akademie Std';
-  src: url('../assets/fonts/NBAkademieStd/NB_Akademie_Std_Bold.otf') format('opentype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
+    font-family: "NB Akademie Std";
+    src: url("../assets/fonts/NBAkademieStd/NB_Akademie_Std_Bold.otf")
+        format("opentype");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: 'NB Akademie Std';
-  src: url('../assets/fonts/NBAkademieStd/NB_Akademie_Std_Black.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
+    font-family: "NB Akademie Std";
+    src: url("../assets/fonts/NBAkademieStd/NB_Akademie_Std_Black.otf")
+        format("opentype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
 }
 
 @tailwind base;
@@ -79,239 +96,258 @@
 @tailwind utilities;
 
 @layer base {
-  h1 {
-    @apply text-3xl sm:text-6xl
-  }
+    h1 {
+        @apply text-3xl sm:text-6xl;
+    }
 
-  h2 {
-    @apply text-lg sm:text-3xl
-  }
+    h2 {
+        @apply text-lg sm:text-3xl;
+    }
 }
 
 @layer components {
-  .checkbox {
-    @apply rounded-none checkbox-info border-none bg-white/20 transition
-  }
+    .checkbox {
+        @apply checkbox-info rounded-none border-none bg-white/20 transition;
+    }
 
-  .btn {
-    @apply rounded-none font-medium tracking-[-0.03em] lowercase
-  }
+    .btn {
+        @apply rounded-none font-medium lowercase tracking-[-0.03em];
+    }
 
-  .btn-gallery {
-    @apply font-medium tracking-[-0.03em] lowercase no-animation text-[16px] sm:text-xl sm:btn-lg
-  }
+    .btn-gallery {
+        @apply no-animation sm:btn-lg text-[16px] font-medium lowercase tracking-[-0.03em] sm:text-xl;
+    }
 
-  .btn-gallery.locked {
-    @apply fixed bottom-0 left-0 w-full sm:static drop-shadow-[0_-5px_10px_rgba(0,0,0,0.2)] sm:drop-shadow-none
-  }
+    .btn-gallery.locked {
+        @apply fixed bottom-0 left-0 w-full drop-shadow-[0_-5px_10px_rgba(0,0,0,0.2)] sm:static sm:drop-shadow-none;
+    }
 
-  .divider {
-    @apply before:bg-white/20 after:bg-white/20 rounded-sm before:h-[1px] after:h-[1px]
-  }
+    .divider {
+        @apply rounded-sm before:h-[1px] before:bg-white/20 after:h-[1px] after:bg-white/20;
+    }
 
-  .list.pro {
-    @apply first:border-t-2 first:border-white/20
-  }
+    .list.pro {
+        @apply first:border-t-2 first:border-white/20;
+    }
 
-  .list .item {
-    @apply border-white/20 border-b-2 py-3 sm:py-7 sm:h-[100px] text-lg sm:text-4xl font-normal flex flex-row justify-between items-center
-  }
+    .list .item {
+        @apply flex flex-row items-center justify-between border-b-2 border-white/20 py-3 text-lg font-normal sm:h-[100px] sm:py-7 sm:text-4xl;
+    }
 
-  .list.list-sm .item {
-    @apply border-white/20 border-b-[1px] 2xl:border-b-2 py-1 2xl:py-1 text-sm 2xl:text-sm h-fit sm:h-fit font-normal flex flex-row justify-between items-center
-  }
+    .list.list-sm .item {
+        @apply flex h-fit flex-row items-center justify-between border-b-[1px] border-white/20 py-1 text-sm font-normal sm:h-fit 2xl:border-b-2 2xl:py-1 2xl:text-sm;
+    }
 
-  .input, .select, .textarea {
-    @apply input-ghost bg-white/[.08] text-white focus:bg-white/10 focus:text-white placeholder:text-white/20 disabled:bg-white/[0.03] disabled:border-white/[0.03] disabled:placeholder:text-white/10
-  }
+    .input,
+    .select,
+    .textarea {
+        @apply input-ghost bg-white/[.08] text-white placeholder:text-white/20 focus:bg-white/10 focus:text-white disabled:border-white/[0.03] disabled:bg-white/[0.03] disabled:placeholder:text-white/10;
+    }
 
-  .form-control .label-text {
-    @apply text-white/40
-  }
+    .form-control .label-text {
+        @apply text-white/40;
+    }
 
-  .input.data-capture, .select.data-capture {
-    @apply rounded-none bg-white text-black placeholder:text-black text-[16px] sm:text-xl font-normal sm:input-lg
-  }
+    .input.data-capture,
+    .select.data-capture {
+        @apply sm:input-lg rounded-none bg-white text-[16px] font-normal text-black placeholder:text-black sm:text-xl;
+    }
 
-  .input.data-capture .react-date-picker__wrapper {
-    @apply border-none
-  }
+    .input.data-capture .react-date-picker__wrapper {
+        @apply border-none;
+    }
 
-  .input.data-capture .react-date-picker__inputGroup {
-    @apply grow-0 px-0 w-full
-  }
+    .input.data-capture .react-date-picker__inputGroup {
+        @apply w-full grow-0 px-0;
+    }
 
-  .input.data-capture .react-date-picker__inputGroup__input:invalid {
-    @apply bg-white
-  }
+    .input.data-capture .react-date-picker__inputGroup__input:invalid {
+        @apply bg-white;
+    }
 
-  .input.data-capture .react-date-picker__button:enabled:hover .react-date-picker__button__icon,
-    .input.data-capture .react-date-picker__button:enabled:focus .react-date-picker__button__icon {
-    @apply stroke-black
-  }
+    .input.data-capture
+        .react-date-picker__button:enabled:hover
+        .react-date-picker__button__icon,
+    .input.data-capture
+        .react-date-picker__button:enabled:focus
+        .react-date-picker__button__icon {
+        @apply stroke-black;
+    }
 
-  .input.error, .select.error {
-    @apply placeholder:text-red-600 text-red-600
-  }
+    .input.error,
+    .select.error {
+        @apply text-red-600 placeholder:text-red-600;
+    }
 
-  .input.pro, .textarea.pro {
-    @apply bg-transparent active:border-none disabled:border-none text-right text-xl sm:text-4xl text-primary outline-none h-auto flex-1
-  }
+    .input.pro,
+    .textarea.pro {
+        @apply text-primary h-auto flex-1 bg-transparent text-right text-xl outline-none active:border-none disabled:border-none sm:text-4xl;
+    }
 
-  .textarea.pro.left, .input.pro.left {
-    @apply text-left pl-0
-  }
+    .textarea.pro.left,
+    .input.pro.left {
+        @apply pl-0 text-left;
+    }
 
-  .select.pro {
-    @apply h-auto bg-transparent active:border-none outline-none min-h-fit
-  }
+    .select.pro {
+        @apply h-auto min-h-fit bg-transparent outline-none active:border-none;
+    }
 
-  .select.pro-form {
-    @apply pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent focus:bg-transparent focus:outline-none text-xl sm:text-4xl
-  }
+    .select.pro-form {
+        @apply h-auto min-h-0 w-full bg-transparent pl-0 text-right text-xl font-normal lowercase focus:bg-transparent focus:outline-none active:bg-transparent sm:text-4xl;
+    }
 
-  .tab {
-    @apply opacity-30 hover:opacity-100 transition-opacity
-  }
+    .tab {
+        @apply opacity-30 transition-opacity hover:opacity-100;
+    }
 
-  .tab-active {
-    @apply opacity-100 
-  }
+    .tab-active {
+        @apply opacity-100;
+    }
 
-  .table.table-ghost :where(tbody th, tbody td, thead) {
-    @apply bg-transparent border-white/20 border-b-[1px] tracking-tight text-lg leading-4 py-5
-  }
+    .table.table-ghost :where(tbody th, tbody td, thead) {
+        @apply border-b-[1px] border-white/20 bg-transparent py-5 text-lg leading-4 tracking-tight;
+    }
 
-  .table.table-ghost :where(thead th) {
-    @apply text-base normal-case font-medium
-  }
+    .table.table-ghost :where(thead th) {
+        @apply text-base font-medium normal-case;
+    }
 
-  .table.table-ghost :where(thead) {
-    @apply border-t-[1px]
-  }
+    .table.table-ghost :where(thead) {
+        @apply border-t-[1px];
+    }
 
-  .toggle.pro {
-    @apply bg-black
-  }
+    .toggle.pro {
+        @apply bg-black;
+    }
 
-  .icon svg {
-    @apply scale-150
-  }
+    .icon svg {
+        @apply scale-150;
+    }
 
-  .icon.icon-sm svg {
-    @apply scale-[0.9]
-  }
+    .icon.icon-sm svg {
+        @apply scale-[0.9];
+    }
 
-  .icon path {
-    @apply transition
-  }
+    .icon path {
+        @apply transition;
+    }
 
-  .icon.primary path {
-    @apply stroke-primary
-  }
+    .icon.primary path {
+        @apply stroke-primary;
+    }
 
-  .icon.grey path {
-    @apply stroke-white/30
-  }
+    .icon.grey path {
+        @apply stroke-white/30;
+    }
 
-  .carousel-arrow svg {
-    @apply scale-[1.75]
-  }
-
+    .carousel-arrow svg {
+        @apply scale-[1.75];
+    }
 }
 
-@supports (font: -apple-system-body) and (-webkit-appearance: none) { img[loading="lazy"] { clip-path: inset(0.6px) } }
+@supports (font: -apple-system-body) and (-webkit-appearance: none) {
+    img[loading="lazy"] {
+        clip-path: inset(0.6px);
+    }
+}
 
 * {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
 }
 
 :root {
-  background-color: black;
+    background-color: black;
 }
 
 html,
 body {
-  max-width: 100vw;
-  overflow-x: hidden;
+    max-width: 100vw;
+    overflow-x: hidden;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: black;
-  letter-spacing: -0.03rem;
-  line-height: 1rem;
+    color: rgb(var(--foreground-rgb));
+    background: black;
+    letter-spacing: -0.03rem;
+    line-height: 1rem;
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+    color: inherit;
+    text-decoration: none;
 }
 
 .input.pro:-webkit-autofill {
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: #00FF99 !important;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: #00ff99 !important;
 }
 
 input[type="date"] {
-  width: 100%;
+    width: 100%;
 }
 
 input[type="date"]::-webkit-date-and-time-value {
     text-align: left;
 }
 
-input::-webkit-calendar-picker-indicator{
-  display: none;
+input::-webkit-calendar-picker-indicator {
+    display: none;
 }
 
-input[type="date"]::-webkit-input-placeholder{ 
-  visibility: hidden !important;
-  width: 100%;
+input[type="date"]::-webkit-input-placeholder {
+    visibility: hidden !important;
+    width: 100%;
 }
 
 .toggle.pro {
-  background-color: black;
-  border-color: #333333;
-  height: 40px;
-  width: 80px;
-  box-shadow: calc(40px * -1) 0 0 2px #333333 inset, 0 0 0 2px #333333 inset, 0 0;
+    background-color: black;
+    border-color: #333333;
+    height: 40px;
+    width: 80px;
+    box-shadow:
+        calc(40px * -1) 0 0 2px #333333 inset,
+        0 0 0 2px #333333 inset,
+        0 0;
 }
 
 .toggle.pro:checked {
-  border: none;
-  box-shadow: calc(40px) 0 0 2px #00FF99 inset, 0 0 0 2px #00FF99 inset, 0 0;
+    border: none;
+    box-shadow:
+        calc(40px) 0 0 2px #00ff99 inset,
+        0 0 0 2px #00ff99 inset,
+        0 0;
 }
 
 .toggle.pro:disabled {
-  opacity: 0.5;
+    opacity: 0.5;
 }
 
 @media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+    html {
+        color-scheme: dark;
+    }
 }
 
 .StripeElement--webkit-autofill {
-  background-color: transparent !important;
+    background-color: transparent !important;
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
+    width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0);
+    background: rgba(0, 0, 0, 0);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 5px;
+    background: #888;
+    border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+    background: #555;
 }
