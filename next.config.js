@@ -141,6 +141,26 @@ const nextConfig = {
           destination: "https://app-a4a1ff.webflow.io/vanities",
           basePath: false,
         },
+        {
+          source: '/pro',
+          destination: "https://app-a4a1ff.webflow.io/pro",
+          basePath: false,
+        },
+        {
+          source: '/terms',
+          destination: "https://app-a4a1ff.webflow.io/terms",
+          basePath: false,
+        },
+        {
+          source: '/privacy',
+          destination: "https://app-a4a1ff.webflow.io/privacy",
+          basePath: false,
+        },
+        {
+          source: '/ai',
+          destination: "https://app-a4a1ff.webflow.io/ai",
+          basePath: false,
+        },
       ]
     }
   }
