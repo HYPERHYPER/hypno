@@ -238,7 +238,7 @@ export default function UniversalSearch() {
         checked={isChecked}
         onChange={(e) => setIsChecked(e.target.checked)}
       />
-      <div className="modal backdrop-blur-sm" role="dialog">
+      <div className="modal z-10 backdrop-blur-sm" role="dialog">
         <div className="modal-box">
           <label className="input flex items-center gap-2 bg-transparent">
             <input

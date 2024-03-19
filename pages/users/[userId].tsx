@@ -53,7 +53,7 @@ function UserProfilePage(props: ResponseData) {
   console.log(userData);
 
   let fullName = userData?.first_name + " " + userData?.last_name;
-  let username = userData?.username || "n/a";
+  let username = userData?.username || "no username";
   const belongsToOrganization = !!userData?.organization.id;
   console.log(belongsToOrganization);
   const isPrimary = userData?.organization?.primary_contact_id === userData?.id;
@@ -112,7 +112,7 @@ function UserProfilePage(props: ResponseData) {
             //   returnLink={{ slug: '/settings', name: 'settings' }}
           >
             <h2 className="badge badge-primary badge-outline">{userData.id}</h2>
-            {userData.organization.hypno_pro ? (
+            {userData.username ? (
               <h2 className="badge badge-primary badge-outline">pro</h2>
             ) : (
               <h2 className="badge badge-error badge-outline">unregistered</h2>
@@ -174,7 +174,14 @@ function UserProfilePage(props: ResponseData) {
                 )}
                 <div className="flex gap-3">
                   <div className="flex flex-col items-end justify-center">
-                    <div>{userData.organization.name}</div>
+                    <div
+                      onClick={() =>
+                        handleClick("organizations", userData.organization.id)
+                      }
+                      className="cursor-pointer"
+                    >
+                      {userData.organization.name}
+                    </div>
                     {isPrimary ? (
                       <div className="badge badge-primary badge-outline badge-xs">
                         owner
@@ -186,7 +193,12 @@ function UserProfilePage(props: ResponseData) {
                     )}
                   </div>
                   <div className="avatar placeholder">
-                    <div className="bg-neutral text-neutral-content w-20 rounded-full">
+                    <div
+                      onClick={() =>
+                        handleClick("organizations", userData.organization.id)
+                      }
+                      className="bg-neutral text-neutral-content w-20 cursor-pointer rounded-full"
+                    >
                       <span className="text-sm">
                         {userData.organization.name.charAt(0)}
                       </span>
