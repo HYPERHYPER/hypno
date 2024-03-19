@@ -58,7 +58,7 @@ export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(({ ...rest
                 showLeadingZeros={true}
                 calendarIcon={false}
                 />
-            {!focused && <input className="absolute inset-0 input data-capture cursor-pointer" placeholder="birthday" onClick={() => setFocused(true)} />}
+            {!focused && <input className="absolute inset-0 input data-capture cursor-pointer" placeholder={rest.placeholder || 'birthday'} onClick={() => setFocused(true)} />}
         </div>
 
         // <Datepicker
