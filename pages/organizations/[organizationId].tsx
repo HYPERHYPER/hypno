@@ -9,6 +9,23 @@ import { getOrganizationPrivileges } from "@/helpers/user-privilege";
 import { useRouter } from "next/router";
 import Spinner from "@/components/Spinner";
 
+interface SimpleEventData {
+  id: number;
+  name: string;
+  event_type: string;
+  uploads: number;
+}
+
+interface NonProUserData {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  updated_at: string;
+  authorizer_id: number;
+  kind: string;
+  status: string;
+}
 interface UserPermissionData {
   id: number;
   user_id: number;
@@ -63,7 +80,7 @@ function OrganizationProfilePage() {
   let totalUsers: any = null;
   if (orgData) {
     totalUsers = { ...eventUsers, ...orgUsers };
-    console.log("total users", totalUsers);
+    console.log("np", nonProUsers);
   }
   //   console.log(
   //     'here',
@@ -465,7 +482,7 @@ function OrganizationProfilePage() {
                       </thead>
                       <tbody>
                         {events &&
-                          events.map((event) => (
+                          events.map((event: SimpleEventData) => (
                             <tr
                               key={event.id}
                               className="hover:bg-neutral-800"
