@@ -38,14 +38,9 @@ function UserProfilePage(props: ResponseData) {
     process.env.NEXT_PUBLIC_API_BASE_URL
   }/hypno/v1/users/${String(query.userId)}?profile_view=true`;
 
-  const {
-    data: data,
-    isValidating: isValidatingUserData,
-    error: userError,
-  } = useSWR(
+  const { data: data } = useSWR(
     [userProfileUrl, token.access_token],
     ([url, token]) => axiosGetWithToken(url, token),
-    { revalidateOnMount: false },
   );
 
   // Access data and render UI based on data

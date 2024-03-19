@@ -38,14 +38,8 @@ function OrganizationProfilePage(props: ResponseData) {
     process.env.NEXT_PUBLIC_API_BASE_URL
   }/hypno/v1/organizations/${String(query.organizationId)}?profile_view=true`;
 
-  const {
-    data: data,
-    isValidating: isValidatingOrgData,
-    error: orgError,
-  } = useSWR(
-    [orgUrl, token.access_token],
-    ([url, token]) => axiosGetWithToken(url, token),
-    { revalidateOnMount: false },
+  const { data: data } = useSWR([orgUrl, token.access_token], ([url, token]) =>
+    axiosGetWithToken(url, token),
   );
 
   // Access data and render UI based on data
