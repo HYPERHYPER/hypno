@@ -182,8 +182,7 @@ function OrganizationProfilePage(props: ResponseData) {
           </GlobalLayout.Header>
           <GlobalLayout.Content>
             <div className="list pro">
-              <div className="collapse-arrow bg-base-200 collapse">
-                <input type="radio" name="my-accordion-2" defaultChecked />
+              <div tabIndex={0} className="collapse-open bg-base-200 collapse">
                 <div className="collapse-title text-xl font-medium">
                   Billable Users
                 </div>
@@ -461,8 +460,7 @@ function OrganizationProfilePage(props: ResponseData) {
                 </div>
               </div>
 
-              <div className="collapse-arrow bg-base-200 collapse">
-                <input type="radio" name="my-accordion-2" />
+              <div tabIndex={0} className="collapse-open bg-base-200 collapse">
                 <div className="collapse-title text-xl font-medium">Events</div>
                 <div className="collapse-content">
                   <div className="stats flex flex-grow shadow">
@@ -579,8 +577,7 @@ function OrganizationProfilePage(props: ResponseData) {
                 </div>
               </div>
 
-              <div className="collapse-arrow bg-base-200 collapse">
-                <input type="radio" name="my-accordion-2" />
+              <div tabIndex={0} className="collapse-open bg-base-200 collapse">
                 <div className="collapse-title text-xl font-medium">
                   Non Pro Users
                 </div>

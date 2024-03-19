@@ -139,15 +139,20 @@ export default function UniversalSearch() {
                     <td>
                       <span className="text-sm">{`${item.name}`}</span>
                       <br />
-                      <span
-                        className={
-                          item.event_type == "hypno"
-                            ? "badge badge-sm badge-outline"
-                            : "badge badge-sm badge-outline badge-primary"
-                        }
-                      >
-                        {item.event_type === "hypno" ? "iPad" : "iPhone"}
-                      </span>
+                      <div className="flex gap-2">
+                        <span className="badge badge-sm badge-outline badge-primary">
+                          {item.id}
+                        </span>
+                        <span
+                          className={
+                            item.event_type == "hypno"
+                              ? "badge badge-sm badge-outline"
+                              : "badge badge-sm badge-outline badge-primary"
+                          }
+                        >
+                          {item.event_type === "hypno" ? "iPad" : "iPhone"}
+                        </span>
+                      </div>
                     </td>
                   </tr>
                 ) : category === "organizations" &&
@@ -168,7 +173,9 @@ export default function UniversalSearch() {
                         </div>
                         <div>
                           <div className="text-sm font-bold">{`${item.name}`}</div>
-                          <div className="text-xs opacity-50">{item.id}</div>
+                          <span className="badge badge-sm badge-outline badge-primary">
+                            {item.id}
+                          </span>
                         </div>
                       </div>
                     </td>
