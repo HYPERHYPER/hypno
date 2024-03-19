@@ -1,31 +1,20 @@
 import Head from "next/head";
-import _, { debounce } from "lodash";
+import _ from "lodash";
 import useUserStore from "@/store/userStore";
 import withAuth from "@/components/hoc/withAuth";
 import GlobalLayout from "@/components/GlobalLayout";
-import Link from "next/link";
-import Modal from "@/components/Modal";
-import FormControl from "@/components/Form/FormControl";
-import { GetServerSideProps } from "next";
-import axios from "axios";
-import nookies from "nookies";
-import { useCallback, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import {
-  AutosaveStatusText,
-  SaveStatus,
-} from "@/components/Form/AutosaveStatusText";
 import { axiosGetWithToken } from "@/lib/fetchWithToken";
 import useSWR from "swr";
 import { getOrganizationPrivileges } from "@/helpers/user-privilege";
 import { useRouter } from "next/router";
 import Spinner from "@/components/Spinner";
 
-interface ResponseData {
-  user_count: number;
+interface TotalUsers {
+  event_users: object;
+  organization_users: object;
 }
 
-function OrganizationProfilePage(props: ResponseData) {
+function OrganizationProfilePage() {
   const router = useRouter();
   const { query } = router;
 
@@ -42,7 +31,6 @@ function OrganizationProfilePage(props: ResponseData) {
     axiosGetWithToken(url, token),
   );
 
-  // Access data and render UI based on data
   const orgData = data?.organization;
   const eventUsers = orgData?.event_users;
   const orgUsers = orgData?.organization_users;
@@ -51,7 +39,7 @@ function OrganizationProfilePage(props: ResponseData) {
   const events = orgData?.events;
   const stats = orgData?.statistics;
 
-  let totalUsers = null;
+  let totalUsers: TotalUsers | null = null;
   if (orgData) {
     totalUsers = { ...eventUsers, ...orgUsers };
     console.log("np users", stats);
@@ -165,10 +153,7 @@ function OrganizationProfilePage(props: ResponseData) {
         </div>
       ) : (
         <GlobalLayout>
-          <GlobalLayout.Header
-            title={orgData.name}
-            //   returnLink={{ slug: '/settings', name: 'settings' }}
-          >
+          <GlobalLayout.Header title={orgData.name}>
             <h2 className="badge badge-primary badge-outline">{orgData.id}</h2>
             {!owner && (
               <h2 className="badge badge-error badge-outline">no owner</h2>
@@ -183,44 +168,13 @@ function OrganizationProfilePage(props: ResponseData) {
                 <div className="collapse-content">
                   <div className="stats flex w-full flex-grow shadow">
                     <div className="stat">
-                      {/* <div className="stat-figure text-secondary">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          className="inline-block h-8 w-8 stroke-current"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                          ></path>
-                        </svg>
-                      </div> */}
                       <div className="stat-title">Guests</div>
                       <div className="stat-value">
                         {Object.keys(eventUsers).length}
                       </div>
-                      {/* <div className="stat-desc">Jan 1st - Feb 1st</div> */}
                     </div>
 
                     <div className="stat">
-                      {/* <div className="stat-figure text-secondary">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          className="inline-block h-8 w-8 stroke-current"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-                          ></path>
-                        </svg>
-                      </div> */}
                       <div className="stat-title">Members</div>
                       <div className="stat-value">
                         {
@@ -229,25 +183,9 @@ function OrganizationProfilePage(props: ResponseData) {
                           ).length
                         }
                       </div>
-                      {/* <div className="stat-desc">↗︎ 400 (22%)</div> */}
                     </div>
 
                     <div className="stat">
-                      {/* <div className="stat-figure text-secondary">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          className="inline-block h-8 w-8 stroke-current"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
-                          ></path>
-                        </svg>
-                      </div> */}
                       <div className="stat-title">Admins</div>
                       <div className="stat-value">
                         {
@@ -256,7 +194,6 @@ function OrganizationProfilePage(props: ResponseData) {
                           ).length
                         }
                       </div>
-                      {/* <div className="stat-desc">↘︎ 90 (14%)</div> */}
                     </div>
                   </div>{" "}
                   <div className="divider"></div>
@@ -336,16 +273,6 @@ function OrganizationProfilePage(props: ResponseData) {
                             <td>{owner.created_at.split("T")[0]}</td>
                             <th>
                               <button className="btn btn-sm hover:btn-info rounded-full">
-                                {/* <svg
-                                  className="h-2 w-2"
-                                  viewBox="0 0 20 20"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    d="M5.05024 13.8891C4.75734 14.182 4.75734 14.6568 5.05024 14.9497C5.34313 15.2426 5.818 15.2426 6.1109 14.9497L10 11.0606L13.8891 14.9497C14.182 15.2426 14.6569 15.2426 14.9498 14.9497C15.2427 14.6568 15.2427 14.182 14.9498 13.8891L11.0607 9.99996L14.9497 6.1109C15.2426 5.818 15.2426 5.34313 14.9497 5.05024C14.6568 4.75734 14.182 4.75734 13.8891 5.05024L10 8.9393L6.11095 5.05024C5.81805 4.75734 5.34318 4.75734 5.05029 5.05024C4.75739 5.34313 4.75739 5.818 5.05029 6.1109L8.93935 9.99996L5.05024 13.8891Z"
-                                    fill="#FFFFFF"
-                                  ></path>
-                                </svg> */}
                                 <svg
                                   viewBox="0 0 20 20"
                                   width={20}
@@ -642,44 +569,10 @@ function OrganizationProfilePage(props: ResponseData) {
               </div>
             </div>
           </GlobalLayout.Content>
-
-          {/* <Modal
-          id='org-name-modal'
-          title='edit org name'
-          menu={AutosaveStatusText(saveStatus)}
-        >
-          <div className='list pro'>
-            <FormControl label='name'>
-              <input
-                {...register('name', { required: true })}
-                className='flex-1 input pro lowercase'
-              />
-            </FormControl>
-          </div>
-        </Modal> */}
         </GlobalLayout>
       )}
     </>
   );
 }
-
-const Item = ({
-  name,
-  value,
-  href,
-}: {
-  name: string;
-  value: string;
-  href?: string;
-}) => {
-  return (
-    <div className="item">
-      <span className="text-white/40">{name}</span>
-      <span className="text-primary lowercase">
-        {href ? <Link href={href}>{value} →</Link> : value}
-      </span>
-    </div>
-  );
-};
 
 export default withAuth(OrganizationProfilePage, "protected");

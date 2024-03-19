@@ -1,31 +1,15 @@
 import Head from "next/head";
-import _, { debounce } from "lodash";
+import _ from "lodash";
 import useUserStore from "@/store/userStore";
 import withAuth from "@/components/hoc/withAuth";
 import GlobalLayout from "@/components/GlobalLayout";
-import Link from "next/link";
-import Modal from "@/components/Modal";
-import FormControl from "@/components/Form/FormControl";
-import { GetServerSideProps } from "next";
-import axios from "axios";
-import nookies from "nookies";
-import { useCallback, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import {
-  AutosaveStatusText,
-  SaveStatus,
-} from "@/components/Form/AutosaveStatusText";
 import { axiosGetWithToken } from "@/lib/fetchWithToken";
 import useSWR from "swr";
 import { getOrganizationPrivileges } from "@/helpers/user-privilege";
 import { useRouter } from "next/router";
 import Spinner from "@/components/Spinner";
 
-interface ResponseData {
-  user_count: number;
-}
-
-function UserProfilePage(props: ResponseData) {
+function UserProfilePage() {
   const router = useRouter();
   const { query } = router;
 
@@ -43,43 +27,10 @@ function UserProfilePage(props: ResponseData) {
     ([url, token]) => axiosGetWithToken(url, token),
   );
 
-  // Access data and render UI based on data
   let userData = data?.user;
-  console.log(userData);
-
   let fullName = userData?.first_name + " " + userData?.last_name;
   let username = userData?.username || "no username";
-  const belongsToOrganization = !!userData?.organization.id;
-  console.log(belongsToOrganization);
   const isPrimary = userData?.organization?.primary_contact_id === userData?.id;
-  console.log(isPrimary);
-
-  //   const [saveStatus, setSaveStatus] = useState<SaveStatus>('ready');
-  //   const {
-  //     register,
-  //     handleSubmit,
-  //     formState: { isDirty, errors },
-  //     reset,
-  //   } = useForm({
-  //     defaultValues: {
-  //       name: orgData.name || '',
-  //     },
-  //   });
-
-  //   const debouncedSave = useCallback(
-  //     debounce(() => {
-  //       handleSubmit(updateOrganizationName)();
-  //       return;
-  //     }, 1000),
-  //     []
-  //   );
-
-  //   useEffect(() => {
-  //     if (isDirty) {
-  //       setSaveStatus('saving');
-  //       debouncedSave();
-  //     }
-  //   }, [isDirty]);
 
   const handleClick = (route: string, id: number) => {
     router.push(`/${route}/${id}`);
@@ -203,44 +154,10 @@ function UserProfilePage(props: ResponseData) {
               </div>
             </div>
           </GlobalLayout.Content>
-
-          {/* <Modal
-          id='org-name-modal'
-          title='edit org name'
-          menu={AutosaveStatusText(saveStatus)}
-        >
-          <div className='list pro'>
-            <FormControl label='name'>
-              <input
-                {...register('name', { required: true })}
-                className='flex-1 input pro lowercase'
-              />
-            </FormControl>
-          </div>
-        </Modal> */}
         </GlobalLayout>
       )}
     </>
   );
 }
-
-// const Item = ({
-//   name,
-//   value,
-//   href,
-// }: {
-//   name: string;
-//   value: string;
-//   href?: string;
-// }) => {
-//   return (
-//     <div className="item">
-//       <span className="text-white/40">{name}</span>
-//       <span className="text-primary lowercase">
-//         {href ? <Link href={href}>{value} →</Link> : value}
-//       </span>
-//     </div>
-//   );
-// };
 
 export default withAuth(UserProfilePage, "protected");
