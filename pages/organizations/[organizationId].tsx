@@ -9,9 +9,20 @@ import { getOrganizationPrivileges } from "@/helpers/user-privilege";
 import { useRouter } from "next/router";
 import Spinner from "@/components/Spinner";
 
+interface UserPermissionData {
+  id: number;
+  user_id: number;
+  event_id: number | null;
+  organization_id: number | null;
+  created_at: string;
+  updated_at: string;
+  authorizer_id: number;
+  kind: string;
+  status: string;
+}
+
 interface TotalUsers {
-  event_users: object;
-  organization_users: object;
+  [key: string]: UserPermissionData[];
 }
 
 function OrganizationProfilePage() {
@@ -23,13 +34,23 @@ function OrganizationProfilePage() {
   const updateUser = useUserStore.useUpdateUser();
   const token = useUserStore.useToken();
 
-  const orgUrl = `${
-    process.env.NEXT_PUBLIC_API_BASE_URL
-  }/hypno/v1/organizations/${String(query.organizationId)}?profile_view=true`;
+  const organizationId = query.organizationId;
+  const orgUrl = organizationId
+    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${String(organizationId)}?profile_view=true`
+    : null;
 
-  const { data: data } = useSWR([orgUrl, token.access_token], ([url, token]) =>
-    axiosGetWithToken(url, token),
+  const { data: data } = useSWR(
+    orgUrl ? [orgUrl, token.access_token] : null,
+    ([url, token]) => axiosGetWithToken(url, token),
   );
+
+  // const orgUrl = `${
+  //   process.env.NEXT_PUBLIC_API_BASE_URL
+  // }/hypno/v1/organizations/${String(query.organizationId)}?profile_view=true`;
+
+  // const { data: data } = useSWR([orgUrl, token.access_token], ([url, token]) =>
+  //   axiosGetWithToken(url, token),
+  // );
 
   const orgData = data?.organization;
   const eventUsers = orgData?.event_users;
@@ -39,10 +60,10 @@ function OrganizationProfilePage() {
   const events = orgData?.events;
   const stats = orgData?.statistics;
 
-  let totalUsers: TotalUsers | null = null;
+  let totalUsers: any = null;
   if (orgData) {
     totalUsers = { ...eventUsers, ...orgUsers };
-    console.log("np users", stats);
+    console.log("total users", totalUsers);
   }
   //   console.log(
   //     'here',
@@ -298,83 +319,97 @@ function OrganizationProfilePage() {
                           </tr>
                         )}
                         {totalUsers &&
-                          Object.keys(totalUsers).map((userInfo, i) => (
-                            <tr
-                              key={userInfo + i}
-                              className="hover:bg-neutral-800"
-                            >
-                              <td>
-                                <div className="flex items-center gap-3">
-                                  <div>
-                                    <div
-                                      onClick={() =>
-                                        handleClick(
-                                          "users",
-                                          totalUsers[userInfo][0].user_id,
-                                        )
-                                      }
-                                      className="cursor-pointer font-bold"
-                                    >
-                                      {userInfo.split("-")[0]}
+                          Object.keys(totalUsers as TotalUsers).map(
+                            (userInfo, i) => (
+                              <tr
+                                key={userInfo + i}
+                                className="hover:bg-neutral-800"
+                              >
+                                <td>
+                                  <div className="flex items-center gap-3">
+                                    <div>
+                                      <div
+                                        onClick={() =>
+                                          handleClick(
+                                            "users",
+                                            totalUsers[userInfo][0].user_id,
+                                          )
+                                        }
+                                        className="cursor-pointer font-bold"
+                                      >
+                                        {userInfo.split("-")[0]}
+                                      </div>
+                                      <div
+                                        onClick={() =>
+                                          handleClick(
+                                            "users",
+                                            totalUsers[userInfo][0].user_id,
+                                          )
+                                        }
+                                        className="cursor-pointer text-sm opacity-50"
+                                      >
+                                        {userInfo.split("-")[1]}
+                                      </div>
                                     </div>
-                                    <div
-                                      onClick={() =>
-                                        handleClick(
-                                          "users",
-                                          totalUsers[userInfo][0].user_id,
-                                        )
-                                      }
-                                      className="cursor-pointer text-sm opacity-50"
+                                  </div>
+                                </td>
+                                <td>
+                                  <div className="flex gap-2">
+                                    {totalUsers[userInfo][0].event_id ? (
+                                      totalUsers[userInfo].map(
+                                        (
+                                          userData: UserPermissionData,
+                                          i: number,
+                                        ) => (
+                                          <div
+                                            key={i}
+                                            className="badge badge-white badge-outline"
+                                          >
+                                            guest: {userData.event_id}
+                                          </div>
+                                        ),
+                                      )
+                                    ) : (
+                                      <div className="badge badge-primary badge-outline">
+                                        {totalUsers[userInfo][0].kind}
+                                      </div>
+                                    )}
+                                  </div>
+                                </td>
+                                <td>
+                                  {
+                                    totalUsers[userInfo][0].created_at.split(
+                                      "T",
+                                    )[0]
+                                  }
+                                </td>
+                                <th>
+                                  <button className="btn btn-sm hover:btn-info rounded-full">
+                                    <svg
+                                      viewBox="0 0 20 20"
+                                      width={20}
+                                      height={20}
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="#00FF99"
                                     >
-                                      {userInfo.split("-")[1]}
-                                    </div>
-                                  </div>
-                                </div>
-                              </td>
-                              <td>
-                                {totalUsers[userInfo][0].event_id ? (
-                                  <div className="badge badge-white badge-outline">
-                                    guest: {totalUsers[userInfo][0].event_id}
-                                  </div>
-                                ) : (
-                                  <div className="badge badge-primary badge-outline">
-                                    {totalUsers[userInfo][0].kind}
-                                  </div>
-                                )}
-                              </td>
-                              <td>
-                                {
-                                  totalUsers[userInfo][0].created_at.split(
-                                    "T",
-                                  )[0]
-                                }
-                              </td>
-                              <th>
-                                <button className="btn btn-sm hover:btn-info rounded-full">
-                                  <svg
-                                    viewBox="0 0 20 20"
-                                    width={20}
-                                    height={20}
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="#00FF99"
-                                  >
-                                    <path
-                                      d="M9 15C9 14.4477 9.44771 14 10 14C10.5523 14 11 14.4477 11 15C11 15.5523 10.5523 16 10 16C9.44771 16 9 15.5523 9 15Z"
-                                      fill="#00FF99"
-                                    ></path>
-                                    <path
-                                      d="M9 10.0001C9 9.44778 9.44772 9.00006 10 9.00006C10.5523 9.00006 11 9.44778 11 10.0001C11 10.5523 10.5523 11.0001 10 11.0001C9.44771 11.0001 9 10.5523 9 10.0001Z"
-                                      fill="#00FF99"
-                                    ></path>
-                                    <path
-                                      d="M9 5C9 4.44772 9.44772 4 10 4C10.5523 4 11 4.44772 11 5C11 5.55228 10.5523 6 10 6C9.44772 6 9 5.55228 9 5Z"
-                                      fill="#00FF99"
-                                    ></path>
-                                  </svg>{" "}
-                                </button>
-                              </th>
-                            </tr>
-                          ))}
+                                      <path
+                                        d="M9 15C9 14.4477 9.44771 14 10 14C10.5523 14 11 14.4477 11 15C11 15.5523 10.5523 16 10 16C9.44771 16 9 15.5523 9 15Z"
+                                        fill="#00FF99"
+                                      ></path>
+                                      <path
+                                        d="M9 10.0001C9 9.44778 9.44772 9.00006 10 9.00006C10.5523 9.00006 11 9.44778 11 10.0001C11 10.5523 10.5523 11.0001 10 11.0001C9.44771 11.0001 9 10.5523 9 10.0001Z"
+                                        fill="#00FF99"
+                                      ></path>
+                                      <path
+                                        d="M9 5C9 4.44772 9.44772 4 10 4C10.5523 4 11 4.44772 11 5C11 5.55228 10.5523 6 10 6C9.44772 6 9 5.55228 9 5Z"
+                                        fill="#00FF99"
+                                      ></path>
+                                    </svg>{" "}
+                                  </button>
+                                </th>
+                              </tr>
+                            ),
+                          )}
                       </tbody>
                     </table>
                   </div>
