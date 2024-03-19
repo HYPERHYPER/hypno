@@ -18,12 +18,15 @@ function UserProfilePage() {
   const updateUser = useUserStore.useUpdateUser();
   const token = useUserStore.useToken();
 
-  const userProfileUrl = `${
-    process.env.NEXT_PUBLIC_API_BASE_URL
-  }/hypno/v1/users/${String(query.userId)}?profile_view=true`;
+  const userId = query.userId;
+  const userProfileUrl = userId
+    ? `${
+        process.env.NEXT_PUBLIC_API_BASE_URL
+      }/hypno/v1/users/${String(query.userId)}?profile_view=true`
+    : null;
 
   const { data: data } = useSWR(
-    [userProfileUrl, token.access_token],
+    userProfileUrl ? [userProfileUrl, token.access_token] : null,
     ([url, token]) => axiosGetWithToken(url, token),
   );
 

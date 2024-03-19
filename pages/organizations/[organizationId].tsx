@@ -58,14 +58,6 @@ function OrganizationProfilePage() {
     ([url, token]) => axiosGetWithToken(url, token),
   );
 
-  // const orgUrl = `${
-  //   process.env.NEXT_PUBLIC_API_BASE_URL
-  // }/hypno/v1/organizations/${String(query.organizationId)}?profile_view=true`;
-
-  // const { data: data } = useSWR([orgUrl, token.access_token], ([url, token]) =>
-  //   axiosGetWithToken(url, token),
-  // );
-
   const orgData = data?.organization;
   const eventUsers = orgData?.event_users;
   const orgUsers = orgData?.organization_users;
@@ -79,93 +71,6 @@ function OrganizationProfilePage() {
     totalUsers = { ...eventUsers, ...orgUsers };
     console.log("np", nonProUsers);
   }
-  //   console.log(
-  //     'here',
-  //     Object.keys(eventUsers).map((user) => eventUsers[user])
-  //   );
-  //   console.log(query.organizationId)
-
-  //   const userUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/users?per_page=1`;
-  //   const {
-  //     data: userData,
-  //     isValidating: isValidatingUserData,
-  //     error: userError,
-  //   } = useSWR([userUrl, token.access_token], ([url, token]) =>
-  //     axiosGetWithToken(url, token)
-  //   );
-  //   //@ts-ignore
-  //   const userCount = userData?.meta?.total_count || 0;
-
-  //   const [saveStatus, setSaveStatus] = useState<SaveStatus>('ready');
-  //   const {
-  //     register,
-  //     handleSubmit,
-  //     formState: { isDirty, errors },
-  //     reset,
-  //   } = useForm({
-  //     defaultValues: {
-  //       name: orgData.name || '',
-  //     },
-  //   });
-
-  //   const updateOrganizationName = async (data: any) => {
-  //     if (!_.isEmpty(errors)) {
-  //       console.log('submitForm errors', { errors });
-  //       setSaveStatus('error');
-  //       return;
-  //     }
-
-  //     /* Update user payload */
-  //     let payload = {
-  //       organization: {
-  //         ...data,
-  //       },
-  //     };
-
-  //     const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${organization.id}`;
-  //     await axios
-  //       .put(url, payload, {
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //           Authorization: 'Bearer ' + token.access_token,
-  //         },
-  //       })
-  //       .then((res) => {
-  //         setSaveStatus('success');
-  //         setTimeout(() => {
-  //           setSaveStatus('ready');
-  //         }, 3000);
-  //         updateUser({
-  //           organization: {
-  //             ...data,
-  //           },
-  //         });
-  //         reset(data);
-  //       })
-  //       .catch((e) => {
-  //         console.log(e);
-  //         setSaveStatus('error');
-  //       });
-  //   };
-
-  //   const debouncedSave = useCallback(
-  //     debounce(() => {
-  //       handleSubmit(updateOrganizationName)();
-  //       return;
-  //     }, 1000),
-  //     []
-  //   );
-
-  //   useEffect(() => {
-  //     if (isDirty) {
-  //       setSaveStatus('saving');
-  //       debouncedSave();
-  //     }
-  //   }, [isDirty]);
-
-  //   const userOrgPrivileges = orgData
-  //     ? getOrganizationPrivileges(orgData.user_privileges)
-  //     : null;
 
   const handleClick = (route: string, id: number) => {
     router.push(`/${route}/${id}`);
@@ -445,7 +350,6 @@ function OrganizationProfilePage() {
                       <div className="stat-value">
                         {stats.total_photos.toLocaleString()}
                       </div>
-                      {/* <div className="stat-desc">↗︎ 400 (22%)</div> */}
                     </div>
 
                     <div className="stat">
