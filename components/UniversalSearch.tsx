@@ -1,9 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import Link from "next/link";
 import { useRouter } from "next/router"; // Import useRouter
 import useUserStore from "@/store/userStore";
 import debounce from "lodash/debounce";
-import { error } from "console";
 
 interface UserResult {
   avatar: string;
@@ -243,7 +241,6 @@ export default function UniversalSearch() {
           <label className="input flex items-center gap-2 bg-transparent">
             <input
               type="text"
-              //   className='grow block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:border-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
               className={`text-md block w-full grow border p-4 ps-10 text-gray-900 ${
                 hasError ? "input-bordered input-error" : "border-gray-300"
               } rounded-lg bg-gray-50 focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500`}
