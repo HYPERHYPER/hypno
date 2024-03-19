@@ -28,7 +28,8 @@ export default function CenteredDetailView({ asset, config, imageProps }: any) {
         return (asset.mp4_url && config.qr_asset_download !== 'posterframe') ? 
             <a className={className} href={asset.download_url}>{text}</a> 
             : 
-            <button className={className} onClick={() => downloadPhoto(asset, config.qr_asset_download == 'posterframe' ? 'posterframe' : '')}>{text}</button>
+            <></>
+            // <button className={className} onClick={() => downloadPhoto(asset, config.qr_asset_download == 'posterframe' ? 'posterframe' : '')}>{text}</button>
     }
 
     return (

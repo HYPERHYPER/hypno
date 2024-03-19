@@ -94,14 +94,15 @@ export default function DetailView({ asset, config, imageProps }: any) {
                 {text}
             </a>
             :
-            <button
-                style={style}
-                className={className}
-                onClick={() => {
-                    downloadPhoto(asset, downloadFiletype);
-                    updateDownloadedMetadata();
-                }}
-            >{text}</button>
+            <></>
+            // <button
+            //     style={style}
+            //     className={className}
+            //     onClick={() => {
+            //         downloadPhoto(asset, downloadFiletype);
+            //         updateDownloadedMetadata();
+            //     }}
+            // >{text}</button>
     }
     
     return (
