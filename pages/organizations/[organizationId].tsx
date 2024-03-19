@@ -21,11 +21,8 @@ interface NonProUserData {
   email: string;
   first_name: string;
   last_name: string;
-  updated_at: string;
-  authorizer_id: number;
-  kind: string;
-  status: string;
 }
+
 interface UserPermissionData {
   id: number;
   user_id: number;
@@ -566,7 +563,7 @@ function OrganizationProfilePage() {
                       </thead>
                       <tbody>
                         {nonProUsers &&
-                          nonProUsers.map((user) => (
+                          nonProUsers.map((user: NonProUserData) => (
                             <tr key={user.id} className="hover:bg-neutral-800">
                               <td>
                                 <div className="flex items-center gap-3">
@@ -574,9 +571,6 @@ function OrganizationProfilePage() {
                                     <div className="badge badge-primary badge-outline">
                                       {user.id}
                                     </div>
-                                    {/* <div className="text-sm opacity-50">
-                                  {userInfo.split("-")[1]}
-                                </div> */}
                                   </div>
                                 </div>
                               </td>
