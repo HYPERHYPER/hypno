@@ -69,7 +69,7 @@ function OrganizationProfilePage() {
   let totalUsers: any = null;
   if (orgData) {
     totalUsers = { ...eventUsers, ...orgUsers };
-    console.log("np", nonProUsers);
+    // console.log("np", nonProUsers);
   }
 
   const handleClick = (route: string, id: number) => {
