@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware'
 import { destroyCookie, setCookie } from 'nookies'
 import { NewUser, UserInvite } from '@/types/users';
 import axios from 'axios';
+// import { isHypnoUser } from '@/helpers/user-privilege';
 
 type UserState = {
   user: any;
@@ -16,7 +17,8 @@ type UserState = {
 }
 
 type UserAction = {
-  updateUser: (updatedUser: UserState['user']) => void
+  updateUser: (updatedUser: UserState['user']) => void;
+  isHypnoUser: () => boolean;
   login: (email: string, password: string) => void;
   logout: () => void;
   signup: (user: NewUser, invite?: UserInvite) => void;
@@ -36,6 +38,11 @@ const useUserStoreBase = create<UserState & UserAction>()(
       isProUser: false,
       _hasHydrated: false,
       updateUser: (updatedUser) => set(() => ({ user: { ...get().user, ...updatedUser } })),
+      isHypnoUser: () => {
+        const user = get().user;
+        const isHypnoUser = (user.role == 'admin' && user.organization.id == 1) ? true : false;
+        return isHypnoUser
+      },
       login: async (email, password) => {
         try {
           // call your authentication API and set the user state
@@ -45,6 +52,7 @@ const useUserStoreBase = create<UserState & UserAction>()(
           const checkUserProRegistration = await checkExistingUser(email);
           const isProUser = checkUserProRegistration.already_pro;
           console.log('checkUser',checkUserProRegistration)
+
           set({ ...authenticatedUser, isLoggedIn: true, isProUser, error: '' });
         } catch (error: any) {
           set({ error: error.message });

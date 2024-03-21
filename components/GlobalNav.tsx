@@ -6,6 +6,8 @@ import useUserStore from '@/store/userStore';
 import { useRouter } from 'next/router';
 import Close from 'public/pop/times.svg'
 import useBannerStore from '@/store/bannerStore';
+import UniversalSearch from './UniversalSearch';
+// import { isHypnoUser } from '@/helpers/user-privilege';
 
 type Item = {
     name?: string;
@@ -16,6 +18,7 @@ export function GlobalNav() {
     const hasHydrated = useUserStore.use_hasHydrated();
     const user = useUserStore.useUser();
     const isLoggedIn = useUserStore.useIsLoggedIn();
+    const isHypnoUser = useUserStore.useIsHypnoUser();
     const { open, dismiss } = useBannerStore();
 
     const [isOpen, setIsOpen] = useState(false);
@@ -57,6 +60,7 @@ export function GlobalNav() {
                     <nav className="h-full flex flex-row items-center gap-3 sm:gap-5 tracking-tight">
                         {isLoggedIn ? (
                             <>
+                                {isHypnoUser() ? <UniversalSearch/> : null}
                                 <GlobalNavItem key='dashboard' item={{ slug: 'dashboard', name: 'dashboard' }} close={close} />
                                 <GlobalNavItem key='settings' item={{ slug: 'settings', name: 'settings' }} close={close} />
                                 <Link href='https://discord.gg/eJc8GtsPQV' className='text-lg sm:text-xl text-primary hover:text-white'>support</Link>
