@@ -25,10 +25,14 @@ function UserProfilePage() {
       }/hypno/v1/users/${String(query.userId)}?profile_view=true`
     : null;
 
-  const { data: data } = useSWR(
+  const { data: data, error: error } = useSWR(
     userProfileUrl ? [userProfileUrl, token.access_token] : null,
     ([url, token]) => axiosGetWithToken(url, token),
   );
+
+  if (error) {
+    router.push("/404");
+  }
 
   let userData = data?.user;
   let fullName = userData?.first_name + " " + userData?.last_name;

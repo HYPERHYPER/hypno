@@ -53,10 +53,14 @@ function OrganizationProfilePage() {
     ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${String(organizationId)}?profile_view=true`
     : null;
 
-  const { data: data } = useSWR(
+  const { data: data, error: error } = useSWR(
     orgUrl ? [orgUrl, token.access_token] : null,
     ([url, token]) => axiosGetWithToken(url, token),
   );
+
+  if (error) {
+    router.push("/404");
+  }
 
   const orgData = data?.organization;
   const eventUsers = orgData?.event_users;
