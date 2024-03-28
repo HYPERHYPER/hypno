@@ -321,6 +321,7 @@ export default function UniversalSearch() {
                 "users"
               ]).map((category) => (
                 <a role="tab"
+                  key={`${category}-tab`}
                   className={clsx(
                     "tab text-white/80 text-lg sm:text-3xl pl-1 pr-4",
                     currentTab == category && "tab-active"
@@ -343,7 +344,7 @@ export default function UniversalSearch() {
             )}
             {input && (
               <div
-                className="w-auto overflow-y-auto overflow-x-hidden max-h-[350px] sm:max-h-[400px]"
+                className="w-auto overflow-y-auto overflow-x-hidden max-h-[350px] sm:max-h-[400px] lg:max-h-[60vh]"
               >
                 <table className="table-pin-rows table">
                   {renderCategory(currentTab as keyof SearchResults)}
