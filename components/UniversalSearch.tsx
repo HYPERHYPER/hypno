@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/router"; // Import useRouter
 import useUserStore from "@/store/userStore";
 import debounce from "lodash/debounce";
+import clsx from "clsx";
+import _ from "lodash";
 
 interface UserResult {
   avatar: string;
@@ -46,6 +48,8 @@ export default function UniversalSearch() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [currentTab, setCurrentTab] = useState<String>('events');
 
   const clearInputAndResults = () => {
     setInput("");
@@ -114,114 +118,104 @@ export default function UniversalSearch() {
     return (item as UserResult).id !== undefined;
   }
 
+  const noResultsFound = !loading && input.length > 0 && _.isEmpty(searchResults[currentTab as keyof SearchResults]) && !hasError
+
   const renderCategory = (category: keyof SearchResults) => {
     return (
-      <>
-        <thead key={category + "_header"}>
-          <tr>
-            <th className="bg-black text-lg">
-              <span key={category + "_group"} className="text-xl">
-                {category.charAt(0).toUpperCase() + category.slice(1)}
-              </span>
-            </th>
-          </tr>
-        </thead>
-        <tbody key={category + "_content"}>
-          {searchResults[category].length > 0 &&
-            searchResults[category].map(
-              (item: UserResult | OrganizationResult | EventResult, index) =>
-                category === "events" && isEventResult(item) ? (
-                  <tr
-                    key={category + index}
-                    className="bg-base-100 cursor-pointer hover:bg-neutral-800"
-                    onClick={() => handleClick("e", item.id)}
-                  >
-                    <td>
-                      <span className="text-sm">{`${item.name}`}</span>
-                      <br />
-                      <div className="flex gap-2">
-                        <span className="badge badge-sm badge-outline badge-primary">
-                          {item.id}
-                        </span>
-                        <span
-                          className={
-                            item.event_type == "hypno"
-                              ? "badge badge-sm badge-outline"
-                              : "badge badge-sm badge-outline badge-primary"
-                          }
-                        >
-                          {item.event_type === "hypno" ? "iPad" : "iPhone"}
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
-                ) : category === "organizations" &&
-                  isOrganizationResult(item) ? (
-                  <tr
-                    key={category + index}
-                    className="bg-base-100 cursor-pointer hover:bg-neutral-800"
-                    onClick={() => handleClick("organizations", item.id)}
-                  >
-                    <td>
-                      <div className="flex items-center gap-3">
-                        <div className="avatar placeholder">
-                          <div className="bg-neutral text-neutral-content w-6 rounded-full">
-                            <span className="text-xs">
-                              {item.name.charAt(0).toUpperCase()}
-                            </span>
-                          </div>
-                        </div>
-                        <div>
-                          <div className="text-sm font-bold">{`${item.name}`}</div>
-                          <span className="badge badge-sm badge-outline badge-primary">
-                            {item.id}
+      <tbody key={category + "_content"}>
+        {searchResults[category].length > 0 &&
+          searchResults[category].map(
+            (item: UserResult | OrganizationResult | EventResult, index) =>
+              category === "events" && isEventResult(item) ? (
+                <tr
+                  key={category + index}
+                  className="bg-base-100 cursor-pointer hover:bg-neutral-800 font-medium"
+                  onClick={() => handleClick("e", item.id)}
+                >
+                  <td>
+                    <span className="text-sm">{`${item.name}`}</span>
+                    <br />
+                    <div className="flex gap-2">
+                      <span className="badge badge-sm badge-outline badge-primary">
+                        {item.id}
+                      </span>
+                      <span
+                        className={
+                          item.event_type == "hypno"
+                            ? "badge badge-sm badge-outline"
+                            : "badge badge-sm badge-outline badge-primary"
+                        }
+                      >
+                        {item.event_type === "hypno" ? "iPad" : "iPhone"}
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              ) : category === "organizations" &&
+                isOrganizationResult(item) ? (
+                <tr
+                  key={category + index}
+                  className="bg-base-100 cursor-pointer hover:bg-neutral-800 font-medium"
+                  onClick={() => handleClick("organizations", item.id)}
+                >
+                  <td>
+                    <div className="flex items-center gap-3">
+                      <div className="avatar placeholder">
+                        <div className="bg-neutral text-neutral-content w-8 rounded-full">
+                          <span className="text-xs">
+                            {item.name.charAt(0).toUpperCase()}
                           </span>
                         </div>
                       </div>
-                    </td>
-                  </tr>
-                ) : (
-                  isUserResult(item) && (
-                    <tr
-                      key={category + index}
-                      className="bg-base-100 cursor-pointer hover:bg-neutral-800"
-                      onClick={() => handleClick("users", item.id)}
-                    >
-                      <td>
-                        <div className="flex items-center gap-3">
-                          {item.avatar === null ? (
-                            <div className="avatar placeholder">
-                              <div className="bg-neutral text-neutral-content w-6 rounded-full">
-                                <span className="text-xs">{`${
-                                  item.first_name.charAt(0).toUpperCase() +
-                                  item.last_name.charAt(0).toUpperCase()
+                      <div>
+                        <div className="text-sm">{`${item.name}`}</div>
+                        <span className="badge badge-sm badge-outline badge-primary">
+                          {item.id}
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                isUserResult(item) && (
+                  <tr
+                    key={category + index}
+                    className="bg-base-100 cursor-pointer hover:bg-neutral-800 font-medium"
+                    onClick={() => handleClick("users", item.id)}
+                  >
+                    <td>
+                      <div className="flex items-center gap-3">
+                        {item.avatar === null ? (
+                          <div className="avatar placeholder">
+                            <div className="bg-neutral text-neutral-content w-8 rounded-full">
+                              <span className="text-xs">{`${item.first_name.charAt(0).toUpperCase() +
+                                item.last_name.charAt(0).toUpperCase()
                                 }`}</span>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="avatar">
-                              <div className="mask mask-squircle h-6 w-6">
-                                <img src={item.avatar} alt="avatar" />
-                              </div>
-                            </div>
-                          )}
-                          <div>
-                            <div className="text-sm font-bold">{`${item.first_name} ${item.last_name}`}</div>
-                            <div className="text-xs opacity-50">
-                              {item.username}
-                            </div>
-                            <div className="text-xs opacity-50">
-                              {item.email}
                             </div>
                           </div>
+                        ) : (
+                          <div className="avatar">
+                            <div className="mask mask-circle h-8 w-8">
+                              <img src={item.avatar} alt="avatar" />
+                            </div>
+                          </div>
+                        )}
+                        <div>
+                          <div className="text-sm">{`${item.first_name} ${item.last_name}`}</div>
+                          <div className="text-sm opacity-50">
+                            {item.username}
+                          </div>
+                          <div className="text-xs opacity-50">
+                            {item.email}
+                          </div>
                         </div>
-                      </td>
-                    </tr>
-                  )
-                ),
-            )}
-        </tbody>
-      </>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              ),
+          )}
+      </tbody>
     );
   };
 
@@ -232,8 +226,19 @@ export default function UniversalSearch() {
         className="btn border-0 bg-transparent p-0"
         onClick={() => handleSearchModal}
       >
-        <span className="text-primary text-lg font-thin sm:text-xl">
-          search
+        <span className="text-primary hover:text-white text-lg font-normal sm:text-xl transition">
+        <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+                className="h-7 w-7 sm:h-9 sm:w-9"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                  clipRule="evenodd"
+                />
+              </svg>
         </span>
       </label>
       <input
@@ -243,47 +248,32 @@ export default function UniversalSearch() {
         checked={isChecked}
         onChange={(e) => setIsChecked(e.target.checked)}
       />
-      <div className="modal z-10 backdrop-blur-sm" role="dialog">
-        <div className="modal-box">
-          <label className="input flex items-center gap-2 bg-transparent">
-            <input
-              type="text"
-              className={`text-md block w-full grow border p-4 ps-10 text-gray-900 ${
-                hasError ? "input-bordered input-error" : "border-gray-300"
-              } rounded-lg bg-gray-50 focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500`}
-              placeholder="Search..."
-              id="search_input"
-              ref={searchInputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              aria-label="Search"
-            />
-            {input.length > 0 ? (
-              loading ? (
-                <span className="loading loading-spinner h-4 w-4"></span>
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  onClick={clearInputAndResults}
-                  className="h-4 w-4 cursor-pointer"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              )
-            ) : (
+      <div className="modal modal-top z-10 backdrop-blur-sm cursor-pointer" role="dialog">
+        <div className="modal-box pt-16 sm:px-12 bg-black">
+          <div className="absolute top-2 right-2 sm:top-4 sm:right-4 cursor-pointer">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              onClick={() => setIsChecked(false)}
+              className="h-9 sm:h-12 w-9 sm:w-12 cursor-pointer"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </div>
+          <div className="max-w-2xl m-auto">
+            <label className="flex items-center gap-2 bg-transparent">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 16 16"
                 fill="currentColor"
-                className="h-4 w-4 opacity-70"
+                className="h-7 w-7 sm:h-9 sm:w-9 opacity-25"
               >
                 <path
                   fillRule="evenodd"
@@ -291,29 +281,76 @@ export default function UniversalSearch() {
                   clipRule="evenodd"
                 />
               </svg>
+              <input
+                type="text"
+                className={`input pro left text-md block w-full grow p-4 ${hasError ? "input-bordered input-error" : ""
+                  } rounded-lg `}
+                placeholder="search hypno"
+                id="search_input"
+                ref={searchInputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                aria-label="Search"
+              />
+              {input.length > 0 && (
+                loading ? (
+                  <span className="loading loading-spinner h-7 w-7 sm:h-9 sm:w-9 opacity-25"></span>
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    onClick={clearInputAndResults}
+                    className="h-7 w-7 sm:h-9 sm:w-9 cursor-pointer opacity-25"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                )
+              )}
+            </label>
+            <div role="tablist" className="tabs tabs-bordered pb-1 sm:pb-5 border-b-[1px] border-white/20">
+              {([
+                "events",
+                "organizations",
+                "users"
+              ]).map((category) => (
+                <a role="tab"
+                  className={clsx(
+                    "tab text-white/80 text-lg sm:text-3xl pl-1 pr-4",
+                    currentTab == category && "tab-active"
+                  )}
+                  onClick={() => setCurrentTab(category)}
+                >
+                  {category}
+                </a>
+              ))}
+            </div>
+            {hasError && (
+              <div className="mt-2 p-4">
+                <h2 className="text-error">error{errorMessage}</h2>
+              </div>
             )}
-          </label>
-          {hasError && (
-            <div className="mt-2 text-right">
-              <span className="text-error pr-12 text-xs">{errorMessage}</span>
-            </div>
-          )}
-          {input && (
-            <div
-              className="mt-1 w-auto overflow-y-auto overflow-x-hidden"
-              style={{ maxHeight: "400px" }}
-            >
-              <table className="table-pin-rows table">
-                {(
-                  [
-                    "events",
-                    "organizations",
-                    "users",
-                  ] as (keyof SearchResults)[]
-                ).map((category) => renderCategory(category))}
-              </table>
-            </div>
-          )}
+            {noResultsFound && (
+              <div className="mt-2 p-4">
+                <h2 className="text-white/40">no results found 😢</h2>
+              </div>
+            )}
+            {input && (
+              <div
+                className="w-auto overflow-y-auto overflow-x-hidden max-h-[350px] sm:max-h-[400px]"
+              >
+                <table className="table-pin-rows table">
+                  {renderCategory(currentTab as keyof SearchResults)}
+                </table>
+              </div>
+            )}
+          </div>
         </div>
         <label className="modal-backdrop" htmlFor="search_modal"></label>
       </div>
