@@ -129,21 +129,21 @@ export default function UniversalSearch() {
               category === "events" && isEventResult(item) ? (
                 <tr
                   key={category + index}
-                  className="bg-base-100 cursor-pointer hover:bg-neutral-800 font-medium"
+                  className="bg-base-100 cursor-pointer hover:bg-neutral-900 font-medium"
                   onClick={() => handleClick("e", item.id)}
                 >
                   <td>
-                    <span className="text-sm">{`${item.name}`}</span>
+                    <span className="text-sm sm:text-lg">{`${item.name}`}</span>
                     <br />
                     <div className="flex gap-2">
-                      <span className="badge badge-sm badge-outline badge-primary">
+                      <span className="badge badge-sm sm:badge-md badge-outline badge-primary">
                         {item.id}
                       </span>
                       <span
                         className={
                           item.event_type == "hypno"
-                            ? "badge badge-sm badge-outline"
-                            : "badge badge-sm badge-outline badge-primary"
+                            ? "badge badge-sm sm:badge-md badge-outline"
+                            : "badge badge-sm sm:badge-md badge-outline badge-primary"
                         }
                       >
                         {item.event_type === "hypno" ? "iPad" : "iPhone"}
@@ -155,21 +155,21 @@ export default function UniversalSearch() {
                 isOrganizationResult(item) ? (
                 <tr
                   key={category + index}
-                  className="bg-base-100 cursor-pointer hover:bg-neutral-800 font-medium"
+                  className="bg-base-100 cursor-pointer hover:bg-neutral-900 font-medium"
                   onClick={() => handleClick("organizations", item.id)}
                 >
                   <td>
                     <div className="flex items-center gap-3">
                       <div className="avatar placeholder">
-                        <div className="bg-neutral text-neutral-content w-8 rounded-full">
-                          <span className="text-xs">
+                        <div className="bg-neutral text-neutral-content w-8 sm:w-9 rounded-full">
+                          <span className="text-sm">
                             {item.name.charAt(0).toUpperCase()}
                           </span>
                         </div>
                       </div>
                       <div>
-                        <div className="text-sm">{`${item.name}`}</div>
-                        <span className="badge badge-sm badge-outline badge-primary">
+                        <div className="text-sm sm:text-lg">{`${item.name}`}</div>
+                        <span className="badge badge-sm sm:badge-md badge-outline badge-primary">
                           {item.id}
                         </span>
                       </div>
@@ -180,32 +180,32 @@ export default function UniversalSearch() {
                 isUserResult(item) && (
                   <tr
                     key={category + index}
-                    className="bg-base-100 cursor-pointer hover:bg-neutral-800 font-medium"
+                    className="bg-base-100 cursor-pointer hover:bg-neutral-900 font-medium"
                     onClick={() => handleClick("users", item.id)}
                   >
                     <td>
                       <div className="flex items-center gap-3">
                         {item.avatar === null ? (
                           <div className="avatar placeholder">
-                            <div className="bg-neutral text-neutral-content w-8 rounded-full">
-                              <span className="text-xs">{`${item.first_name.charAt(0).toUpperCase() +
+                            <div className="bg-neutral text-neutral-content w-8 sm:w-9 rounded-full">
+                              <span className="text-sm">{`${item.first_name.charAt(0).toUpperCase() +
                                 item.last_name.charAt(0).toUpperCase()
                                 }`}</span>
                             </div>
                           </div>
                         ) : (
                           <div className="avatar">
-                            <div className="mask mask-circle h-8 w-8">
+                            <div className="mask mask-circle h-8 w-8 sm:h-9 sm:w-9">
                               <img src={item.avatar} alt="avatar" />
                             </div>
                           </div>
                         )}
                         <div>
-                          <div className="text-sm">{`${item.first_name} ${item.last_name}`}</div>
-                          <div className="text-sm opacity-50">
+                          <div className="text-sm sm:text-lg">{`${item.first_name} ${item.last_name}`}</div>
+                          <div className="text-xs sm:text-sm opacity-50">
                             {item.username}
                           </div>
-                          <div className="text-xs opacity-50">
+                          <div className="text-xs sm:text-sm opacity-50">
                             {item.email}
                           </div>
                         </div>
