@@ -37,6 +37,7 @@ import { getEventPrivileges } from "@/helpers/user-privilege";
 import ArchiveEventModal from "@/components/Events/ArchiveEventModal";
 import { downloadPhoto, getAspectRatio } from "@/helpers/image";
 import ContentDownloadModal from "@/components/Events/ContentDownloadModal";
+import { formatTimestamp } from "@/helpers/date";
 
 type PhotosResponse = {
   photos: any;
@@ -242,6 +243,7 @@ const AdminAsset = ({
                 >
                   <Share />
                 </Link>
+                <span className="text-white lowercase px-3 py-2 font-normal text-lg">{formatTimestamp(asset.captured_at)}</span>
               </div>
 
               {asset.gif && (
