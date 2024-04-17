@@ -23,11 +23,13 @@ interface EventResult {
   name: string;
   event_type: string;
 }
+
 interface SearchResults {
   users: Array<UserResult>;
   organizations: Array<OrganizationResult>;
   events: Array<EventResult>;
 }
+
 interface ErrorResponse {
   message: string;
 }
