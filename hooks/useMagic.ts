@@ -10,6 +10,7 @@ export interface MagicImage {
     urls?: string[];
 }
 
+const sleep = (ms: number | undefined) => new Promise((r) => setTimeout(r, ms));
 
 export default function useMagic(config: AiConfig, asset: any) {
     const [images, setImages] = useState<MagicImage[]>([]); // array of generated image urls, if still loading will be empty string
@@ -18,11 +19,117 @@ export default function useMagic(config: AiConfig, asset: any) {
     const [error, setError] = useState<boolean>(false);
 
     const editTextPrompt = (updatedText: string) => setTextPrompt(updatedText);
+    
+    const customModel = _.find(config.custom?.models, m => (m.id === config.custom?.current) && m.lora_url)
 
+    // Custom 
+    async function generateCustomModelImage() {
+        setIsLoading(true);
+        const defaultMagicImage = {
+            src: '',
+            status: 'pending',
+            textPrompt
+        }
+        setImages((prev) => [...prev, defaultMagicImage]) // image generating in progress
+
+        const response = await fetch("/api/predictions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                input: {
+                    image: `${asset.urls.url}?width=512`,
+                    lora_urls:  customModel?.lora_url || '',
+                    prompt: `a photo in the style of <1>, ${textPrompt}`,
+                    prompt_strength: 0.4,
+                    lora_scales: '0.7'
+                }
+            }),
+        });
+        let prediction = await response.json();
+        if (response.status !== 201) {
+            setError(true);
+            console.log('Error generating custom model img:', prediction.detail);
+            return;
+        }
+
+        while (
+            prediction.status !== "succeeded" &&
+            prediction.status !== "failed"
+        ) {
+            await sleep(1000);
+            const response = await fetch("/api/predictions/" + prediction.id);
+            prediction = await response.json();
+            if (response.status !== 200) {
+                console.log('Error', prediction.detail);
+                return;
+            }
+            
+            const magicImage : MagicImage = {
+                src: _.first(prediction.output),
+                status: prediction.status,
+                textPrompt,
+                urls: prediction.output,
+            }
+            setImages((prev) => [...prev.slice(0, -1), magicImage]); // replace with loaded url
+            setIsLoading(false);
+            console.log('Completed image details', prediction);
+        }
+    }
 
     // Stable diffusion
     async function generateStableDiffusionImage() {
+        setIsLoading(true);
+        const defaultMagicImage = {
+            src: '',
+            status: 'pending',
+            textPrompt
+        }
+        setImages((prev) => [...prev, defaultMagicImage]) // image generating in progress
 
+        const response = await fetch("/api/predictions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                type: 'sdxl',
+                input: {
+                    image: `${asset.urls.url}?width=1024`,
+                    prompt: textPrompt,
+                }
+            }),
+        });
+        let prediction = await response.json();
+        if (response.status !== 201) {
+            setError(true);
+            console.log('Error generating custom model img:', prediction.detail);
+            return;
+        }
+
+        while (
+            prediction.status !== "succeeded" &&
+            prediction.status !== "failed"
+        ) {
+            await sleep(1000);
+            const response = await fetch("/api/predictions/" + prediction.id);
+            prediction = await response.json();
+            if (response.status !== 200) {
+                console.log('Error', prediction.detail);
+                return;
+            }
+            
+            const magicImage : MagicImage = {
+                src: _.first(prediction.output),
+                status: prediction.status,
+                textPrompt,
+                urls: prediction.output,
+            }
+            setImages((prev) => [...prev.slice(0, -1), magicImage]); // replace with loaded url
+            setIsLoading(false);
+            console.log('Completed image details', prediction);
+        }
     }
 
     // Midjourney
@@ -99,6 +206,14 @@ export default function useMagic(config: AiConfig, asset: any) {
             throw error;
         }
     }
+    
+    const generateAiImage = () => {
+        switch (config.type) {
+            case "custom": return generateCustomModelImage();
+            case "midjourney": return generateMidjourneyImage();
+            default: return generateStableDiffusionImage();
+        }
+    }
 
     return {
         images,
@@ -106,6 +221,7 @@ export default function useMagic(config: AiConfig, asset: any) {
         isLoading,
         error,
         editTextPrompt,
-        generateMidjourneyImage
+        generateMidjourneyImage,
+        generateAiImage,
     }
 }

@@ -1,10 +1,14 @@
 export type AiConfig = {
     enabled?: boolean;
-    type?: 'midjourney' | 'stable diffusion';
+    type?: 'midjourney' | 'stable diffusion' | 'sdxl' | 'custom';
     text_prompt?: string;
     prompt_strength?: number;
     img_prompt?: string[];
     midjourney_parameters?: string;
+    custom?: {
+        current?: string;
+        models?: any[];
+    }
 }
 
 export type EventMicrosite = {

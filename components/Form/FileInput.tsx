@@ -33,7 +33,12 @@ export default function FileInput(props: UploaderProps) {
     if (!files?.length) return;
     setUploadStatus(undefined);
     setNewFilename(files[0].name.split('.')[0]);
-    createImage(files[0]);
+    console.log('setup input', files[0].name.split('.')[0])
+    if (files[0].type == 'application/zip') {
+      createZipFile(files[0]);
+    } else {
+      createImage(files[0]);
+    }
   };
 
   const createImage = (file: File) => {
@@ -76,14 +81,34 @@ export default function FileInput(props: UploaderProps) {
     reader.readAsDataURL(file);
   };
 
+  const createZipFile = (file: File) => {
+    let reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        // Create a new Uint8Array from the ArrayBuffer
+        const arrayBuffer = e.target.result as ArrayBuffer;
+        const uint8Array = new Uint8Array(arrayBuffer);
+  
+        // Set the file data and content type
+        setFile(uint8Array.buffer);
+        setContentType('application/zip');
+        setUploadStatus('ready');
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
   const uploadToS3 = async () => {
     setUploadStatus('uploading')
     const url = process.env.NEXT_PUBLIC_AWS_ENDPOINT as string;
     const resp = await axios.get(url, {
-      params: { fileName: getS3Filename(user.id, props.uploadCategory, newFilename, props.validateAspectRatio), contentType },
+      params: { 
+        fileName: getS3Filename(user.id, props.uploadCategory, newFilename, props.validateAspectRatio), 
+        contentType 
+      },
     });
 
-    let binary = Buffer.from((file as string).split(',')[1], 'base64');
+    let binary = Buffer.from(contentType == 'application/zip' ? (file as string) : (file as string).split(',')[1], 'base64');
     let blob = new Blob([binary as BlobPart], {
       type: contentType,
     });

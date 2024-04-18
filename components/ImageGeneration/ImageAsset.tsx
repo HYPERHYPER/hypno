@@ -35,7 +35,7 @@ export function ImageAsset({ src, error }: { src?: string, error?: boolean }) {
                     <img
                         src={src}
                         alt={`ai-${src}`}
-                        className={clsx('w-auto transition duration-300', loadImage ? 'opacity-100' : 'opacity-0')}
+                        className={clsx('w-auto m-auto transition duration-300', loadImage ? 'opacity-100' : 'opacity-0')}
                     />
                 )}
             </div>

@@ -4,19 +4,6 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<any>
 ) {
-
-
-  // Pinned to a specific version of Stable Diffusion
-  // See https://replicate.com/stability-ai/sdxl
-  // version: "2b017d9b67edd2ee1401238df49d75da53c523f36e363881e057f5dc3ed3c5b2",
-      
-  // Lora 
-  // See https://replicate.com/cloneofsimo/lora
-  const modelId = req.body.model == 'sdxl' ? 
-    "39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b"
-    :
-    "fce477182f407ffd66b94b08e761424cabd13b82b518754b83080bc75ad32466";
-
   const response = await fetch("https://api.replicate.com/v1/predictions", {
     method: "POST",
     headers: {
@@ -24,9 +11,14 @@ export default async function handler(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      version: modelId,
-      // This is the text prompt that will be submitted by a form on the frontend
-      input: { ...req.body.input },
+      // Pinned to a specific version of Stable Diffusion
+      // See https://replicate.com/stability-ai/sdxl
+      version:  "b2a308762e36ac48d16bfadc03a65493fe6e799f429f7941639a6acec5b276cc",
+      input: {
+        task: req.body.task,
+        instance_data: req.body.instance_data,
+        // resolution: 1024, // not enough memory
+      },
     }),
   });
 

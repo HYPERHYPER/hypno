@@ -21,7 +21,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
     const [assetHeight, setAssetHeight] = useState<number>(0);
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
-    const { images, isLoading: isLoadingGeneration, textPrompt, editTextPrompt, generateMidjourneyImage } = useMagic(config.ai_generation, asset);
+    const { images, isLoading: isLoadingGeneration, textPrompt, editTextPrompt, generateAiImage } = useMagic(config.ai_generation, asset);
     const containerRef = useRef<HTMLDivElement | null>(null);
 
     const scrollToBottom = useCallback(() => {
@@ -32,12 +32,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
     }, [containerRef.current])
 
     const handleRemix = async (e: any) => {
-        // generateImgToImgREST({
-        //     url: asset.urls.url,
-        //     text_prompt: config.aiGeneration.text_prompt,
-        //     image_strength: Number(config.aiGeneration.image_strength) / 100
-        // })
-        generateMidjourneyImage();
+        generateAiImage();
     };
 
     const imagesLength = _.size(images);
