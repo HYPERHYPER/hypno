@@ -20,7 +20,7 @@ export default function useMagic(config: AiConfig, asset: any) {
 
     const editTextPrompt = (updatedText: string) => setTextPrompt(updatedText);
     
-    const customModel = _.find(config.custom?.models, m => (m.id === config.custom?.current) && m.lora_url)
+    const customModel = _.find(config?.custom?.models, m => (m.id === config.custom?.current) && m.lora_url)
 
     // Custom 
     async function generateCustomModelImage() {
