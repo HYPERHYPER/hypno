@@ -63,7 +63,7 @@ export default function EffectsModal({
         console.log('pred', prediction);
         let model_id = prediction.id;
         setValue('ai_generation.custom.models', {
-            ...ai_generation.custom.models,
+            ...ai_generation?.custom?.models,
             [model_id]: {
                 id: model_id,
                 name: modelName,
@@ -87,7 +87,7 @@ export default function EffectsModal({
 
             console.log({ prediction })
             setValue('ai_generation.custom.models', {
-                ...ai_generation.custom.models,
+                ...ai_generation?.custom?.models,
                 [model_id]: {
                     id: model_id,
                     name: modelName,
@@ -99,7 +99,6 @@ export default function EffectsModal({
     };
 
     const customModels = _.filter(ai_generation?.custom?.models, (m) => m.status === 'succeeded')
-    console.log('custom', ai_generation?.custom)
 
     useEffect(() => {
         const checkTrainingStatus = async () => {
@@ -116,7 +115,7 @@ export default function EffectsModal({
                 setValue('ai_generation.custom.models', updateModels, { shouldDirty: true })
             } else {
                 setValue('ai_generation.custom.models', {
-                    ...ai_generation.custom.models,
+                    ...ai_generation?.custom?.models,
                     [modelTraining.id]: {
                         ...modelTraining,
                         status: prediction.status,
