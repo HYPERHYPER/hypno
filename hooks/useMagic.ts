@@ -96,7 +96,7 @@ export default function useMagic(config: AiConfig, asset: any) {
             body: JSON.stringify({
                 type: 'sdxl',
                 input: {
-                    image: `${asset.urls.url}?width=1024`,
+                    image: `${asset.urls.url}?width=512`,
                     prompt: textPrompt,
                 }
             }),
