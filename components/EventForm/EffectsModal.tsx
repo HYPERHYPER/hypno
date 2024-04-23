@@ -167,7 +167,7 @@ export default function EffectsModal({
                     ai_generation.type == 'sdxl' && (
                         <FormControl label='strength'>
                             <div className="flex flex-row gap-4 items-center">
-                                <h3 className="text-primary text-xl sm:text-4xl">{Number(ai_generation?.image_strength)}%</h3>
+                                <h3 className="text-primary text-xl sm:text-4xl">{Number(ai_generation?.prompt_strength)}%</h3>
                                 <input
                                     type="range"
                                     min={0}
