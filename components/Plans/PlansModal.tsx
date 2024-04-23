@@ -78,8 +78,8 @@ const PLAN_TYPES: PlanType = {
   },
   brand: {
     tagline: "enterprise data/legal",
-    annualPrice: 4999,
-    monthlyPrice: 6250,
+    annualPrice: 999,
+    monthlyPrice: 1250,
     users: 1,
     additionalPrice: 999,
     uploads: "unlimited",
@@ -166,7 +166,7 @@ const PlanCard = ({
       </h4>
       <h4>
         {PLAN_TYPES[type].uploads != "unlimited"
-          ? "100 uploads/mo"
+          ? "100 upload limit"
           : "unlimited uploads"}
       </h4>
     </div>
@@ -199,17 +199,6 @@ const PlanCard = ({
     </div>
     {type == current ? (
       <div className="btn btn-disabled w-full rounded-2xl">current plan</div>
-    ) : type == "brand" ? (
-      <a
-        href={`mailto:sales@hypno.com?subject=${encodeURIComponent("hypno pro brand subscription from $9999/mo")}`}
-        className={
-          cancelledState
-            ? "btn btn-disabled w-full rounded-2xl"
-            : "btn btn-primary w-full rounded-2xl"
-        }
-      >
-        contact sales
-      </a>
     ) : (
       <button
         className={
@@ -245,11 +234,10 @@ export default function PaymentPlansModal() {
 
   const orgTier = orgData?.organization.metadata.hypno_pro.current_tier;
   const cancelledState = !!orgData?.organization.metadata.hypno_pro.cancel_at;
-  console.log("here", cancelledState);
 
   const [billingFrequency, setBillingFrequency] = useState<
     "annual" | "monthly"
-  >("monthly");
+  >("annual");
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -342,7 +330,7 @@ export default function PaymentPlansModal() {
       >
         <div className="flex justify-between">
           <div className="space-y-4">
-            <h1 className="text-white">plans + pricing</h1>
+            <h1 className="text-white">subscription</h1>
             <div className="flex flex-row gap-4">
               <h2 className={cancelledState ? "text-error" : "text-primary"}>
                 {cancelledState
@@ -397,7 +385,7 @@ export default function PaymentPlansModal() {
                         : "text-white/30",
                     )}
                   >
-                    annual-20% off
+                    annual (save 20%)
                   </span>
                 </div>
 
