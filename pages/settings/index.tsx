@@ -251,7 +251,9 @@ function SettingsPage() {
             {isHypnoUser({
               organization_id: user.organization_id,
               role: user.role,
-            }) && <Item name="" value={"console"} href="/settings/console" />}
+            }) && (
+              <Item name="console" value={"console"} href="/settings/console" />
+            )}
           </div>
         </GlobalLayout.Content>
 
