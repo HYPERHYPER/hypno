@@ -47,8 +47,6 @@ const CustomCheckout = () => {
   const token = useUserStore.useToken();
 
   const [status, setStatus] = useState("ready");
-  const [validated, setValidated] = useState(false);
-
   const [input, setInput] = useState("");
   const [result, setResult] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -130,32 +128,12 @@ const CustomCheckout = () => {
 
   useEffect(() => {
     if (selectedSubscriptionType?.split("_")[1] === "yearly") {
-      console.log("yearly");
       setCouponDuration(yearlyDurations);
     } else {
-      console.log("monthly");
       setCouponDuration(monthlyDurations);
     }
   }, [selectedSubscriptionType]);
 
-  useEffect(() => {
-    if (selectedCouponType === "percentage") {
-      console.log("percentage detected");
-    }
-  }, [selectedCouponType]);
-
-  useEffect(() => {
-    if (selectedCouponDuration === "repeating") {
-      console.log("repeating detected");
-    }
-  }, [selectedCouponDuration]);
-
-  useEffect(() => {}, [
-    input,
-    result,
-    selectedCouponType,
-    selectedCouponDuration,
-  ]);
   const {
     register,
     watch,
@@ -221,6 +199,10 @@ const CustomCheckout = () => {
       console.log("submitForm errors", { errors });
       setStatus("error");
       return;
+    }
+
+    if (data.amount_off) {
+      data.amount_off = parseInt(data.amount_off) * 100 + "";
     }
 
     let payload = {
@@ -294,9 +276,7 @@ const CustomCheckout = () => {
               setValue("email", e.target.value);
             }}
             type="text"
-            className={`text-md block w-full grow border p-4 ps-10 text-gray-900 ${
-              hasError ? "input-bordered input-error" : "border-gray-300"
-            } rounded-lg bg-gray-50 focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500`}
+            className="input pro flex-1"
             placeholder="existing@user.com"
             id="search_input"
             ref={emailSearchInputRef}
@@ -351,8 +331,7 @@ const CustomCheckout = () => {
               setValue("price_id", priceId);
               setSelectedSubscriptionType(option);
             }}
-            className="select select-ghost w-full max-w-xs"
-            defaultValue="select a subscription type..."
+            className="select pro-form pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl"
           >
             {_.map(subscriptionTiers, (option, i) => (
               <option key={i}>{option.name}</option>
@@ -368,7 +347,7 @@ const CustomCheckout = () => {
               setSelectedCouponType(e.target.value);
             }}
             defaultValue="percentage"
-            className="select select-ghost w-full max-w-xs"
+            className="select pro-form pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl"
           >
             {_.map(couponType, (option, i) => (
               <option key={i}>{option.name}</option>
@@ -387,7 +366,7 @@ const CustomCheckout = () => {
                 percentOff.onChange(e);
                 setValue("percent_off", parseInt(e.target.value));
               }}
-              className={`text-md block w-full grow border p-4 ps-10 text-gray-900 rounded-lg bg-gray-50 focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500`}
+              className="input pro flex-1"
             />
           </label>
         </FormControl>
@@ -403,7 +382,7 @@ const CustomCheckout = () => {
                 amountOff.onChange(e);
                 setValue("amount_off", parseInt(e.target.value));
               }}
-              className={`text-md block w-full grow border p-4 ps-10 text-gray-900 rounded-lg bg-gray-50 focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500`}
+              className="input pro flex-1"
             />
           </label>
         </FormControl>
@@ -418,7 +397,7 @@ const CustomCheckout = () => {
               setValue("duration", e.target.value);
             }}
             defaultValue="once"
-            className="select select-ghost w-full max-w-xs"
+            className="select pro-form pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl"
           >
             {_.map(couponDuration, (option, i) => (
               <option key={i}>{option.name}</option>
@@ -436,7 +415,7 @@ const CustomCheckout = () => {
                 setValue("duration_in_months", parseInt(e.target.value))
               }
               defaultValue="0"
-              className={`text-md block w-full grow border p-4 ps-10 text-gray-900 rounded-lg bg-gray-50 focus:border-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500`}
+              className="input pro flex-1"
             />
           </label>
         </FormControl>
