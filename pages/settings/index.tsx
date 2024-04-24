@@ -170,7 +170,7 @@ function SettingsPage() {
                         <Item name='email' value={user.email} modalId='email-modal' />
                         <Item name='password' value={'change'} modalId='password-modal' />
                         {user.organization && <Item name='organization' value={user.organization?.name} href='/org' /> }
-                        <Item name='plan' value={
+                        <Item name='subscription' value={
                             <>{orgData?.organization && <span className='cursor-pointer' onClick={() => window.payment_plans_modal.showModal()}>{orgTier}</span>}</>
                         } />
                         <Item name='billing' value={

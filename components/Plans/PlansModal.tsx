@@ -22,8 +22,8 @@ const FEATURE_ACCESS: FeatureAccess = {
   branding: ["creator", "studio", "brand"],
   "data capture": ["brand"],
   "custom legal": ["brand"],
-  "your domain": ["brand"],
-  "api access": ["brand"],
+  // "your domain": ["brand"],
+  // "api access": ["brand"],
   "live support": ["studio", "brand"],
   "studio services": ["studio", "brand"],
   "hypno community": ["studio", "brand"],
@@ -166,8 +166,8 @@ const PlanCard = ({
       </h4>
       <h4>
         {PLAN_TYPES[type].uploads != "unlimited"
-          ? "100 upload limit"
-          : "unlimited uploads"}
+          ? "100 photo limit"
+          : "unlimited photos"}
       </h4>
     </div>
 
@@ -336,8 +336,8 @@ export default function PaymentPlansModal() {
                 {cancelledState
                   ? "you are not currently subscribed, please renew via the billing portal to make changes to your subscription"
                   : orgTier == "custom"
-                    ? "you are currently signed up for a custom subscription plan. please contact us to make any changes."
-                    : "choose a subscription plan for your organization"}
+                    ? "you are currently signed up for a custom plan. please contact us to make any changes."
+                    : "choose a plan for your organization"}
               </h2>
             </div>
           </div>
