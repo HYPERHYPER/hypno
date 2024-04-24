@@ -215,7 +215,7 @@ function SettingsPage() {
               />
             )}
             <Item
-              name="plan"
+              name="subscription"
               value={
                 <>
                   {orgData?.organization && (
