@@ -83,7 +83,7 @@ export function TextPromptEditor({ onChange, textPrompt, generateImage, isGenera
                     value={textPrompt}
                     onChange={(e) => onChange(e.target.value)}
                     onInput={adjustTextareaHeight}
-                    rows={1}
+                    rows={4}
                     placeholder="your magic text prompt"
                     tabIndex={1}
                 />
