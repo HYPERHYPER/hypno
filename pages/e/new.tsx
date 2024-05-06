@@ -56,7 +56,7 @@ function NewEventPage(props: ResponseData) {
                 is_private: eventData.is_private,
                 blendmode: eventData.blendmode,
                 custom_gallery_assigned: eventData.custom_gallery_assigned ? '1' : '0',
-                ...(eventData.ai_generation?.enabled && { metadata: { ai_generation: { ...eventData.ai_generation }} })
+                ...(eventData.ai_generation?.enabled && { metadata: { ai_generation: { ...eventData.ai_generation }} }),
             },
             custom_frontend: {
                 logo_image: eventData.logo_image,
@@ -76,7 +76,8 @@ function NewEventPage(props: ResponseData) {
                 }
             }),
             ...(eventData.watermarks && { watermarks: transformWatermarks(eventData.watermarks) }),
-            delivery: eventData.qr_delivery ? "qr_gallery" : "qr"
+            delivery: eventData.qr_delivery ? "qr_gallery" : "qr",
+            pro_raw_upload: eventData.pro_raw_upload,
         }
 
         const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events`;

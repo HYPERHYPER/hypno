@@ -48,6 +48,7 @@ const EditEventPage = (props: ResponseData) => {
         let filter: any = {};
         let delivery: string = '';
         let metadata: any = {};
+        let pro_raw_upload: boolean | undefined = undefined;
 
         // Build event payload - any field that's not watermark
         // Build watermark payload in seperate reqs by watermark_id
@@ -71,6 +72,9 @@ const EditEventPage = (props: ResponseData) => {
                 if (key == 'ai_generation') {
                     metadata = { ai_generation: { ...field[key]} }
                 }
+                if (key == 'pro_raw_upload') {
+                    pro_raw_upload = field[key];
+                }
             }
         })
 
@@ -79,7 +83,8 @@ const EditEventPage = (props: ResponseData) => {
             ...(!_.isEmpty(custom_frontend) && { custom_frontend }),
             ...(!_.isEmpty(filter) && { filter }),
             ...(delivery && { delivery }),
-            ...(!_.isEmpty(metadata) && { metadata })
+            ...(!_.isEmpty(metadata) && { metadata }),
+            ...(!_.isNil(pro_raw_upload) && { pro_raw_upload })
         }
         if (!_.isEmpty(eventPayload)) {
             payloadArr.push(eventPayload);

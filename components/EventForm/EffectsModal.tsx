@@ -153,6 +153,9 @@ export default function EffectsModal({
                         ))}
                     </div>
                 </FormControl>
+                <FormControl label='apply graphics?'>
+                    <input type="checkbox" className="toggle pro toggle-lg" {...register('pro_raw_upload')} />
+                </FormControl>
                 {ai_generation.type != 'custom' && (
                     <FormControl label='keywords' dir='col'>
                         <h3 className="text-white/40 sm:text-xl">enter descriptive text prompts in priority order to style your content</h3>

@@ -42,9 +42,11 @@ export type EventConfig = {
         ai_generation?: AiConfig | null;
         qr_asset_download?: string;
         filetype_download?: string;
+        pro_raw_upload?: boolean;
     }
     custom_frontend?: EventMicrosite | null;
     filetype_download?: string;
+    event_filter_watermarks?: any;
 }
 
 export type EventPayload = {
@@ -53,6 +55,7 @@ export type EventPayload = {
         name?: string;
         client_id?: number;
         custom_gallery_assigned?: string;
+        pro_raw_upload?: boolean;
     };
     custom_frontend?: EventMicrosite;
     filter?: { id: number };
