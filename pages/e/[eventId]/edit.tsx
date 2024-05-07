@@ -84,7 +84,7 @@ const EditEventPage = (props: ResponseData) => {
             ...(!_.isEmpty(filter) && { filter }),
             ...(delivery && { delivery }),
             ...(!_.isEmpty(metadata) && { metadata }),
-            ...(!_.isNil(pro_raw_upload) && { pro_raw_upload })
+            ...(!_.isUndefined(pro_raw_upload) && { pro_raw_upload })
         }
         if (!_.isEmpty(eventPayload)) {
             payloadArr.push(eventPayload);
