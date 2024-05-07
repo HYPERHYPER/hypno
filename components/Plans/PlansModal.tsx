@@ -39,8 +39,8 @@ const FEATURES = [
       "branding",
       "data capture",
       "custom legal",
-      "your domain",
-      "api access",
+      // "your domain",
+      // "api access",
     ],
   },
   {
