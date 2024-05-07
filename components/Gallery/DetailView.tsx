@@ -99,7 +99,26 @@ export default function DetailView({ asset, config, imageProps }: any) {
             //     }}
             // >{text}</button>
     }
-    
+
+    useEffect(() => {
+        const loadImage = () => {
+            const img = new window.Image(); // Check if window is defined before using Image constructor
+            img.onload = () => {
+                setIsLoaded(true);
+            };
+            img.src = displayUrl;
+
+            // If the image is already loaded before the onload event is attached
+            if (img.complete) {
+                setIsLoaded(true);
+            }
+        };
+
+        if (typeof window !== 'undefined') {
+            loadImage();
+        }
+    }, [displayUrl]);
+
     return (
         <>
             <div
@@ -126,18 +145,20 @@ export default function DetailView({ asset, config, imageProps }: any) {
                             <VideoAsset src={asset.mp4_url} poster={asset.posterframe} />
                         ) : (
                             <div className='block'>
-                                {/* <img
-                                    //@ts-ignore
-                                    onLoad={(e) => {setAssetHeight(e.target.height); setIsLoaded(true);}}
-                                    //@ts-ignore
-                                    onResize={(e) => setAssetHeight(e.target.height)}
-                                    src={asset.urls.url}
+                                <img
+                                    {...imageProps}
+                                    id='detail-view-image'
+                                    // onLoad={(e: React.SyntheticEvent<HTMLImageElement>) => {console.log('LOADING'); setAssetHeight(e.currentTarget.height); setIsLoaded(true);}}
+                                    onResize={(e: React.SyntheticEvent<HTMLImageElement>) => setAssetHeight(e.currentTarget.height)}
+                                    src={displayUrl}
                                     alt={`${asset.event_id}-${asset.id}`}
                                     style={isPortrait && assetHeight > Number(outerHeight.split('px')[0]) ? { minHeight: height } : {}}
-                                    className={isPortrait ? `w-auto h-auto` : `w-full h-auto sm:max-h-[70vh]`} />
-                             */}
-                                <Image
+                                    className={isPortrait ? `w-auto h-auto` : `w-full h-auto sm:max-h-[70vh]`} 
+                                    />
+                            
+                                {/* <Image
                                     {...imageProps}
+                                    id='detail-view-image'
                                     onLoadingComplete={() => setIsLoaded(true)}
                                     //@ts-ignore
                                     onLoad={(e) => setAssetHeight(e.target.height)}
@@ -149,7 +170,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                                     alt={`${asset.event_id}-${asset.id}`}
                                     placeholder={imageProps?.blurDataURL ? 'blur' : 'empty'}
                                     style={isPortrait && assetHeight > Number(outerHeight.split('px')[0]) ? { minHeight: height } : {}}
-                                    className={isPortrait ? `w-auto h-auto` : `w-full h-auto sm:max-h-[70vh]`} />
+                                    className={isPortrait ? `w-auto h-auto` : `w-full h-auto sm:max-h-[70vh]`} /> */}
                             </div>
                         )}
                     </div>
