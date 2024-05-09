@@ -7,7 +7,7 @@ import useContentHeight from "@/hooks/useContentHeight";
 import _ from 'lodash';
 import { toTextColor } from "@/helpers/color";
 import useWidth from "@/hooks/useWidth";
-import { downloadPhoto } from "@/helpers/image";
+import { downloadPhoto, getAspectRatio } from "@/helpers/image";
 import useMagic from "@/hooks/useMagic";
 import MagicButton from "../ImageGeneration/MagicButton";
 import MagicImageItem from "../ImageGeneration/ImageAsset";
@@ -50,6 +50,16 @@ export default function DetailView({ asset, config, imageProps }: any) {
     const width = useWidth();
     const btnColor = config?.color === '#00FF99' ? null : config.color;
     const enableAiMagic = !asset.mp4_url && config?.ai_generation && config?.ai_generation.enabled;
+
+    // get watermark to be applied to image generation
+    const aspectRatio = Number(getAspectRatio(asset.width, asset.height))
+    // check if apply graphics is turned on (stored in pro_raw_upload) - since watermarks are applied to raw url
+    const watermarkUrl = config.rawEnabled ? _.first(_.filter(config?.watermarks, (wm) => {
+        const w_h = wm.name.split(":")
+        const ar = Number(w_h[0]) / Number(w_h[1])
+        return ar === aspectRatio
+    }))?.watermark_url : null;
+
     // portrait
     // mobile
     // desktop
@@ -90,14 +100,14 @@ export default function DetailView({ asset, config, imageProps }: any) {
             </a>
             :
             <></>
-            // <button
-            //     style={style}
-            //     className={className}
-            //     onClick={() => {
-            //         downloadPhoto(asset, downloadFiletype);
-            //         updateDownloadedMetadata();
-            //     }}
-            // >{text}</button>
+        // <button
+        //     style={style}
+        //     className={className}
+        //     onClick={() => {
+        //         downloadPhoto(asset, downloadFiletype);
+        //         updateDownloadedMetadata();
+        //     }}
+        // >{text}</button>
     }
 
     useEffect(() => {
@@ -180,7 +190,12 @@ export default function DetailView({ asset, config, imageProps }: any) {
                     <div ref={containerRef} className="mt-7 w-full h-auto pb-[36px]">
                         {(!_.isEmpty(images)) && (
                             _.map(images, (img, i) => (
-                                <MagicImageItem image={img} key={i} updateEditorPrompt={editTextPrompt} />
+                                <MagicImageItem 
+                                    image={img} 
+                                    watermark={watermarkUrl}
+                                    key={i} 
+                                    updateEditorPrompt={editTextPrompt} 
+                                />
                             ))
                         )}
                     </div>

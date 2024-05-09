@@ -7,8 +7,10 @@ import { MagicImage } from '@/hooks/useMagic';
 import Carousel from "nuka-carousel"
 import ArrowNext from '../../assets/icons/arrow-next.svg';
 import ArrowBack from '../../assets/icons/arrow-back.svg';
+import GraphicOverlay from './GraphicOverlay';
+import useElementSize from '@/hooks/useElementSize';
 
-export function ImageAsset({ src, error }: { src?: string, error?: boolean }) {
+export function ImageAsset({ src, error, watermark }: { src?: string, error?: boolean, watermark?: string }) {
     const isGenerating = _.isEmpty(src);
 
     const [loadImage, setLoadImage] = useState<boolean>(false);
@@ -18,12 +20,16 @@ export function ImageAsset({ src, error }: { src?: string, error?: boolean }) {
         }
     }, [isGenerating])
 
+    const { width, height } = useElementSize('detail-view-image')
+
     return (
         <div
-            className={clsx('relative bg-black/50 backdrop-blur-[50px] mx-auto', isGenerating ? 'w-auto aspect-square min-w-full' : 'w-auto')}>
+            className={clsx('relative bg-black/50 backdrop-blur-[50px] mx-auto transition-all')}
+            style={{ width: `${width}px`, height: `${height}px` }}
+        >
             {(isGenerating || error) && (
                 <div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
-                    {error ? 
+                    {error ?
                         <h2 className='text-white text-4xl tracking-wider'>{':('}</h2>
                         : <DotsSpinner />
                     }
@@ -32,49 +38,76 @@ export function ImageAsset({ src, error }: { src?: string, error?: boolean }) {
 
             <div className='block'>
                 {!isGenerating && (
-                    <img
-                        src={src}
-                        alt={`ai-${src}`}
-                        className={clsx('w-auto m-auto transition duration-300', loadImage ? 'opacity-100' : 'opacity-0')}
-                    />
+                    watermark ? (
+                        <div className=''>
+                            <GraphicOverlay
+                                imageUrl={src}
+                                watermarkUrl={watermark}
+                                loadImage={!isGenerating}
+                            />
+                        </div>
+                    ) : (
+                        <img
+                            src={src}
+                            alt={`ai-${src}`}
+                            className={clsx('w-auto m-auto transition duration-300', loadImage ? 'opacity-100' : 'opacity-0')}
+                        />
+                    )
                 )}
             </div>
         </div>
     )
 }
 
-export const ImageCarousel = ({ urls }: { urls?: string[] }) => {
+export const ImageCarousel = ({ urls, watermark }: { urls?: string[], watermark?: string }) => {
     const [loadImage, setLoadImage] = useState<boolean>(false);
     useEffect(() => {
         setLoadImage(true)
     }, [])
+
+    const { width, height } = useElementSize('detail-view-image');
     return (
-        <Carousel
-            className='bg-black/50 backdrop-blur-[50px]'
-            wrapAround={true}
-            defaultControlsConfig={{
-                nextButtonStyle: { padding: '8px', background: 'none' },
-                nextButtonText: <span className='carousel-arrow'><ArrowNext /></span>,
-                prevButtonStyle: { padding: '8px', background: 'none' },
-                prevButtonText: <span className='carousel-arrow'><ArrowBack /></span>,
-                pagingDotsStyle: { fill: 'white', scale: '125%', borderRadius: '100%' },
-                pagingDotsContainerClassName: 'space-x-3',
-            }}
-        >
-            {_.map(urls, (src, i) => (
-                <img
-                    key={i}
-                    src={src}
-                    alt={`ai-${i}`}
-                    className={clsx('h-auto w-full object-cover transition duration-300', loadImage ? 'opacity-100' : 'opacity-0')}
-                />
-            ))}
-        </Carousel>
+        <div style={{ width: `${width}px`, height: `${height}px`}}>
+            <Carousel
+                className='bg-black/50 backdrop-blur-[50px]'
+                wrapAround={true}
+                defaultControlsConfig={{
+                    nextButtonStyle: { padding: '8px', background: 'none' },
+                    nextButtonText: <span className='carousel-arrow'><ArrowNext /></span>,
+                    prevButtonStyle: { padding: '8px', background: 'none' },
+                    prevButtonText: <span className='carousel-arrow'><ArrowBack /></span>,
+                    pagingDotsStyle: { fill: 'white', scale: '125%', borderRadius: '100%' },
+                    pagingDotsContainerClassName: 'space-x-3',
+                }}
+            style={{ width: `${width}px`, height: `${height}px`}}
+            >
+                {_.map(urls, (src, i) => {
+                    if (watermark) {
+                        return (
+                            <div key={i}>
+                                <GraphicOverlay
+                                    imageUrl={src}
+                                    watermarkUrl={watermark}
+                                    loadImage={loadImage}
+                                />
+                            </div>
+                        )
+                    }
+                    return <img
+                        key={i}
+                        src={src}
+                        alt={`ai-${i}`}
+                        className={clsx('h-auto w-full object-cover transition duration-300', loadImage ? 'opacity-100' : 'opacity-0')}
+                    />
+                })}
+            </Carousel>
+        </div>
     )
 }
 
-export default function MagicImageItem({ image, updateEditorPrompt }: {
+export default function MagicImageItem({ image, watermark, updateEditorPrompt }: {
     image: MagicImage,
+    watermark?: string,
     updateEditorPrompt?: any,
 }) {
     const { src, status, textPrompt } = image;
@@ -84,8 +117,14 @@ export default function MagicImageItem({ image, updateEditorPrompt }: {
 
     const hasUpscaledImages = _.size(image.urls) > 1;
     return (
-        <div className='w-full mb-7'>
-            <div>{status == 'completed' && hasUpscaledImages ? <ImageCarousel urls={image?.urls} /> : <ImageAsset src={src} error={status == 'failed'} />}</div>
+        <div className='mb-7'>
+            <div className='flex justify-center'>
+                {status == 'completed' && hasUpscaledImages ? (
+                    <ImageCarousel urls={image?.urls} watermark={watermark} />
+                ) : (
+                    <ImageAsset src={src} error={status == 'failed'} watermark={watermark} />
+                )}
+            </div>
             {status != 'pending' && (
                 <div className="text-center mt-5 px-2">
                     <h3 className="text-white/50 mb-4">{textPrompt}</h3>
