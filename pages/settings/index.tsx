@@ -223,26 +223,7 @@ function SettingsPage() {
                       className="cursor-pointer"
                       onClick={() => window.payment_plans_modal.showModal()}
                     >
-                      {orgTier}
-                    </span>
-                  )}
-                </>
-              }
-            />
-            <Item
-              name="billing"
-              value={
-                <>
-                  {orgTier && orgTier == "custom" ? (
-                    <span className="text-white/20">contact sales</span>
-                  ) : orgTier == "free" ? (
-                    <span className="text-white/20">none</span>
-                  ) : (
-                    <span
-                      className="cursor-pointer"
-                      onClick={handleBillingRedirect}
-                    >
-                      manage →
+                      {orgTier} →
                     </span>
                   )}
                 </>
