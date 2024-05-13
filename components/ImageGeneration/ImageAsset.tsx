@@ -105,10 +105,11 @@ export const ImageCarousel = ({ urls, watermark }: { urls?: string[], watermark?
     )
 }
 
-export default function MagicImageItem({ image, watermark, updateEditorPrompt }: {
+export default function MagicImageItem({ image, watermark, updateEditorPrompt, disablePromptEditor }: {
     image: MagicImage,
     watermark?: string,
     updateEditorPrompt?: any,
+    disablePromptEditor?: boolean,
 }) {
     const { src, status, textPrompt } = image;
     const handleEditTextPromptClick = () => {
@@ -128,7 +129,7 @@ export default function MagicImageItem({ image, watermark, updateEditorPrompt }:
             {status != 'pending' && (
                 <div className="text-center mt-5 px-2">
                     <h3 className="text-white/50 mb-4">{textPrompt}</h3>
-                    <EditTextPrompt onClick={handleEditTextPromptClick} />
+                    {!disablePromptEditor && <EditTextPrompt onClick={handleEditTextPromptClick} />}
                 </div>
             )}
         </div>

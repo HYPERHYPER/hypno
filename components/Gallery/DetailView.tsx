@@ -195,6 +195,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                                     watermark={watermarkUrl}
                                     key={i} 
                                     updateEditorPrompt={editTextPrompt} 
+                                    disablePromptEditor={config?.ai_generation?.disable_prompt_editor}
                                 />
                             ))
                         )}
