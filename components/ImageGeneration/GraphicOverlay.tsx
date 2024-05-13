@@ -1,15 +1,21 @@
+import { convertBlendMode } from '@/helpers/blendmode';
 import useElementSize from '@/hooks/useElementSize';
 import React, { useRef, useEffect } from 'react';
 
 interface GraphicOverlayProps {
     imageUrl?: string;
-    watermarkUrl?: string;
+    watermark?: {
+        url?: string;
+        blendmode?: string;
+    };
     loadImage: boolean;
 }
 
-const GraphicOverlay = ({ imageUrl, watermarkUrl, loadImage }: GraphicOverlayProps) => {
+const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const { width, height } = useElementSize('detail-view-image');
+    const blendMode = convertBlendMode(watermark?.blendmode || 'source-over')
+    const watermarkUrl = watermark?.url || '';
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -51,7 +57,7 @@ const GraphicOverlay = ({ imageUrl, watermarkUrl, loadImage }: GraphicOverlayPro
                 context.drawImage(image, 0, 0, scaledImageWidth, scaledImageHeight);
         
                 // Set blend mode
-                context.globalCompositeOperation = 'lighten'; // Change blend mode as needed
+                context.globalCompositeOperation = blendMode as GlobalCompositeOperation; // Change blend mode as needed
         
                 // Scale watermark to match image dimensions
                 const scaledWatermarkWidth = watermark.width * watermarkScaleFactor;

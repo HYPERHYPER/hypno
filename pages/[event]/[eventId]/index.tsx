@@ -119,6 +119,7 @@ const SubGallery = (props: ResponseData) => {
         qr_asset_download: event?.metadata?.qr_asset_download,
         displayFileType: event?.filetype_download,
         watermarks: event?.event_filter_watermarks,
+        watermarkBlendmode: event?.metadata?.blendmode,
         rawEnabled: event?.metadata?.pro_raw_upload, // if raw is enabled, apply watermark
     }
 

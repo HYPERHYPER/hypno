@@ -10,7 +10,12 @@ import ArrowBack from '../../assets/icons/arrow-back.svg';
 import GraphicOverlay from './GraphicOverlay';
 import useElementSize from '@/hooks/useElementSize';
 
-export function ImageAsset({ src, error, watermark }: { src?: string, error?: boolean, watermark?: string }) {
+type WatermarkProps = {
+    url?: string;
+    blendmode?: string;
+}
+
+export function ImageAsset({ src, error, watermark }: { src?: string, error?: boolean, watermark?: WatermarkProps }) {
     const isGenerating = _.isEmpty(src);
 
     const [loadImage, setLoadImage] = useState<boolean>(false);
@@ -42,7 +47,7 @@ export function ImageAsset({ src, error, watermark }: { src?: string, error?: bo
                         <div className=''>
                             <GraphicOverlay
                                 imageUrl={src}
-                                watermarkUrl={watermark}
+                                watermark={watermark}
                                 loadImage={!isGenerating}
                             />
                         </div>
@@ -59,7 +64,7 @@ export function ImageAsset({ src, error, watermark }: { src?: string, error?: bo
     )
 }
 
-export const ImageCarousel = ({ urls, watermark }: { urls?: string[], watermark?: string }) => {
+export const ImageCarousel = ({ urls, watermark }: { urls?: string[], watermark?: WatermarkProps }) => {
     const [loadImage, setLoadImage] = useState<boolean>(false);
     useEffect(() => {
         setLoadImage(true)
@@ -87,7 +92,7 @@ export const ImageCarousel = ({ urls, watermark }: { urls?: string[], watermark?
                             <div key={i}>
                                 <GraphicOverlay
                                     imageUrl={src}
-                                    watermarkUrl={watermark}
+                                    watermark={watermark}
                                     loadImage={loadImage}
                                 />
                             </div>
@@ -107,7 +112,7 @@ export const ImageCarousel = ({ urls, watermark }: { urls?: string[], watermark?
 
 export default function MagicImageItem({ image, watermark, updateEditorPrompt, disablePromptEditor }: {
     image: MagicImage,
-    watermark?: string,
+    watermark?: WatermarkProps,
     updateEditorPrompt?: any,
     disablePromptEditor?: boolean,
 }) {

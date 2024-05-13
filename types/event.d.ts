@@ -9,6 +9,7 @@ export type AiConfig = {
         current?: string;
         models?: any[];
     }
+    disable_prompt_editor?: boolean;
 }
 
 export type EventMicrosite = {
@@ -43,6 +44,7 @@ export type EventConfig = {
         qr_asset_download?: string;
         filetype_download?: string;
         pro_raw_upload?: boolean;
+        blendmode?: string;
     }
     custom_frontend?: EventMicrosite | null;
     filetype_download?: string;

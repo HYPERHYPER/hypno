@@ -59,6 +59,10 @@ export default function DetailView({ asset, config, imageProps }: any) {
         const ar = Number(w_h[0]) / Number(w_h[1])
         return ar === aspectRatio
     }))?.watermark_url : null;
+    const watermark = {
+        url: watermarkUrl,
+        blendmode: config.watermarkBlendmode
+    }
 
     // portrait
     // mobile
@@ -192,7 +196,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                             _.map(images, (img, i) => (
                                 <MagicImageItem 
                                     image={img} 
-                                    watermark={watermarkUrl}
+                                    watermark={watermark}
                                     key={i} 
                                     updateEditorPrompt={editTextPrompt} 
                                     disablePromptEditor={config?.ai_generation?.disable_prompt_editor}
