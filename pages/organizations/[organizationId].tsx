@@ -92,14 +92,13 @@ function OrganizationProfilePage() {
   let totalUsers: any = null;
   if (orgData) {
     totalUsers = { ...eventUsers, ...orgUsers };
-    console.log("total", totalUsers);
   }
 
   const handleClick = (route: string, id: number) => {
     router.push(`/${route}/${id}`);
   };
 
-  const handleModalOpen = (userData: any, userInfo) => {
+  const handleModalOpen = (userData: any, userInfo: string) => {
     let userPermission = { ...userData, email: userInfo.split("-")[0] };
     setSelectedUserData(userPermission);
     (
@@ -107,7 +106,6 @@ function OrganizationProfilePage() {
         "updateUserPermissionModal",
       ) as DaisyUIModalElement
     ).showModal();
-    console.log(userPermission);
   };
 
   const kickGuestUser = async (guestPermission: any) => {
@@ -122,8 +120,6 @@ function OrganizationProfilePage() {
       permission: guestPermission,
     };
 
-    console.log("payload", payload);
-
     const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/users/kick_guest_user`;
     await axios
       .put(url, payload, {
@@ -133,7 +129,6 @@ function OrganizationProfilePage() {
         },
       })
       .then((res) => {
-        console.log("result", res);
         setStatus("success");
         setTimeout(() => {
           (
