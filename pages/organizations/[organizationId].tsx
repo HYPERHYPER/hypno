@@ -5,9 +5,10 @@ import withAuth from "@/components/hoc/withAuth";
 import GlobalLayout from "@/components/GlobalLayout";
 import { axiosGetWithToken } from "@/lib/fetchWithToken";
 import useSWR from "swr";
-import { getOrganizationPrivileges } from "@/helpers/user-privilege";
+import axios from "axios";
 import { useRouter } from "next/router";
 import Spinner from "@/components/Spinner";
+import { useState } from "react";
 
 interface SimpleEventData {
   id: number;
@@ -39,14 +40,31 @@ interface TotalUsers {
   [key: string]: UserPermissionData[];
 }
 
+interface DaisyUIModalElement extends HTMLElement {
+  close: () => void;
+  showModal: () => void;
+}
+
 function OrganizationProfilePage() {
   const router = useRouter();
   const { query } = router;
 
-  const user = useUserStore.useUser();
-  const isHypnoUser = useUserStore.useIsHypnoUser();
-  const updateUser = useUserStore.useUpdateUser();
+  // const user = useUserStore.useUser();
+  // const isHypnoUser = useUserStore.useIsHypnoUser();
+  // const updateUser = useUserStore.useUpdateUser();
   const token = useUserStore.useToken();
+
+  const [selectedUserData, setSelectedUserData] = useState({
+    event_id: null,
+    user_id: null,
+    organization_id: null,
+    kind: null,
+    status: null,
+    email: null,
+    id: null,
+  });
+
+  const [status, setStatus] = useState("ready");
 
   const organizationId = query.organizationId;
   const orgUrl = organizationId
@@ -69,15 +87,70 @@ function OrganizationProfilePage() {
   const owner = orgData?.owner;
   const events = orgData?.events;
   const stats = orgData?.statistics;
+  const tier = orgData?.metadata?.hypno_pro?.sub_type || "free";
 
   let totalUsers: any = null;
   if (orgData) {
     totalUsers = { ...eventUsers, ...orgUsers };
-    // console.log("np", nonProUsers);
   }
 
   const handleClick = (route: string, id: number) => {
     router.push(`/${route}/${id}`);
+  };
+
+  const handleModalOpen = (userData: any, userInfo: string) => {
+    let userPermission = { ...userData, email: userInfo.split("-")[0] };
+    setSelectedUserData(userPermission);
+    (
+      document.getElementById(
+        "updateUserPermissionModal",
+      ) as DaisyUIModalElement
+    ).showModal();
+  };
+
+  const kickGuestUser = async (guestPermission: any) => {
+    setStatus("saving");
+
+    if (!selectedUserData.user_id) {
+      setStatus("error");
+      return;
+    }
+
+    let payload = {
+      permission: guestPermission,
+    };
+
+    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/users/kick_guest_user`;
+    await axios
+      .put(url, payload, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token.access_token,
+        },
+      })
+      .then((res) => {
+        setStatus("success");
+        setTimeout(() => {
+          (
+            document.getElementById(
+              "updateUserPermissionModal",
+            ) as DaisyUIModalElement
+          ).close();
+          setStatus("ready");
+        }, 2000);
+      })
+      .catch((e) => {
+        console.log(e);
+        setStatus("error");
+        setTimeout(() => {
+          (
+            document.getElementById(
+              "updateUserPermissionModal",
+            ) as DaisyUIModalElement
+          ).close();
+          setStatus("ready");
+        }, 3000);
+      });
   };
 
   return (
@@ -99,6 +172,7 @@ function OrganizationProfilePage() {
         <GlobalLayout>
           <GlobalLayout.Header title={orgData.name}>
             <h2 className="badge badge-primary badge-outline">{orgData.id}</h2>
+            <h2 className="badge badge-primary badge-outline">{tier}</h2>
             {!owner && (
               <h2 className="badge badge-error badge-outline">no owner</h2>
             )}
@@ -216,28 +290,42 @@ function OrganizationProfilePage() {
                             </td>
                             <td>{owner.created_at.split("T")[0]}</td>
                             <th>
-                              <button className="btn btn-sm hover:btn-info rounded-full">
-                                <svg
-                                  viewBox="0 0 20 20"
-                                  width={20}
-                                  height={20}
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="#00FF99"
+                              <div className="dropdown dropdown-left">
+                                <div
+                                  tabIndex={0}
+                                  role="button"
+                                  className="btn btn-sm hover:btn-info rounded-full"
                                 >
-                                  <path
-                                    d="M9 15C9 14.4477 9.44771 14 10 14C10.5523 14 11 14.4477 11 15C11 15.5523 10.5523 16 10 16C9.44771 16 9 15.5523 9 15Z"
+                                  <svg
+                                    viewBox="0 0 20 20"
+                                    width={20}
+                                    height={20}
+                                    xmlns="http://www.w3.org/2000/svg"
                                     fill="#00FF99"
-                                  ></path>
-                                  <path
-                                    d="M9 10.0001C9 9.44778 9.44772 9.00006 10 9.00006C10.5523 9.00006 11 9.44778 11 10.0001C11 10.5523 10.5523 11.0001 10 11.0001C9.44771 11.0001 9 10.5523 9 10.0001Z"
-                                    fill="#00FF99"
-                                  ></path>
-                                  <path
-                                    d="M9 5C9 4.44772 9.44772 4 10 4C10.5523 4 11 4.44772 11 5C11 5.55228 10.5523 6 10 6C9.44772 6 9 5.55228 9 5Z"
-                                    fill="#00FF99"
-                                  ></path>
-                                </svg>{" "}
-                              </button>
+                                  >
+                                    <path
+                                      d="M9 15C9 14.4477 9.44771 14 10 14C10.5523 14 11 14.4477 11 15C11 15.5523 10.5523 16 10 16C9.44771 16 9 15.5523 9 15Z"
+                                      fill="#00FF99"
+                                    ></path>
+                                    <path
+                                      d="M9 10.0001C9 9.44778 9.44772 9.00006 10 9.00006C10.5523 9.00006 11 9.44778 11 10.0001C11 10.5523 10.5523 11.0001 10 11.0001C9.44771 11.0001 9 10.5523 9 10.0001Z"
+                                      fill="#00FF99"
+                                    ></path>
+                                    <path
+                                      d="M9 5C9 4.44772 9.44772 4 10 4C10.5523 4 11 4.44772 11 5C11 5.55228 10.5523 6 10 6C9.44772 6 9 5.55228 9 5Z"
+                                      fill="#00FF99"
+                                    ></path>
+                                  </svg>{" "}
+                                </div>
+                                <ul
+                                  tabIndex={0}
+                                  className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                                >
+                                  <li>
+                                    <p>n/a</p>
+                                  </li>
+                                </ul>
+                              </div>
                             </th>
                           </tr>
                         )}
@@ -307,28 +395,56 @@ function OrganizationProfilePage() {
                                   }
                                 </td>
                                 <th>
-                                  <button className="btn btn-sm hover:btn-info rounded-full">
-                                    <svg
-                                      viewBox="0 0 20 20"
-                                      width={20}
-                                      height={20}
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="#00FF99"
+                                  <div className="dropdown dropdown-left">
+                                    <div
+                                      tabIndex={0}
+                                      role="button"
+                                      className="btn btn-sm hover:btn-info rounded-full"
                                     >
-                                      <path
-                                        d="M9 15C9 14.4477 9.44771 14 10 14C10.5523 14 11 14.4477 11 15C11 15.5523 10.5523 16 10 16C9.44771 16 9 15.5523 9 15Z"
+                                      <svg
+                                        viewBox="0 0 20 20"
+                                        width={20}
+                                        height={20}
+                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="#00FF99"
-                                      ></path>
-                                      <path
-                                        d="M9 10.0001C9 9.44778 9.44772 9.00006 10 9.00006C10.5523 9.00006 11 9.44778 11 10.0001C11 10.5523 10.5523 11.0001 10 11.0001C9.44771 11.0001 9 10.5523 9 10.0001Z"
-                                        fill="#00FF99"
-                                      ></path>
-                                      <path
-                                        d="M9 5C9 4.44772 9.44772 4 10 4C10.5523 4 11 4.44772 11 5C11 5.55228 10.5523 6 10 6C9.44772 6 9 5.55228 9 5Z"
-                                        fill="#00FF99"
-                                      ></path>
-                                    </svg>{" "}
-                                  </button>
+                                      >
+                                        <path
+                                          d="M9 15C9 14.4477 9.44771 14 10 14C10.5523 14 11 14.4477 11 15C11 15.5523 10.5523 16 10 16C9.44771 16 9 15.5523 9 15Z"
+                                          fill="#00FF99"
+                                        ></path>
+                                        <path
+                                          d="M9 10.0001C9 9.44778 9.44772 9.00006 10 9.00006C10.5523 9.00006 11 9.44778 11 10.0001C11 10.5523 10.5523 11.0001 10 11.0001C9.44771 11.0001 9 10.5523 9 10.0001Z"
+                                          fill="#00FF99"
+                                        ></path>
+                                        <path
+                                          d="M9 5C9 4.44772 9.44772 4 10 4C10.5523 4 11 4.44772 11 5C11 5.55228 10.5523 6 10 6C9.44772 6 9 5.55228 9 5Z"
+                                          fill="#00FF99"
+                                        ></path>
+                                      </svg>{" "}
+                                    </div>
+                                    <ul
+                                      tabIndex={0}
+                                      className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-fit gap-2"
+                                    >
+                                      <li>
+                                        {totalUsers[userInfo].map(
+                                          (up: UserPermissionData) => (
+                                            <button
+                                              key={up.id}
+                                              className="btn btn-sm btn-error text-xs rounded-md m-1"
+                                              onClick={() =>
+                                                handleModalOpen(up, userInfo)
+                                              }
+                                            >
+                                              {up.event_id
+                                                ? `remove guest: ${up.event_id}`
+                                                : `remove ${up.kind}`}
+                                            </button>
+                                          ),
+                                        )}
+                                      </li>
+                                    </ul>
+                                  </div>
                                 </th>
                               </tr>
                             ),
@@ -522,6 +638,41 @@ function OrganizationProfilePage() {
                 </div>
               </div>
             </div>
+            {/* MODAL */}
+            <dialog id="updateUserPermissionModal" className="modal">
+              <div className="modal-box border border-info">
+                <h3 className="font-bold text-lg">Remove Permission</h3>
+                <p className="py-4">
+                  {`are you sure you want to disable ${selectedUserData.event_id ? `guest access in event: ${selectedUserData.event_id}` : `${selectedUserData.kind} access`} for ${selectedUserData.email}?`}
+                </p>
+                <div className="modal-action">
+                  <button
+                    className={
+                      status === "ready"
+                        ? "btn btn-primary rounded-md"
+                        : "btn btn-primary rounded-md btn-disabled"
+                    }
+                    onClick={() =>
+                      kickGuestUser({
+                        user_id: selectedUserData.user_id,
+                        event_id: selectedUserData.event_id,
+                      })
+                    }
+                  >
+                    {status === "ready" && "Confirm"}
+                    {status === "saving" && "Saving..."}
+                    {status === "success" && "Success!"}
+                    {status === "error" && "Error!"}
+                  </button>
+                  <form method="dialog">
+                    <button className="btn border-error rounded-md">
+                      Close
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </dialog>
+            {/* MODAL END */}
           </GlobalLayout.Content>
         </GlobalLayout>
       )}
