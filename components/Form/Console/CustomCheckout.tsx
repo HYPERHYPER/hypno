@@ -119,7 +119,15 @@ const CustomCheckout = () => {
     }
   };
 
-  const debouncedFetchResults = useCallback(debounce(fetchResults, 300), []);
+  // const debouncedFetchResults = useCallback(debounce(fetchResults, 300), []);
+  // const debouncedFetchResults = useCallback(
+  //   debounce((query) => fetchResults(query), 300),
+  //   [],
+  // );
+  const debouncedFetchResults = useCallback(
+    debounce((query) => fetchResults(query), 300),
+    [],
+  );
 
   useEffect(() => {
     if (input) debouncedFetchResults(input);

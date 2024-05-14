@@ -7,6 +7,7 @@ import useOrgAccessStore from "@/store/orgAccessStore";
 import { useForm } from "react-hook-form";
 import { SaveStatus } from "@/components/Form/AutosaveStatusText";
 import FormControl from "@/components/Form/FormControl";
+import withAuth from "@/components/hoc/withAuth";
 
 const userRoles = [
   { name: "member", id: 3 },
@@ -20,9 +21,7 @@ const GlobalInvite = () => {
   const isLoadingOrgs = useOrgAccessStore.useIsLoading();
 
   useEffect(() => {
-    if (!!organizations.length) {
-      getOrganizations();
-    }
+    getOrganizations();
   }, []);
 
   const [status, setStatus] = useState<SaveStatus>("ready");
@@ -166,4 +165,4 @@ const GlobalInvite = () => {
   );
 };
 
-export default GlobalInvite;
+export default withAuth(GlobalInvite, "hypno");
