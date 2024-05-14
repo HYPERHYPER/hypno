@@ -49,9 +49,9 @@ function OrganizationProfilePage() {
   const router = useRouter();
   const { query } = router;
 
-  const user = useUserStore.useUser();
-  const isHypnoUser = useUserStore.useIsHypnoUser();
-  const updateUser = useUserStore.useUpdateUser();
+  // const user = useUserStore.useUser();
+  // const isHypnoUser = useUserStore.useIsHypnoUser();
+  // const updateUser = useUserStore.useUpdateUser();
   const token = useUserStore.useToken();
 
   const [selectedUserData, setSelectedUserData] = useState({
@@ -427,19 +427,21 @@ function OrganizationProfilePage() {
                                       className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-fit gap-2"
                                     >
                                       <li>
-                                        {totalUsers[userInfo].map((up) => (
-                                          <button
-                                            key={up.id}
-                                            className="btn btn-sm btn-error text-xs rounded-md m-1"
-                                            onClick={() =>
-                                              handleModalOpen(up, userInfo)
-                                            }
-                                          >
-                                            {up.event_id
-                                              ? `remove guest: ${up.event_id}`
-                                              : `remove ${up.kind}`}
-                                          </button>
-                                        ))}
+                                        {totalUsers[userInfo].map(
+                                          (up: UserPermissionData) => (
+                                            <button
+                                              key={up.id}
+                                              className="btn btn-sm btn-error text-xs rounded-md m-1"
+                                              onClick={() =>
+                                                handleModalOpen(up, userInfo)
+                                              }
+                                            >
+                                              {up.event_id
+                                                ? `remove guest: ${up.event_id}`
+                                                : `remove ${up.kind}`}
+                                            </button>
+                                          ),
+                                        )}
                                       </li>
                                     </ul>
                                   </div>
