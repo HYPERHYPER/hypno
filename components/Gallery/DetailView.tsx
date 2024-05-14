@@ -7,7 +7,7 @@ import useContentHeight from "@/hooks/useContentHeight";
 import _ from 'lodash';
 import { toTextColor } from "@/helpers/color";
 import useWidth from "@/hooks/useWidth";
-import { downloadPhoto } from "@/helpers/image";
+import { downloadPhoto, getAspectRatio } from "@/helpers/image";
 import useMagic from "@/hooks/useMagic";
 import MagicButton from "../ImageGeneration/MagicButton";
 import MagicImageItem from "../ImageGeneration/ImageAsset";
@@ -50,6 +50,20 @@ export default function DetailView({ asset, config, imageProps }: any) {
     const width = useWidth();
     const btnColor = config?.color === '#00FF99' ? null : config.color;
     const enableAiMagic = !asset.mp4_url && config?.ai_generation && config?.ai_generation.enabled;
+
+    // get watermark to be applied to image generation
+    const aspectRatio = Number(getAspectRatio(asset.width, asset.height))
+    // check if apply graphics is turned on (stored in pro_raw_upload) - since watermarks are applied to raw url
+    const watermarkUrl = config.rawEnabled ? _.first(_.filter(config?.watermarks, (wm) => {
+        const w_h = wm.name.split(":")
+        const ar = Number(w_h[0]) / Number(w_h[1])
+        return ar === aspectRatio
+    }))?.watermark_url : null;
+    const watermark = {
+        url: watermarkUrl,
+        blendmode: config.watermarkBlendmode
+    }
+
     // portrait
     // mobile
     // desktop
@@ -90,16 +104,35 @@ export default function DetailView({ asset, config, imageProps }: any) {
             </a>
             :
             <></>
-            // <button
-            //     style={style}
-            //     className={className}
-            //     onClick={() => {
-            //         downloadPhoto(asset, downloadFiletype);
-            //         updateDownloadedMetadata();
-            //     }}
-            // >{text}</button>
+        // <button
+        //     style={style}
+        //     className={className}
+        //     onClick={() => {
+        //         downloadPhoto(asset, downloadFiletype);
+        //         updateDownloadedMetadata();
+        //     }}
+        // >{text}</button>
     }
-    
+
+    useEffect(() => {
+        const loadImage = () => {
+            const img = new window.Image(); // Check if window is defined before using Image constructor
+            img.onload = () => {
+                setIsLoaded(true);
+            };
+            img.src = displayUrl;
+
+            // If the image is already loaded before the onload event is attached
+            if (img.complete) {
+                setIsLoaded(true);
+            }
+        };
+
+        if (typeof window !== 'undefined') {
+            loadImage();
+        }
+    }, [displayUrl]);
+
     return (
         <>
             <div
@@ -126,18 +159,20 @@ export default function DetailView({ asset, config, imageProps }: any) {
                             <VideoAsset src={asset.mp4_url} poster={asset.posterframe} />
                         ) : (
                             <div className='block'>
-                                {/* <img
-                                    //@ts-ignore
-                                    onLoad={(e) => {setAssetHeight(e.target.height); setIsLoaded(true);}}
-                                    //@ts-ignore
-                                    onResize={(e) => setAssetHeight(e.target.height)}
-                                    src={asset.urls.url}
+                                <img
+                                    {...imageProps}
+                                    id='detail-view-image'
+                                    // onLoad={(e: React.SyntheticEvent<HTMLImageElement>) => {console.log('LOADING'); setAssetHeight(e.currentTarget.height); setIsLoaded(true);}}
+                                    onResize={(e: React.SyntheticEvent<HTMLImageElement>) => setAssetHeight(e.currentTarget.height)}
+                                    src={displayUrl}
                                     alt={`${asset.event_id}-${asset.id}`}
                                     style={isPortrait && assetHeight > Number(outerHeight.split('px')[0]) ? { minHeight: height } : {}}
-                                    className={isPortrait ? `w-auto h-auto` : `w-full h-auto sm:max-h-[70vh]`} />
-                             */}
-                                <Image
+                                    className={isPortrait ? `w-auto h-auto` : `w-full h-auto sm:max-h-[70vh]`} 
+                                    />
+                            
+                                {/* <Image
                                     {...imageProps}
+                                    id='detail-view-image'
                                     onLoadingComplete={() => setIsLoaded(true)}
                                     //@ts-ignore
                                     onLoad={(e) => setAssetHeight(e.target.height)}
@@ -149,7 +184,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                                     alt={`${asset.event_id}-${asset.id}`}
                                     placeholder={imageProps?.blurDataURL ? 'blur' : 'empty'}
                                     style={isPortrait && assetHeight > Number(outerHeight.split('px')[0]) ? { minHeight: height } : {}}
-                                    className={isPortrait ? `w-auto h-auto` : `w-full h-auto sm:max-h-[70vh]`} />
+                                    className={isPortrait ? `w-auto h-auto` : `w-full h-auto sm:max-h-[70vh]`} /> */}
                             </div>
                         )}
                     </div>
@@ -159,7 +194,13 @@ export default function DetailView({ asset, config, imageProps }: any) {
                     <div ref={containerRef} className="mt-7 w-full h-auto pb-[36px]">
                         {(!_.isEmpty(images)) && (
                             _.map(images, (img, i) => (
-                                <MagicImageItem image={img} key={i} updateEditorPrompt={editTextPrompt} />
+                                <MagicImageItem 
+                                    image={img} 
+                                    watermark={watermark}
+                                    key={i} 
+                                    updateEditorPrompt={editTextPrompt} 
+                                    disablePromptEditor={config?.ai_generation?.disable_prompt_editor}
+                                />
                             ))
                         )}
                     </div>

@@ -135,7 +135,7 @@
     }
 
     .list.list-sm .item {
-        @apply flex h-fit flex-row items-center justify-between border-b-[1px] border-white/20 py-1 text-sm font-normal sm:h-fit 2xl:border-b-2 2xl:py-1 2xl:text-sm;
+        @apply flex h-fit flex-row items-center justify-between border-b-[1px] border-white/20 py-1 text-lg font-normal sm:h-fit 2xl:py-1 2xl:text-lg;
     }
 
     .input,

@@ -125,6 +125,7 @@ const EventForm = (props: FormData) => {
             magic_button_url: event?.metadata?.magic_button?.url || '',
             // email_delivery: event?.metadata?.email_delivery || false,
             ai_generation: event?.metadata?.ai_generation || {},
+            pro_raw_upload: event?.metadata?.pro_raw_upload || false,
         }
     });
 

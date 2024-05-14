@@ -153,6 +153,12 @@ export default function EffectsModal({
                         ))}
                     </div>
                 </FormControl>
+                <FormControl label='apply graphics?'>
+                    <input type="checkbox" className="toggle pro toggle-lg" {...register('pro_raw_upload')} />
+                </FormControl>
+                <FormControl label='disable prompt editor?' altLabel="input for users to edit image generation prompt will be hidden">
+                    <input type="checkbox" className="toggle pro toggle-lg" {...register('ai_generation.disable_prompt_editor')} />
+                </FormControl>
                 {ai_generation.type != 'custom' && (
                     <FormControl label='keywords' dir='col'>
                         <h3 className="text-white/40 sm:text-xl">enter descriptive text prompts in priority order to style your content</h3>

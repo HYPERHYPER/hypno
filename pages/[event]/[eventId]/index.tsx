@@ -118,6 +118,9 @@ const SubGallery = (props: ResponseData) => {
         color: gallery.primary_color, 
         qr_asset_download: event?.metadata?.qr_asset_download,
         displayFileType: event?.filetype_download,
+        watermarks: event?.event_filter_watermarks,
+        watermarkBlendmode: event?.metadata?.blendmode,
+        rawEnabled: event?.metadata?.pro_raw_upload, // if raw is enabled, apply watermark
     }
 
     return (
@@ -132,7 +135,7 @@ const SubGallery = (props: ResponseData) => {
 
             <CustomGallery event={event} galleryBanner={showBrowseGalleryBanner} defaultBackground={isDetailView ? photo.posterframe : _.first(photos)?.posterframe}>
                 {isDetailView ? (
-                    <DetailView asset={photo} config={detailViewConfig} imageProps={{ ...placeholder?.img, blurDataURL: placeholder?.base64 }} />
+                    <DetailView asset={photo} config={detailViewConfig} imageProps={{ ...placeholder?.img }} />
                 ) : (
                     <div
                         style={{ height: outerHeight }}
@@ -309,6 +312,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
                 metadata: eventData.metadata || {},
                 event_type: eventData.event_type || '',
                 filetype_download: eventData.filetype_download || '',
+                event_filter_watermarks: eventData.event_filter_watermarks || [],
                 custom_frontend: {
                     ...(eventData.custom_gallery_assigned == '1' && { ...eventData.custom_frontend }),
                     ...(deliverySlug && { email_delivery: true })

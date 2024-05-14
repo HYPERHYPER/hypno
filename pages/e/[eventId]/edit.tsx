@@ -47,7 +47,8 @@ const EditEventPage = (props: ResponseData) => {
         const customFrontendKeys = ['logo_image', 'home_background_image', 'primary_color', 'data_capture', 'fields', 'data_capture_title', 'data_capture_subtitle', 'enable_legal', 'explicit_opt_in', 'terms_privacy', 'email_delivery'];
         let filter: any = {};
         let delivery: string = '';
-        let metadata: any = {};
+        let metadata: any = { ...event.metadata };
+        let pro_raw_upload: boolean | undefined = undefined;
 
         // Build event payload - any field that's not watermark
         // Build watermark payload in seperate reqs by watermark_id
@@ -71,6 +72,9 @@ const EditEventPage = (props: ResponseData) => {
                 if (key == 'ai_generation') {
                     metadata = { ai_generation: { ...field[key]} }
                 }
+                if (key == 'pro_raw_upload') {
+                    pro_raw_upload = field[key];
+                }
             }
         })
 
@@ -79,7 +83,8 @@ const EditEventPage = (props: ResponseData) => {
             ...(!_.isEmpty(custom_frontend) && { custom_frontend }),
             ...(!_.isEmpty(filter) && { filter }),
             ...(delivery && { delivery }),
-            ...(!_.isEmpty(metadata) && { metadata })
+            ...(!_.isEmpty(metadata) && { metadata }),
+            ...(!_.isUndefined(pro_raw_upload) && { pro_raw_upload })
         }
         if (!_.isEmpty(eventPayload)) {
             payloadArr.push(eventPayload);

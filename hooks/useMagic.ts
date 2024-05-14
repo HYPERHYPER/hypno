@@ -147,7 +147,7 @@ export default function useMagic(config: AiConfig, asset: any) {
         const imgAspectRatioParam = `--ar ${calculateAspectRatioString(asset?.width, asset?.height)}`
         const parameters = _.isNil(config?.midjourney_parameters) ? '' : config?.midjourney_parameters;
         const data = {
-            prompt: `${asset.urls.url} ${img_prompts} ${textPrompt} ${imgAspectRatioParam} ${parameters}`
+            prompt: `${asset.urls.url} ${img_prompts} ${textPrompt} ${imgAspectRatioParam} ${parameters} --cref ${asset.urls.url} --sref ${asset.urls.url}`
         };
 
         let promptResponseData: any;
