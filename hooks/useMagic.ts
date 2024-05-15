@@ -20,7 +20,7 @@ export default function useMagic(config: AiConfig, asset: any) {
 
     const editTextPrompt = (updatedText: string) => setTextPrompt(updatedText);
 
-    const customModel = _.find(config?.custom?.models, m => (m.id === config.custom?.current) && m.lora_url)
+    const customModel = _.find(config?.custom?.models, m => (m.id === config.custom?.current) && m.lora_url) || Object.values(config?.custom?.models)[0]
 
     // Custom 
     async function generateCustomModelImage() {
@@ -44,7 +44,7 @@ export default function useMagic(config: AiConfig, asset: any) {
                     prompt: `a photo in the style of TOK, ${textPrompt}`,
                     refine: "base_image_refiner",
                     img2img: false,
-                    strength: 0.71,
+                    strength: 0.79,
                     scheduler: "K_EULER",
                     lora_scale: 0.95,
                     num_outputs: 4,
