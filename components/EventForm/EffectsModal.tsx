@@ -30,9 +30,7 @@ export default function EffectsModal({
 
     const [modelName, setModelName] = useState<string>('');
     const [zipFile, setZipFile] = useState<string>();
-    const [taskType, setTaskType] = useState<string>('style');
     const [customModelView, setCustomModelView] = useState<'train' | 'edit' | 'default'>('default')
-    const [customPrompt, setCustomPrompt] = useState<string>('a photo in the style of <1>')
     const handleNavigateCustomModelView = (e: any, view: 'train' | 'edit' | 'default') => {
         e.preventDefault();
         setCustomModelView(view)
@@ -51,8 +49,7 @@ export default function EffectsModal({
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                instance_data: zipFile,
-                task: taskType,
+                input_images: zipFile,
             }),
         });
         let prediction = await response.json();
@@ -253,18 +250,6 @@ export default function EffectsModal({
                                 </FormControl>
                                 <FormControl label="zip file" altLabel="upload a zip file of 20-100 training images to fine tune your model">
                                     <FileInput uploadCategory="ai" inputId='trainingPhotosInput' onInputChange={(val) => setZipFile(val)} value={zipFile} />
-                                </FormControl>
-                                <FormControl label="task type">
-                                    <div className='flex flex-row gap-3 text-xl sm:text-4xl'>
-                                        {_.map(['style', 'object'], (type, i) => (
-                                            <div
-                                                key={i}
-                                                onClick={() => setTaskType(type)}
-                                                className={clsx('cursor-pointer transition', taskType == type ? 'text-primary' : 'text-primary/40')}>
-                                                {type}
-                                            </div>
-                                        ))}
-                                    </div>
                                 </FormControl>
                                 <div className="list pro">
                                     <button className="item text-primary w-full" onClick={trainModel}><span className="text-white/40">$0.49 to run</span>start training →</button>

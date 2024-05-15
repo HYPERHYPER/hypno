@@ -1,8 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 
+// find url
+const SAFETENSORS = "b2a308762e36ac48d16bfadc03a65493fe6e799f429f7941639a6acec5b276cc"
+
+// https://replicate.com/zylim0702/sdxl-lora-customize-training
+const TRAINED_MODEL_TAR_ID = "2ea90da29b19984472a0bbad4ecb39abe4b91fa0d6a5e8dc59988022149dee55"
+
 export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse<any>
+  req: NextApiRequest,
+  res: NextApiResponse<any>
 ) {
   const response = await fetch("https://api.replicate.com/v1/predictions", {
     method: "POST",
@@ -11,25 +17,40 @@ export default async function handler(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      // Pinned to a specific version of Stable Diffusion
-      // See https://replicate.com/stability-ai/sdxl
-      version:  "b2a308762e36ac48d16bfadc03a65493fe6e799f429f7941639a6acec5b276cc",
+      version: TRAINED_MODEL_TAR_ID,
       input: {
-        task: req.body.task,
-        instance_data: req.body.instance_data,
-        // resolution: 1024, // not enough memory
-      },
+        input_images: req.body.input_images,
+        use_face_detection_instead: true,
+        token_string: "TOK",
+        caption_prefix: "a photo in the style of TOK",
+        ti_lr: 0.0003,
+        is_lora: true,
+        lora_lr: 0.0001,
+        verbose: true,
+        lora_rank: 32,
+        resolution: 1024,
+        lr_scheduler: "constant",
+        lr_warmup_steps: 100,
+        max_train_steps: 1000,
+        num_train_epochs: 4000,
+        train_batch_size: 4,
+        unet_learning_rate: 0.000001,
+        checkpointing_steps: 999999,
+        clipseg_temperature: 1,
+        input_images_filetype: "infer",
+        crop_based_on_salience: true,
+    },
     }),
-  });
+});
 
-  if (response.status !== 201) {
-    let error = await response.json();
-    res.statusCode = 500;
-    res.end(JSON.stringify({ detail: error.detail }));
-    return;
-  }
+if (response.status !== 201) {
+  let error = await response.json();
+  res.statusCode = 500;
+  res.end(JSON.stringify({ detail: error.detail }));
+  return;
+}
 
-  const prediction = await response.json();
-  res.statusCode = 201;
-  res.end(JSON.stringify(prediction));
+const prediction = await response.json();
+res.statusCode = 201;
+res.end(JSON.stringify(prediction));
 }

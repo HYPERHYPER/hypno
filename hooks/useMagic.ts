@@ -19,7 +19,7 @@ export default function useMagic(config: AiConfig, asset: any) {
     const [error, setError] = useState<boolean>(false);
 
     const editTextPrompt = (updatedText: string) => setTextPrompt(updatedText);
-    
+
     const customModel = _.find(config?.custom?.models, m => (m.id === config.custom?.current) && m.lora_url)
 
     // Custom 
@@ -40,10 +40,19 @@ export default function useMagic(config: AiConfig, asset: any) {
             body: JSON.stringify({
                 input: {
                     image: `${asset.urls.url}?width=512`,
-                    lora_urls:  customModel?.lora_url || '',
-                    prompt: `a photo in the style of <1>, ${textPrompt}`,
-                    prompt_strength: 0.4,
-                    lora_scales: '0.7'
+                    lora_weights: customModel?.lora_url || '',
+                    prompt: `a photo in the style of TOK, ${textPrompt}`,
+                    refine: "base_image_refiner",
+                    img2img: false,
+                    strength: 0.71,
+                    scheduler: "K_EULER",
+                    lora_scale: 0.95,
+                    num_outputs: 4,
+                    refine_steps: 30,
+                    guidance_scale: 6.32,
+                    apply_watermark: true,
+                    condition_scale: 1.5,
+                    num_inference_steps: 40
                 }
             }),
         });
@@ -65,8 +74,8 @@ export default function useMagic(config: AiConfig, asset: any) {
                 console.log('Error', prediction.detail);
                 return;
             }
-            
-            const magicImage : MagicImage = {
+
+            const magicImage: MagicImage = {
                 src: _.first(prediction.output),
                 status: prediction.status,
                 textPrompt,
@@ -119,8 +128,8 @@ export default function useMagic(config: AiConfig, asset: any) {
                 console.log('Error', prediction.detail);
                 return;
             }
-            
-            const magicImage : MagicImage = {
+
+            const magicImage: MagicImage = {
                 src: _.first(prediction.output),
                 status: prediction.status,
                 textPrompt,
@@ -159,43 +168,43 @@ export default function useMagic(config: AiConfig, asset: any) {
                 },
                 body: JSON.stringify({ prompt: data.prompt })
             });
-     
+
             if (response.ok) {
                 promptResponseData = await response.json();
                 console.log(promptResponseData);
 
                 const intervalId = setInterval(async function () {
                     try {
-                      console.log('Checking image details');
-                      const response = await fetch(`/api/imagine/${promptResponseData.data.id}`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json'
+                        console.log('Checking image details');
+                        const response = await fetch(`/api/imagine/${promptResponseData.data.id}`, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        })
+
+                        const responseData = await response.json();
+                        if (responseData.data.status === 'completed' || responseData.data.status === 'failed') {
+                            // stop repeating
+                            clearInterval(intervalId);
+                            const imageGrid = responseData.data.url;
+                            const upscaledImage = _.first(responseData.data.upscaled_urls);
+                            const image = upscaledImage || imageGrid;
+                            const magicImage = {
+                                src: image,
+                                status: responseData.data.status,
+                                textPrompt,
+                                urls: responseData.data.upscaled_urls,
+                            }
+                            setImages((prev) => [...prev.slice(0, -1), magicImage]); // replace with loaded url
+                            setIsLoading(false);
+                            console.log('Completed image details', responseData.data);
+                        } else {
+                            console.log("Image is not finished generation. Status: ", responseData.data.status)
                         }
-                      })
-             
-                      const responseData = await response.json();
-                      if (responseData.data.status === 'completed' || responseData.data.status === 'failed') {
-                        // stop repeating
-                        clearInterval(intervalId);
-                        const imageGrid = responseData.data.url;
-                        const upscaledImage = _.first(responseData.data.upscaled_urls);
-                        const image = upscaledImage || imageGrid;
-                        const magicImage = {
-                            src: image,
-                            status: responseData.data.status,
-                            textPrompt,
-                            urls: responseData.data.upscaled_urls,
-                        }
-                        setImages((prev) => [...prev.slice(0, -1), magicImage]); // replace with loaded url
-                        setIsLoading(false);
-                        console.log('Completed image details', responseData.data);
-                      } else {
-                        console.log("Image is not finished generation. Status: ", responseData.data.status)
-                      }
                     } catch (error) {
-                      console.error('Error getting updates', error);
-                      throw error;
+                        console.error('Error getting updates', error);
+                        throw error;
                     }
                 }, 5000 /* every 5 seconds */);
             }
@@ -206,7 +215,7 @@ export default function useMagic(config: AiConfig, asset: any) {
             throw error;
         }
     }
-    
+
     const generateAiImage = () => {
         switch (config.type) {
             case "custom": return generateCustomModelImage();

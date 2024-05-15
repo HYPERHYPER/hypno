@@ -56,6 +56,7 @@ export function ImageAsset({ src, error, watermark }: { src?: string, error?: bo
                             src={src}
                             alt={`ai-${src}`}
                             className={clsx('w-auto m-auto transition duration-300', loadImage ? 'opacity-100' : 'opacity-0')}
+                            style={{ width: `${width}px`, height: `${height}px`}}
                         />
                     )
                 )}
@@ -103,6 +104,7 @@ export const ImageCarousel = ({ urls, watermark }: { urls?: string[], watermark?
                         src={src}
                         alt={`ai-${i}`}
                         className={clsx('h-auto w-full object-cover transition duration-300', loadImage ? 'opacity-100' : 'opacity-0')}
+                        style={{ width: `${width}px`, height: `${height}px`}}
                     />
                 })}
             </Carousel>
@@ -121,11 +123,12 @@ export default function MagicImageItem({ image, watermark, updateEditorPrompt, d
         updateEditorPrompt(textPrompt);
     }
 
-    const hasUpscaledImages = _.size(image.urls) > 1;
+    const hasMultipleImages = _.size(image.urls) > 1;
+
     return (
         <div className='mb-7'>
             <div className='flex justify-center'>
-                {status == 'completed' && hasUpscaledImages ? (
+                {(status == 'completed' || status == 'succeeded') && hasMultipleImages ? (
                     <ImageCarousel urls={image?.urls} watermark={watermark} />
                 ) : (
                     <ImageAsset src={src} error={status == 'failed'} watermark={watermark} />
