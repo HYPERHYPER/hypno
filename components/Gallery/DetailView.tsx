@@ -63,7 +63,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
     const watermark = (config.rawEnabled && watermarkUrl) ? {
         url: watermarkUrl,
         blendmode: config.watermarkBlendmode
-    } : null;
+    } : undefined;
 
     // portrait
     // mobile
