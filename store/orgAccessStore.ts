@@ -19,6 +19,7 @@ type OrgAccessAction = {
   ) => void;
   getOrganizations: () => void;
   setHasHydrated: (state: any) => void;
+  reset: () => void;
 };
 
 const useOrgAccessStoreBase = create<OrgAccessState & OrgAccessAction>()(
@@ -43,6 +44,9 @@ const useOrgAccessStoreBase = create<OrgAccessState & OrgAccessAction>()(
         } catch (error: any) {
           set({ error: error.message, isLoading: false });
         }
+      },
+      reset: () => { 
+        set({ organizations: [], isLoading: false, error: ""})
       },
       setHasHydrated: (state) => {
         set({

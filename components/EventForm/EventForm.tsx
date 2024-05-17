@@ -218,7 +218,9 @@ const EventForm = (props: FormData) => {
     const getOrganizations = useOrgAccessStore.useGetOrganizations();
     const isLoadingOrgs = useOrgAccessStore.useIsLoading();
     useEffect(() => {
-        getOrganizations();
+        if (_.isEmpty(organizations)) {
+            getOrganizations();
+        }
     }, []);
 
     const [featureAccess, setFeatureAccess] = useState<any>(null);

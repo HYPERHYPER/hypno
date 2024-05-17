@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware'
 import { destroyCookie, setCookie } from 'nookies'
 import { NewUser, UserInvite } from '@/types/users';
 import axios from 'axios';
+import useOrgAccessStore from './orgAccessStore';
 // import { isHypnoUser } from '@/helpers/user-privilege';
 
 type UserState = {
@@ -63,6 +64,8 @@ const useUserStoreBase = create<UserState & UserAction>()(
         try {
           await logoutUser(get().token);
           set({ user: null, token: null, isLoggedIn: false, isProUser: false, error: '' });
+          const resetOrgStore = useOrgAccessStore.getState().reset;
+          resetOrgStore();
         } catch (error: any) {
           set({ error: error.message });
         }
@@ -109,7 +112,7 @@ const useUserStoreBase = create<UserState & UserAction>()(
     }),
     {
       name: "hypno",
-      partialize: (state) => ({ token: state.token, user: state.user, isLoggedIn: state.isLoggedIn }),
+      partialize: (state) => ({ ...state, token: state.token, user: state.user, isLoggedIn: state.isLoggedIn }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       }
