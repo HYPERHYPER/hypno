@@ -56,7 +56,7 @@ export function ImageAsset({ src, error, watermark }: { src?: string, error?: bo
                             src={src}
                             alt={`ai-${src}`}
                             className={clsx('w-auto m-auto transition duration-300', loadImage ? 'opacity-100' : 'opacity-0')}
-                            style={{ width: `${width}px`, height: `${height}px`}}
+                            style={{ width: `${width}px`, height: `${height}px` }}
                         />
                     )
                 )}
@@ -67,13 +67,22 @@ export function ImageAsset({ src, error, watermark }: { src?: string, error?: bo
 
 export const ImageCarousel = ({ urls, watermark }: { urls?: string[], watermark?: WatermarkProps }) => {
     const [loadImage, setLoadImage] = useState<boolean>(false);
-    useEffect(() => {
-        setLoadImage(true)
-    }, [])
-
     const { width, height } = useElementSize('detail-view-image');
+
+    useEffect(() => {
+        // Preload images before setting loadImage to true
+        Promise.all(urls?.map(url => new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = url;
+            img.onload = resolve;
+            img.onerror = reject;
+        })) || []).then(() => {
+            setLoadImage(true);
+        });
+    }, [urls]);
+
     return (
-        <div style={{ width: `${width}px`, height: `${height}px`}}>
+        <div style={{ width: `${width}px`, height: `${height}px` }}>
             <Carousel
                 className='bg-black/50 backdrop-blur-[50px]'
                 wrapAround={true}
@@ -85,12 +94,13 @@ export const ImageCarousel = ({ urls, watermark }: { urls?: string[], watermark?
                     pagingDotsStyle: { fill: 'white', scale: '125%', borderRadius: '100%' },
                     pagingDotsContainerClassName: 'space-x-3',
                 }}
-            style={{ width: `${width}px`, height: `${height}px`}}
+                style={{ width: `${width}px`, height: `${height}px` }}
             >
                 {_.map(urls, (src, i) => {
                     if (watermark) {
                         return (
-                            <div key={i}>
+                            <div key={i}
+                                className={clsx('transition duration-300', loadImage ? 'opacity-100' : 'opacity-0')}>
                                 <GraphicOverlay
                                     imageUrl={src}
                                     watermark={watermark}
@@ -104,7 +114,7 @@ export const ImageCarousel = ({ urls, watermark }: { urls?: string[], watermark?
                         src={src}
                         alt={`ai-${i}`}
                         className={clsx('h-auto w-full object-cover transition duration-300', loadImage ? 'opacity-100' : 'opacity-0')}
-                        style={{ width: `${width}px`, height: `${height}px`}}
+                        style={{ width: `${width}px`, height: `${height}px` }}
                     />
                 })}
             </Carousel>

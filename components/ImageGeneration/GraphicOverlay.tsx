@@ -39,26 +39,37 @@ const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps)
                     loadImage(imageUrl),
                     loadImage(watermarkUrl),
                 ]);
-        
+
                 // Calculate scaling factors for the image and watermark
                 const imageScaleFactor = Math.min(width / image.width, height / image.height);
                 const watermarkScaleFactor = Math.min(width / watermark.width, height / watermark.height);
-        
+
                 // Set canvas dimensions to match element size
-                canvas.width = width;
-                canvas.height = height;
+                // Increase canvas size for higher resolution
+                const canvasWidth = width * window.devicePixelRatio;
+                const canvasHeight = height * window.devicePixelRatio;
+                canvas.width = canvasWidth;
+                canvas.height = canvasHeight;
+
+                // Scale canvas context to match device pixel ratio
+                canvas.style.width = `${width}px`;
+                canvas.style.height = `${height}px`;
+                context.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+                // Set image smoothing for better quality
+                context.imageSmoothingEnabled = true;
 
                 // Clear the canvas
-                context.clearRect(0, 0, width, height);
+                context.clearRect(0, 0, canvasWidth, canvasHeight);
 
                 // Draw the image
                 const scaledImageWidth = image.width * imageScaleFactor;
                 const scaledImageHeight = image.height * imageScaleFactor;
                 context.drawImage(image, 0, 0, scaledImageWidth, scaledImageHeight);
-        
+
                 // Set blend mode
                 context.globalCompositeOperation = blendMode as GlobalCompositeOperation; // Change blend mode as needed
-        
+
                 // Scale watermark to match image dimensions
                 const scaledWatermarkWidth = watermark.width * watermarkScaleFactor;
                 const scaledWatermarkHeight = watermark.height * watermarkScaleFactor;
@@ -74,11 +85,11 @@ const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps)
     }, [imageUrl, watermarkUrl, width, height, canvasRef.current, loadImage]);
 
     return (
-        <canvas 
+        <canvas
             id={`ai-${imageUrl}`}
-            style={{ width: `${width}px`, height: `${height}px`}}  
-            ref={canvasRef} 
-            />
+            style={{ width: `${width}px`, height: `${height}px` }}
+            ref={canvasRef}
+        />
     );
 };
 
