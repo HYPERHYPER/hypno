@@ -24,7 +24,7 @@ export default function useMagic(config: AiConfig, asset: any) {
     const currentCustom = config?.custom?.current;
     const defaultModel = Object.values(config?.custom?.models || {})[0];
 
-    const customModel = customModels?.find((m: { id: string | undefined; lora_url: any; }) => m.id === currentCustom && m.lora_url) || defaultModel;
+    const customModel = _.find(customModels, (m: { id: string | undefined; lora_url: any; }) => m.id === currentCustom && m.lora_url) || defaultModel;
 
     // Custom 
     async function generateCustomModelImage() {
