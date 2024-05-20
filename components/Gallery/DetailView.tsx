@@ -21,7 +21,13 @@ export default function DetailView({ asset, config, imageProps }: any) {
     const [assetHeight, setAssetHeight] = useState<number>(0);
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
-    const { images, isLoading: isLoadingGeneration, textPrompt, editTextPrompt, generateAiImage } = useMagic(config.ai_generation, asset);
+    const { 
+        images, 
+        isLoading: isLoadingGeneration, 
+        textPrompt, 
+        editTextPrompt, 
+        generateAiImage 
+    } = useMagic({...config.ai_generation, apply_graphics: config.rawEnabled}, asset);
     const containerRef = useRef<HTMLDivElement | null>(null);
 
     const scrollToBottom = useCallback(() => {

@@ -39,18 +39,20 @@ export default async function handler(
         clipseg_temperature: 1,
         input_images_filetype: "infer",
         crop_based_on_salience: true,
-    },
+      },
+      // webhook: 'https://2f8b-2603-7000-4340-23bd-d9d2-49ff-35b4-3839.ngrok-free.app/api/train/replicate-webhook',
+      // webhook_events_filter: ["completed"]
     }),
-});
+  });
 
-if (response.status !== 201) {
-  let error = await response.json();
-  res.statusCode = 500;
-  res.end(JSON.stringify({ detail: error.detail }));
-  return;
-}
+  if (response.status !== 201) {
+    let error = await response.json();
+    res.statusCode = 500;
+    res.end(JSON.stringify({ detail: error.detail }));
+    return;
+  }
 
-const prediction = await response.json();
-res.statusCode = 201;
-res.end(JSON.stringify(prediction));
+  const prediction = await response.json();
+  res.statusCode = 201;
+  res.end(JSON.stringify(prediction));
 }

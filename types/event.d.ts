@@ -7,9 +7,10 @@ export type AiConfig = {
     midjourney_parameters?: string;
     custom?: {
         current?: string;
-        models?: any[];
+        models?: any;
     }
     disable_prompt_editor?: boolean;
+    apply_graphics?: boolean;
 }
 
 export type EventMicrosite = {

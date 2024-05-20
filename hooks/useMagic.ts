@@ -25,6 +25,8 @@ export default function useMagic(config: AiConfig, asset: any) {
     const defaultModel = Object.values(config?.custom?.models || {})[0];
 
     const customModel = _.find(customModels, (m: { id: string | undefined; lora_url: any; }) => m.id === currentCustom && m.lora_url) || defaultModel;
+    // const imageSrc = config.apply_graphics ? asset.raw : asset.urls.url;
+    const imageSrc = asset.urls.url;
 
     // Custom 
     async function generateCustomModelImage() {
@@ -43,7 +45,7 @@ export default function useMagic(config: AiConfig, asset: any) {
             },
             body: JSON.stringify({
                 input: {
-                    image: `${asset.urls.url}?width=512`,
+                    image: `${imageSrc}?width=512`,
                     lora_weights: customModel?.lora_url || '',
                     prompt: `a photo in the style of TOK, ${textPrompt}`,
                     refine: "base_image_refiner",
@@ -109,7 +111,7 @@ export default function useMagic(config: AiConfig, asset: any) {
             body: JSON.stringify({
                 type: 'sdxl',
                 input: {
-                    image: `${asset.urls.url}?width=512`,
+                    image: `${imageSrc}?width=512`,
                     prompt: textPrompt,
                 }
             }),
@@ -160,7 +162,7 @@ export default function useMagic(config: AiConfig, asset: any) {
         const imgAspectRatioParam = `--ar ${calculateAspectRatioString(asset?.width, asset?.height)}`
         const parameters = _.isNil(config?.midjourney_parameters) ? '' : config?.midjourney_parameters;
         const data = {
-            prompt: `${asset.urls.url} ${img_prompts} ${textPrompt} ${imgAspectRatioParam} ${parameters} --cref ${asset.urls.url} --sref ${asset.urls.url}`
+            prompt: `${imageSrc} ${img_prompts} ${textPrompt} ${imgAspectRatioParam} ${parameters} --cref ${imageSrc} --sref ${imageSrc}`
         };
 
         let promptResponseData: any;
