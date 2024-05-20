@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { GetServerSideProps } from 'next';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Head from 'next/head';
 import _ from 'lodash';
 import EventForm from '@/components/EventForm/EventForm';
@@ -12,6 +12,8 @@ import useUserStore from '@/store/userStore';
 import useSWR from 'swr';
 import { useRouter } from 'next/router';
 import { axiosGetWithToken } from '@/lib/fetchWithToken';
+import LoadingView from '@/components/LoadingView';
+import useOrgAccessStore from '@/store/orgAccessStore';
 
 interface ResponseData {
     status: number;
@@ -30,7 +32,7 @@ const EditEventPage = (props: ResponseData) => {
     const { data: eventData, isValidating: isValidatingEventData, error: eventError } = useSWR([eventUrl, token.access_token],
         ([url, token]) => axiosGetWithToken(url, token))
     
-    const event = initialEvent || eventData?.event;
+    const event = eventData?.event || initialEvent;
     const id = event?.id || null;
     const name = event?.name || '';
     const initialCustomFrontend = event?.custom_frontend;
@@ -38,6 +40,7 @@ const EditEventPage = (props: ResponseData) => {
     const [view, setView] = useState<'default' | 'data' | 'legal'>('default');
     const [status, setStatus] = useState<SaveStatus>('ready');
 
+    console.log(initialEvent)
     // Provided array of changed fields [{field_name: value}]
     const submitForm = (changedFieldsArr: any) => {
         let payloadArr: any = [];
@@ -47,7 +50,7 @@ const EditEventPage = (props: ResponseData) => {
         const customFrontendKeys = ['logo_image', 'home_background_image', 'primary_color', 'data_capture', 'fields', 'data_capture_title', 'data_capture_subtitle', 'enable_legal', 'explicit_opt_in', 'terms_privacy', 'email_delivery'];
         let filter: any = {};
         let delivery: string = '';
-        let metadata: any = { ...event.metadata };
+        let metadata: any = {};
         let pro_raw_upload: boolean | undefined = undefined;
 
         // Build event payload - any field that's not watermark
@@ -70,7 +73,8 @@ const EditEventPage = (props: ResponseData) => {
                     payloadArr.push(field);
                 }
                 if (key == 'ai_generation') {
-                    metadata = { ai_generation: { ...field[key]} }
+                    console.log('event.metadata', event.metadata)
+                    metadata = { ...event.metadata, ai_generation: { ...field[key]} }
                 }
                 if (key == 'pro_raw_upload') {
                     pro_raw_upload = field[key];
@@ -110,7 +114,7 @@ const EditEventPage = (props: ResponseData) => {
 
         // Use Promise.all to wait for all promises to resolve
         return Promise.all(promises);
-    }
+    };
 
     useEffect(() => {
         if (eventError || (!_.isNil(event?.event_type) && event?.event_type !== 'hypno_pro')) {
@@ -118,11 +122,10 @@ const EditEventPage = (props: ResponseData) => {
         }
     }, [eventError, event])
 
-    if (!event && isValidatingEventData) {
+    const orgsLoading = useOrgAccessStore.useIsLoading();
+    if ((!eventData && isValidatingEventData) || orgsLoading) {
         return (
-            <div className='flex min-h-screen flex-col items-center justify-center'>
-                <span className="loading loading-ring loading-lg sm:w-[200px] text-primary"></span>
-            </div>
+            <LoadingView />
         )
     }
 
