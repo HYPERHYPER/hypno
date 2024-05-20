@@ -361,7 +361,7 @@ const EventForm = (props: FormData) => {
 
                             <FormControl label='effects' featureGated={featureAccess?.effects ? undefined : 'creator'}>
                                 {config.ai_generation.enabled && <Modal.Trigger id='effects-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
-                                <input type="checkbox" className="toggle pro toggle-lg" {...register('ai_generation.enabled')} />
+                                <input type="checkbox" defaultChecked={config.ai_generation.enabled} className="toggle pro toggle-lg" {...register('ai_generation.enabled')} />
                             </FormControl>
 
                             <EffectsModal
@@ -369,7 +369,7 @@ const EventForm = (props: FormData) => {
                             />
 
                             <FormControl label='show delivery code'>
-                                <input type="checkbox" className="toggle pro toggle-lg" {...register('qr_delivery')} />
+                                <input type="checkbox" defaultChecked={config.qr_delivery} className="toggle pro toggle-lg" {...register('qr_delivery')} />
                             </FormControl>
                         </div >
                     )}
@@ -378,7 +378,7 @@ const EventForm = (props: FormData) => {
                         view == 'default' && (
                             <div className='lg:border-t-2 lg:border-white/20'>
                                 <FormControl label='branded gallery' featureGated={featureAccess?.custom_branding ? undefined : 'creator'}>
-                                    <input type="checkbox" className="toggle pro toggle-lg" {...register('custom_gallery_assigned')} />
+                                    <input type="checkbox" defaultChecked={config.custom_gallery_assigned} className="toggle pro toggle-lg" {...register('custom_gallery_assigned')} />
                                 </FormControl>
 
                                 {/* <div className='form-control '>
@@ -447,12 +447,12 @@ const EventForm = (props: FormData) => {
                             </FormControl> */}
 
                                 <FormControl label='private' nested={true} disabled={!config.custom_gallery_assigned}>
-                                    <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery_assigned} {...register('is_private')} />
+                                    <input type="checkbox" defaultChecked={config.is_private} className="toggle pro toggle-lg" disabled={!config.custom_gallery_assigned} {...register('is_private')} />
                                 </FormControl>
 
                                 <FormControl label='data/legal' nested={true} disabled={!config.custom_gallery_assigned} featureGated={featureAccess?.data_capture ? undefined : 'brand'}>
                                     {config.data_capture && config.custom_gallery_assigned && <Modal.Trigger id='data-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
-                                    <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery_assigned} {...register('data_capture')} />
+                                    <input type="checkbox" defaultChecked={config.data_capture} className="toggle pro toggle-lg" disabled={!config.custom_gallery_assigned} {...register('data_capture')} />
                                 </FormControl>
 
                                 <FormControl label='domain' nested={true} disabled={!config.custom_gallery_assigned} featureGated={featureAccess?.custom_domain ? undefined : 'brand'}>
