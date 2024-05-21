@@ -47,7 +47,7 @@ export default function useMagic(config: AiConfig, asset: any) {
                 input: {
                     image: `${imageSrc}?width=512`,
                     lora_weights: customModel?.lora_url || '',
-                    prompt: `a photo in the style of TOK, ${textPrompt}`,
+                    prompt: `In the style of TOK, ${textPrompt}`,
                     refine: "base_image_refiner",
                     img2img: false,
                     strength: 0.8,

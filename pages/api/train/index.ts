@@ -20,12 +20,12 @@ export default async function handler(
       version: TRAINED_MODEL_TAR_ID,
       input: {
         input_images: req.body.input_images,
-        use_face_detection_instead: true,
+        use_face_detection_instead: false,
         token_string: "TOK",
-        caption_prefix: "a photo in the style of TOK",
+        caption_prefix: "In the style of TOK,",
         ti_lr: 0.0003,
         is_lora: true,
-        lora_lr: 0.0001,
+        lora_lr: 0.0004, // speed up learning rate from 0.0001
         verbose: true,
         lora_rank: 32,
         resolution: 1024,

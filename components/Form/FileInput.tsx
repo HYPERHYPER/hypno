@@ -88,7 +88,7 @@ export default function FileInput(props: UploaderProps) {
         // Create a new Uint8Array from the ArrayBuffer
         const arrayBuffer = e.target.result as ArrayBuffer;
         const uint8Array = new Uint8Array(arrayBuffer);
-  
+
         // Set the file data and content type
         setFile(uint8Array.buffer);
         setContentType('application/zip');
@@ -102,9 +102,9 @@ export default function FileInput(props: UploaderProps) {
     setUploadStatus('uploading')
     const url = process.env.NEXT_PUBLIC_AWS_ENDPOINT as string;
     const resp = await axios.get(url, {
-      params: { 
-        fileName: getS3Filename(user.id, props.uploadCategory, newFilename, props.validateAspectRatio), 
-        contentType 
+      params: {
+        fileName: getS3Filename(user.id, props.uploadCategory, newFilename, props.validateAspectRatio),
+        contentType
       },
     });
 
@@ -154,9 +154,11 @@ export default function FileInput(props: UploaderProps) {
     <div className='flex gap-3 items-center'>
       <div className="dropdown dropdown-top dropdown-hover">
         <label tabIndex={0} className='text-lg sm:text-4xl text-primary truncate'>{uploadStatus == 'error' ? <span className='text-red-500'>error</span> : getFilename(props.value || '')}</label>
-        <div tabIndex={0} className='left-1/2 mb-5 dropdown-content bg-white/10 backdrop-blur-[30px] rounded-box p-3 sm:p-4'>
+        {contentType !== 'application/zip' &&
+          <div tabIndex={0} className='left-1/2 mb-5 dropdown-content bg-white/10 backdrop-blur-[30px] rounded-box p-3 sm:p-4'>
             <img className='max-h-[200px] w-auto' src={props.value || ''} />
-        </div>
+          </div>
+        }
       </div>
       <input
         type='file'

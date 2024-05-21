@@ -10,6 +10,7 @@ import clsx from "clsx";
 import axios from "axios";
 import { getS3Filename } from "@/helpers/text";
 import useUserStore from "@/store/userStore";
+import Timer from "../Timer";
 
 const AI_GENERATION_TYPES = ['custom', 'sdxl', 'midjourney']
 
@@ -126,7 +127,7 @@ export default function EffectsModal({
         }
         console.log('pred', prediction);
         let model_id = prediction.id;
-        setModelId(modelId);
+        setModelId(model_id);
         setValue('ai_generation.custom.models', {
             ...ai_generation?.custom?.models,
             [model_id]: {
@@ -317,7 +318,7 @@ export default function EffectsModal({
                                         <FormControl label="model name">
                                             <input className="input pro" value={modelName} onChange={(e) => setModelName(e.target.value)} />
                                         </FormControl>
-                                        <FormControl label="zip file" altLabel="upload a zip file of 20-100 training images to fine tune your model">
+                                        <FormControl label="zip file" altLabel="upload a zip file of training images to fine tune your model">
                                             <FileInput uploadCategory="ai" inputId='trainingPhotosInput' onInputChange={(val) => setZipFile(val)} value={zipFile} />
                                         </FormControl>
                                         <div className="list pro">
@@ -330,7 +331,7 @@ export default function EffectsModal({
                                             <div className="text-white text-xl sm:text-4xl">{modelName}</div>
                                         </FormControl>
                                         <FormControl label="status">
-                                            <div className="text-white text-xl sm:text-4xl flex items-center">{trainingStatus} {trainingStatus !== 'finished' && <span className="ml-2 loading" />}</div>
+                                            <div className="text-white text-xl sm:text-4xl flex items-center gap-2">{trainingStatus} {trainingStatus !== 'finished' && <span className="w-[50px] sm:min-w-[90px]"><Timer /></span>}</div>
                                         </FormControl>
                                         {trainingStatus == 'finished' &&
                                             <div className="list pro">
