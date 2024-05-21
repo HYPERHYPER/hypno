@@ -18,10 +18,15 @@ export default async function handler(
   // See https://replicate.com/batouresearch/sdxl-controlnet-lora
   // version: "3bb13fe1c33c35987b33792b01b71ed6529d03f165d1c2416375859f09ca9fef"
 
+  // Realvisxl-v3-multi-controlnet-lora
+  // See https://replicate.com/fofr/realvisxl-v3-multi-controlnet-lora
+  // version: "90a4a3604cd637cb9f1a2bdae1cfa9ed869362ca028814cdce310a78e27daade"
+
   const modelId = req.body.model == 'sdxl' ? 
     "39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b"
     :
-    "3bb13fe1c33c35987b33792b01b71ed6529d03f165d1c2416375859f09ca9fef";
+    "90a4a3604cd637cb9f1a2bdae1cfa9ed869362ca028814cdce310a78e27daade"
+    // "3bb13fe1c33c35987b33792b01b71ed6529d03f165d1c2416375859f09ca9fef";
 
   const response = await fetch("https://api.replicate.com/v1/predictions", {
     method: "POST",
@@ -34,7 +39,7 @@ export default async function handler(
       // This is the text prompt that will be submitted by a form on the frontend
       input: { 
         ...req.body.input,
-        negative_prompt: "ugly, disfigured, deformed, mutilated, mangled, warped, open mouth, distorted, blurry, crossed eyes, derailed eyes, weird pupils, heterochromia, odd eye colors, extra teeth, no teeth, weird teeth, lopsided mouth, malformed mouth, extra limbs, missing limbs, fused limbs, odd joints, contorted, malformed, disproportionate, unrealistic muscles, odd proportions, artifacts, noise, blurs, glitches, compression, pixelation, jpeg, poorly drawn, rendering issue, rendering failure, worst quality, low quality, bad anatomy, unrealistic body, unrealistic proportions, malformed hands, long neck, bad face, cloned face, cropped, watermarked, text, error, malformed, grotesque, monstrous, deformed, disfigured, mutated, multiple heads, multiple bodies, fused bodies, conjoined, corrupted, broken, wobbly, melting, stretchy, liquified"
+        negative_prompt: "(worst quality, low quality, illustration, 3d, 2d, painting, cartoons, sketch), open mouth, disfigured, deformed, mutilated, mangled, warped, distorted, blurry, crossed eyes, derailed eyes, weird pupils, heterochromia, odd eye colors, extra teeth, no teeth, weird teeth, lopsided mouth, malformed mouth, extra limbs, missing limbs, fused limbs, odd joints, contorted, malformed, disproportionate, unrealistic muscles, odd proportions, artifacts, noise, blurs, glitches, compression, pixelation, jpeg, poorly drawn, rendering issue, rendering failure, worst quality, low quality, bad anatomy, unrealistic body, unrealistic proportions, malformed hands, long neck, bad face, cloned face, cropped, watermarked, text, error, malformed, grotesque, monstrous, deformed, disfigured, mutated, multiple heads, multiple bodies, fused bodies, conjoined, corrupted, broken, wobbly, melting, stretchy, liquified"
       },
     }),
   });

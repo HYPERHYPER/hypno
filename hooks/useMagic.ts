@@ -45,20 +45,44 @@ export default function useMagic(config: AiConfig, asset: any) {
             },
             body: JSON.stringify({
                 input: {
-                    image: `${imageSrc}?width=512`,
-                    lora_weights: customModel?.lora_url || '',
-                    prompt: `In the style of TOK, ${textPrompt}`,
-                    refine: "base_image_refiner",
-                    img2img: false,
-                    strength: 0.8,
+                    prompt: `in the style of TOK, ${textPrompt}`,
+                    refine: "no_refiner",
                     scheduler: "K_EULER",
-                    lora_scale: 0.95,
-                    num_outputs: 4,
-                    refine_steps: 20,
+                    lora_scale: 0.8,
+                    num_outputs: 1,
+                    controlnet_1: "edge_canny",
+                    controlnet_2: "illusion",
+                    controlnet_3: "none",
+                    lora_weights: customModel?.lora_url || '',
                     guidance_scale: 7.5,
-                    apply_watermark: true,
-                    condition_scale: 1.5,
-                    num_inference_steps: 40
+                    apply_watermark: false,
+                    prompt_strength: 0.8,
+                    sizing_strategy: "controlnet_1_image",
+                    controlnet_1_end: 1,
+                    controlnet_2_end: 1,
+                    controlnet_1_image: `${imageSrc}?width=512`,
+                    controlnet_1_start: 0,
+                    controlnet_2_image: `${imageSrc}?width=512`,
+                    controlnet_2_start: 0,
+                    num_inference_steps: 30,
+                    controlnet_1_conditioning_scale: 0.8,
+                    controlnet_2_conditioning_scale: 0.8,
+                    
+                    // https://replicate.com/batouresearch/sdxl-controlnet-lora
+                    // image: `${imageSrc}?width=512`,
+                    // lora_weights: customModel?.lora_url || '',
+                    // prompt: `In the style of TOK, ${textPrompt}`,
+                    // refine: "base_image_refiner",
+                    // img2img: false,
+                    // strength: 0.8,
+                    // scheduler: "K_EULER",
+                    // lora_scale: 0.95,
+                    // num_outputs: 4,
+                    // refine_steps: 10,
+                    // guidance_scale: 7.5,
+                    // apply_watermark: true,
+                    // condition_scale: 1.5,
+                    // num_inference_steps: 40
                 }
             }),
         });
@@ -81,11 +105,12 @@ export default function useMagic(config: AiConfig, asset: any) {
                 return;
             }
 
+            const output_urls = _.filter(prediction.output, (o: string) => !o.includes('control'))
             const magicImage: MagicImage = {
-                src: _.first(prediction.output),
+                src: _.first(output_urls),
                 status: prediction.status,
                 textPrompt,
-                urls: prediction.output,
+                urls: output_urls,
             }
             setImages((prev) => [...prev.slice(0, -1), magicImage]); // replace with loaded url
             setIsLoading(false);
