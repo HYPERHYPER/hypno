@@ -160,7 +160,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
             event.stopPropagation(); // Stop the touch event from propagating
             if (navigator) {
                 try {
-                    await navigator.share({ url: displayUrl });
+                    await navigator.share({ url: displayUrl, title: window.location.href });
                 } catch (error) {
                     console.error('Error sharing image:', error);
                 }
