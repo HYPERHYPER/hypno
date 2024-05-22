@@ -32,7 +32,7 @@ const handler = async (
             }
 
             const responseJSON = (await response.json())
-            console.log(responseJSON)
+
             res.status(200).json(responseJSON);
         } catch (error) {
             console.error('Error fetching image:', error);

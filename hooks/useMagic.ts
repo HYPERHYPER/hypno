@@ -215,23 +215,25 @@ export default function useMagic(config: AiConfig, asset: any) {
                         })
 
                         const responseData = await response.json();
-                        if (responseData.data.status === 'completed' || responseData.data.status === 'failed') {
+                        const data = responseData.data;
+
+                        if (data.status === 'completed' || data.status === 'failed') {
                             // stop repeating
                             clearInterval(intervalId);
-                            const imageGrid = responseData.data.url;
-                            const upscaledImage = _.first(responseData.data.upscaled_urls);
+                            const imageGrid = data.url;
+                            const upscaledImage = _.first(data.upscaled_urls);
                             const image = upscaledImage || imageGrid;
                             const magicImage = {
                                 src: image,
-                                status: responseData.data.status,
+                                status: data.status,
                                 textPrompt,
-                                urls: responseData.data.upscaled_urls,
+                                urls: data.upscaled_urls,
                             }
                             setImages((prev) => [...prev.slice(0, -1), magicImage]); // replace with loaded url
                             setIsLoading(false);
-                            console.log('Completed image details', responseData.data);
+                            console.log('Completed image details', data);
                         } else {
-                            console.log("Image is not finished generation. Status: ", responseData.data.status)
+                            console.log("Image is not finished generation. Status: ", data.status)
                         }
                     } catch (error) {
                         console.error('Error getting updates', error);
