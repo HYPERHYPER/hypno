@@ -86,6 +86,7 @@ const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps)
 
         // Add touch event listener for saving the image
         const saveImageOnTouch = async (event: any) => {
+            event.stopPropagation(); // Stop the touch event from propagating
             event.preventDefault();
             const canvas = canvasRef.current;
             if (canvas) {
