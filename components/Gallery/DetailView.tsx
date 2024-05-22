@@ -149,7 +149,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
             pressTimer = setTimeout(() => {
                 // Long press detected, trigger image sharing logic
                 shareImage(event);
-            }, 1000); // Adjust the timeout duration as needed
+            }, 500); // Adjust the timeout duration as needed
         };
 
         const cancelPress = () => {
