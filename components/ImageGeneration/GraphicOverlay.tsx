@@ -82,6 +82,25 @@ const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps)
         };
 
         drawImageWithWatermark();
+
+        // Add touch event listener for saving the image
+        const saveImageOnTouch = (event: TouchEvent) => {
+            event.preventDefault();
+            const canvas = canvasRef.current;
+            if (canvas) {
+                const dataURL = canvas.toDataURL('image/png');
+                const a = document.createElement('a');
+                a.href = dataURL;
+                a.download = 'hypno.png';
+                a.click();
+            }
+        };
+
+        canvas.addEventListener('touchstart', saveImageOnTouch);
+
+        return () => {
+            canvas.removeEventListener('touchstart', saveImageOnTouch);
+        };
     }, [imageUrl, watermarkUrl, width, height, canvasRef.current, loadImage]);
 
     return (
