@@ -1,5 +1,6 @@
 import { convertBlendMode } from '@/helpers/blendmode';
 import useElementSize from '@/hooks/useElementSize';
+import clsx from 'clsx';
 import React, { useRef, useEffect } from 'react';
 
 interface GraphicOverlayProps {
@@ -36,8 +37,8 @@ const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps)
             if (!imageUrl || !watermarkUrl) return;
             try {
                 const [image, watermark] = await Promise.all([
-                    loadImage(imageUrl),
-                    loadImage(watermarkUrl),
+                    loadImage(`/api/proxy-images?url=${imageUrl}`),
+                    loadImage(`/api/proxy-images?url=${watermarkUrl}`),
                 ]);
 
                 // Calculate scaling factors for the image and watermark
@@ -84,15 +85,27 @@ const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps)
         drawImageWithWatermark();
 
         // Add touch event listener for saving the image
-        const saveImageOnTouch = (event: TouchEvent) => {
+        const saveImageOnTouch = async (event: any) => {
             event.preventDefault();
             const canvas = canvasRef.current;
             if (canvas) {
                 const dataURL = canvas.toDataURL('image/png');
-                const a = document.createElement('a');
-                a.href = dataURL;
-                a.download = 'hypno.png';
-                a.click();
+
+                // Convert data URL to Blob
+                const blob = await fetch(dataURL).then(response => response.blob());
+
+                // Convert Blob to File
+                const file = new File([blob], 'hypno-ai.png', { type: 'image/png' });
+
+                try {
+                    await navigator.share({ files: [file], title: 'hypno-ai.png' });
+                } catch (error) {
+                    console.error('Error sharing image:', error);
+                }
+                // const a = document.createElement('a');
+                // a.href = dataURL;
+                // a.download = 'hypno.png';
+                // a.click();
             }
         };
 
