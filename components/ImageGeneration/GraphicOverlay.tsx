@@ -117,6 +117,7 @@ const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps)
         <canvas
             id={`ai-${imageUrl}`}
             style={{ width: `${width}px`, height: `${height}px` }}
+            className={clsx('transition duration-300', loadImage ? 'opacity-100' : 'opacity-0')}
             ref={canvasRef}
         />
     );

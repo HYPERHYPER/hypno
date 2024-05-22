@@ -82,8 +82,8 @@ export const ImageCarousel = ({ urls, watermark }: { urls?: string[], watermark?
     }, [urls]);
 
     return (
-        <div style={{ width: `${width}px`, height: `${height}px` }}>
-            <Carousel
+        <div className='space-y-7'>
+            {/* <Carousel
                 className='bg-black/50 backdrop-blur-[50px]'
                 wrapAround={true}
                 swiping={false}
@@ -96,12 +96,12 @@ export const ImageCarousel = ({ urls, watermark }: { urls?: string[], watermark?
                     pagingDotsContainerClassName: 'space-x-3',
                 }}
                 style={{ width: `${width}px`, height: `${height}px` }}
-            >
+            > */}
                 {_.map(urls, (src, i) => {
                     if (watermark) {
                         return (
                             <div key={i}
-                                className={clsx('transition duration-300', loadImage ? 'opacity-100' : 'opacity-0')}>
+                                className={clsx('bg-black/50 backdrop-blur-[50px]')}>
                                 <GraphicOverlay
                                     imageUrl={src}
                                     watermark={watermark}
@@ -118,7 +118,7 @@ export const ImageCarousel = ({ urls, watermark }: { urls?: string[], watermark?
                         style={{ width: `${width}px`, height: `${height}px` }}
                     />
                 })}
-            </Carousel>
+            {/* </Carousel> */}
         </div>
     )
 }
