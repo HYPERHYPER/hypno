@@ -7,6 +7,10 @@ const handler = async (
     req: NextApiRequest,
     res: NextApiResponse<any>
 ) => {
+    // Allow requests from all origins
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+
     if (!apiKey) throw new Error('Missing Imagine API key.')
 
     if (req.method === 'GET') {
