@@ -141,32 +141,43 @@ export default function DetailView({ asset, config, imageProps }: any) {
         }
     }, [displayUrl]);
 
-
-
     useEffect(() => {
         const image = document.getElementById('detail-view-image');
+        let pressTimer: string | number | NodeJS.Timeout | undefined;
+
+        const startPress = () => {
+            pressTimer = setTimeout(() => {
+                // Long press detected, trigger image sharing logic
+                shareImage();
+            }, 1000); // Adjust the timeout duration as needed
+        };
+
+        const cancelPress = () => {
+            clearTimeout(pressTimer);
+        };
+
+        const shareImage = async () => {
+            if (navigator) {
+                try {
+                    await navigator.share({ url: displayUrl });
+                } catch (error) {
+                    console.error('Error sharing image:', error);
+                }
+            }
+        };
+
         if (image) {
-            // Add touch event listener for sharing the image
-            const shareImageOnTouch = async (event: TouchEvent) => {
-                event.preventDefault();     
-                if (navigator) {
-                    try {
-                        await navigator.share({ url: displayUrl });
-                    } catch (error) {
-                        console.error('Error sharing image:', error);
-                    }
-                }   
-            };
-        
-            // Assuming you want to listen to touchstart event
-            image.addEventListener('touchstart', shareImageOnTouch);
-        
-            // Clean up the event listener
+            // Add touch event listeners for long press detection
+            image.addEventListener('touchstart', startPress);
+            image.addEventListener('touchend', cancelPress);
+
+            // Clean up the event listeners
             return () => {
-                image.removeEventListener('touchstart', shareImageOnTouch);
+                image.removeEventListener('touchstart', startPress);
+                image.removeEventListener('touchend', cancelPress);
             };
         }
-    }, [displayUrl])
+    }, [displayUrl]);
 
     return (
         <>
