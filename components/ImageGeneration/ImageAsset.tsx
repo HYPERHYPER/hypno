@@ -145,7 +145,7 @@ export default function MagicImageItem({ image, watermark, updateEditorPrompt, d
                     <ImageAsset src={src} error={status == 'failed'} watermark={watermark} />
                 )}
             </div>
-            {(status != 'pending' && !disablePromptEditor) && (
+            {(status != 'pending' && disablePromptEditor) && (
                 <div className="text-center mt-5 px-2">
                     <h3 className="text-white/50 mb-4">{textPrompt}</h3>
                     <EditTextPrompt onClick={handleEditTextPromptClick} />
