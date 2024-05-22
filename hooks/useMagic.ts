@@ -25,8 +25,8 @@ export default function useMagic(config: AiConfig, asset: any) {
     const defaultModel = Object.values(config?.custom?.models || {})[0];
 
     const customModel = _.find(customModels, (m: { id: string | undefined; lora_url: any; }) => m.id === currentCustom && m.lora_url) || defaultModel;
-    // const imageSrc = config.apply_graphics ? asset.raw : asset.urls.url;
-    const imageSrc = asset.urls.url;
+    const imageSrc = config.apply_graphics ? asset.raw : asset.urls.url;
+    // const imageSrc = asset.urls.url;
 
     // Custom 
     async function generateCustomModelImage() {
@@ -60,9 +60,9 @@ export default function useMagic(config: AiConfig, asset: any) {
                     sizing_strategy: "controlnet_1_image",
                     controlnet_1_end: 1,
                     controlnet_2_end: 1,
-                    controlnet_1_image: `${imageSrc}?width=512`,
+                    controlnet_1_image: `${asset.urls.url}?width=512`,
                     controlnet_1_start: 0,
-                    controlnet_2_image: `${imageSrc}?width=512`,
+                    controlnet_2_image: `${asset.urls.url}?width=512`,
                     controlnet_2_start: 0,
                     num_inference_steps: 30,
                     controlnet_1_conditioning_scale: 0.8,
@@ -136,7 +136,7 @@ export default function useMagic(config: AiConfig, asset: any) {
             body: JSON.stringify({
                 type: 'sdxl',
                 input: {
-                    image: `${imageSrc}?width=512`,
+                    image: `${asset.urls.url}?width=512`,
                     prompt: textPrompt,
                 }
             }),
