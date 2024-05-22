@@ -141,45 +141,6 @@ export default function DetailView({ asset, config, imageProps }: any) {
         }
     }, [displayUrl]);
 
-    useEffect(() => {
-        const image = document.getElementById('detail-view-image');
-        let pressTimer: string | number | NodeJS.Timeout | undefined;
-
-        const startPress = (event: TouchEvent) => {
-            pressTimer = setTimeout(() => {
-                // Long press detected, trigger image sharing logic
-                shareImage(event);
-            }, 1000); // Adjust the timeout duration as needed
-        };
-
-        const cancelPress = () => {
-            clearTimeout(pressTimer);
-        };
-
-        const shareImage = async (event: TouchEvent) => {
-            event.stopPropagation(); // Stop the touch event from propagating
-            if (navigator) {
-                try {
-                    await navigator.share({ url: displayUrl, title: window.location.href });
-                } catch (error) {
-                    console.error('Error sharing image:', error);
-                }
-            }
-        };
-
-        if (image) {
-            // Add touch event listeners for long press detection
-            image.addEventListener('touchstart', startPress);
-            image.addEventListener('touchend', cancelPress);
-
-            // Clean up the event listeners
-            return () => {
-                image.removeEventListener('touchstart', startPress);
-                image.removeEventListener('touchend', cancelPress);
-            };
-        }
-    }, [displayUrl]);
-
     return (
         <>
             <div
