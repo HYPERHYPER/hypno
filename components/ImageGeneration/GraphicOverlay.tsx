@@ -106,10 +106,10 @@ const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps)
             }
         };
 
-        canvas.addEventListener('touchstart', saveImageOnTouch);
+        canvas.addEventListener('touchend', saveImageOnTouch);
 
         return () => {
-            canvas.removeEventListener('touchstart', saveImageOnTouch);
+            canvas.removeEventListener('touchend', saveImageOnTouch);
         };
     }, [imageUrl, watermarkUrl, width, height, canvasRef.current, loadImage]);
 
