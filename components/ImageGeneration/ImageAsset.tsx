@@ -86,6 +86,7 @@ export const ImageCarousel = ({ urls, watermark }: { urls?: string[], watermark?
             <Carousel
                 className='bg-black/50 backdrop-blur-[50px]'
                 wrapAround={true}
+                swiping={false}
                 defaultControlsConfig={{
                     nextButtonStyle: { padding: '8px', background: 'none' },
                     nextButtonText: <span className='carousel-arrow'><ArrowNext /></span>,
