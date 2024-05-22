@@ -145,10 +145,10 @@ export default function DetailView({ asset, config, imageProps }: any) {
         const image = document.getElementById('detail-view-image');
         let pressTimer: string | number | NodeJS.Timeout | undefined;
 
-        const startPress = () => {
+        const startPress = (event: TouchEvent) => {
             pressTimer = setTimeout(() => {
                 // Long press detected, trigger image sharing logic
-                shareImage();
+                shareImage(event);
             }, 1000); // Adjust the timeout duration as needed
         };
 
@@ -156,7 +156,8 @@ export default function DetailView({ asset, config, imageProps }: any) {
             clearTimeout(pressTimer);
         };
 
-        const shareImage = async () => {
+        const shareImage = async (event: TouchEvent) => {
+            event.stopPropagation(); // Stop the touch event from propagating
             if (navigator) {
                 try {
                     await navigator.share({ url: displayUrl });
