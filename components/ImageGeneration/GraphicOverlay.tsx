@@ -102,10 +102,6 @@ const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps)
                 } catch (error) {
                     console.error('Error sharing image:', error);
                 }
-                // const a = document.createElement('a');
-                // a.href = dataURL;
-                // a.download = 'hypno.png';
-                // a.click();
             }
         };
 

@@ -21,13 +21,13 @@ export default function DetailView({ asset, config, imageProps }: any) {
     const [assetHeight, setAssetHeight] = useState<number>(0);
     const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
-    const { 
-        images, 
-        isLoading: isLoadingGeneration, 
-        textPrompt, 
-        editTextPrompt, 
-        generateAiImage 
-    } = useMagic({...config.ai_generation, apply_graphics: config.rawEnabled}, asset);
+    const {
+        images,
+        isLoading: isLoadingGeneration,
+        textPrompt,
+        editTextPrompt,
+        generateAiImage
+    } = useMagic({ ...config.ai_generation, apply_graphics: config.rawEnabled }, asset);
     const containerRef = useRef<HTMLDivElement | null>(null);
 
     const scrollToBottom = useCallback(() => {
@@ -59,7 +59,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
 
     // get watermark to be applied to image generation
     const aspectRatio = Number(getAspectRatio(asset.width, asset.height))
-   
+
     // check if apply graphics is turned on (stored in pro_raw_upload) - since watermarks are applied to raw url
     const watermarkUrl = _.first(_.filter(config?.watermarks, (wm) => {
         const w_h = wm.name.split(":")
@@ -141,6 +141,33 @@ export default function DetailView({ asset, config, imageProps }: any) {
         }
     }, [displayUrl]);
 
+
+
+    useEffect(() => {
+        const image = document.getElementById('detail-view-image');
+        if (image) {
+            // Add touch event listener for sharing the image
+            const shareImageOnTouch = async (event: TouchEvent) => {
+                event.preventDefault();     
+                if (navigator) {
+                    try {
+                        await navigator.share({ url: displayUrl });
+                    } catch (error) {
+                        console.error('Error sharing image:', error);
+                    }
+                }   
+            };
+        
+            // Assuming you want to listen to touchstart event
+            image.addEventListener('touchstart', shareImageOnTouch);
+        
+            // Clean up the event listener
+            return () => {
+                image.removeEventListener('touchstart', shareImageOnTouch);
+            };
+        }
+    }, [displayUrl])
+
     return (
         <>
             <div
@@ -175,9 +202,9 @@ export default function DetailView({ asset, config, imageProps }: any) {
                                     src={displayUrl}
                                     alt={`${asset.event_id}-${asset.id}`}
                                     style={isPortrait && assetHeight > Number(outerHeight.split('px')[0]) ? { minHeight: height } : {}}
-                                    className={isPortrait ? `w-auto h-auto` : `w-full h-auto sm:max-h-[70vh]`} 
-                                    />
-                            
+                                    className={isPortrait ? `w-auto h-auto` : `w-full h-auto sm:max-h-[70vh]`}
+                                />
+
                                 {/* <Image
                                     {...imageProps}
                                     id='detail-view-image'
@@ -202,11 +229,11 @@ export default function DetailView({ asset, config, imageProps }: any) {
                     <div ref={containerRef} className="mt-7 w-full h-auto pb-[36px]">
                         {(!_.isEmpty(images)) && (
                             _.map(images, (img, i) => (
-                                <MagicImageItem 
-                                    image={img} 
+                                <MagicImageItem
+                                    image={img}
                                     watermark={watermark}
-                                    key={i} 
-                                    updateEditorPrompt={editTextPrompt} 
+                                    key={i}
+                                    updateEditorPrompt={editTextPrompt}
                                     disablePromptEditor={config?.ai_generation?.disable_prompt_editor}
                                 />
                             ))
