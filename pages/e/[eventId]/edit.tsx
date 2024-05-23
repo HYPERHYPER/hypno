@@ -40,11 +40,10 @@ const EditEventPage = (props: ResponseData) => {
     const [view, setView] = useState<'default' | 'data' | 'legal'>('default');
     const [status, setStatus] = useState<SaveStatus>('ready');
 
-    console.log(initialEvent)
     // Provided array of changed fields [{field_name: value}]
     const submitForm = (changedFieldsArr: any) => {
         let payloadArr: any = [];
-        let event: any = {};
+        let eventObj: any = {};
         const eventKeys = ['name', 'is_private', 'blendmode', 'custom_gallery_assigned']
         let custom_frontend: any = {};
         const customFrontendKeys = ['logo_image', 'home_background_image', 'primary_color', 'data_capture', 'fields', 'data_capture_title', 'data_capture_subtitle', 'enable_legal', 'explicit_opt_in', 'terms_privacy', 'email_delivery'];
@@ -67,13 +66,12 @@ const EditEventPage = (props: ResponseData) => {
                     custom_frontend[key] = key == 'fields' ? { ...field[key] } : field[key]
                 }
                 if (_.includes(eventKeys, key)) {
-                    event[key] = field[key]
+                    eventObj[key] = field[key]
                 }
                 if (key == 'watermark') {
                     payloadArr.push(field);
                 }
                 if (key == 'ai_generation') {
-                    console.log('event.metadata', event.metadata)
                     metadata = { ...event.metadata, ai_generation: { ...field[key]} }
                 }
                 if (key == 'pro_raw_upload') {
@@ -83,7 +81,7 @@ const EditEventPage = (props: ResponseData) => {
         })
 
         const eventPayload = {
-            ...(!_.isEmpty(event) && { event }),
+            ...(!_.isEmpty(eventObj) && { event: eventObj }),
             ...(!_.isEmpty(custom_frontend) && { custom_frontend }),
             ...(!_.isEmpty(filter) && { filter }),
             ...(delivery && { delivery }),
