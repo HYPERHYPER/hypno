@@ -169,8 +169,7 @@ const SubGallery = (props: ResponseData) => {
                                 />
                             ) : (!singleAsset && _.size(photos) > 1) ? (
                                 <div className='sm:max-w-2xl md:max-w-6xl block mx-auto h-full flex-1 w-full px-6'>
-                                    <FadeIn
-                                        from="bottom" positionOffset={300} triggerOffset={0}>
+                                    <FadeIn from="bottom" positionOffset={0} triggerOffset={0}>
                                         <ResponsiveMasonry columnsCountBreakPoints={{ 750: 2, 900: 3 }} className='pb-8'>
                                             <Masonry gutter='15px'>
                                                 {photos.map((p, i) => (
