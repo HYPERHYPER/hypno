@@ -169,7 +169,7 @@ const SubGallery = (props: ResponseData) => {
                                 />
                             ) : (!singleAsset && _.size(photos) > 1) ? (
                                 <div className='sm:max-w-2xl md:max-w-6xl block mx-auto h-full flex-1 w-full px-6'>
-                                    <FadeIn from="bottom" positionOffset={0} triggerOffset={0}>
+                                    {/* <FadeIn from="bottom" positionOffset={0} triggerOffset={0}> */}
                                         <ResponsiveMasonry columnsCountBreakPoints={{ 750: 2, 900: 3 }} className='pb-8'>
                                             <Masonry gutter='15px'>
                                                 {photos.map((p, i) => (
@@ -179,12 +179,10 @@ const SubGallery = (props: ResponseData) => {
                                                                 <Spinner />
                                                             </div>
                                                             <div className='transition'>
-                                                                <AutosizeImage
+                                                                <img
                                                                     src={p.urls.gif ? p.urls.posterframe : p.urls.url}
                                                                     alt={`${p.event_id}-${p.id}`}
-                                                                    width={p.width}
-                                                                    height={p.height}
-                                                                    priority={i < 11}
+                                                                    className='object-cover'
                                                                 />
                                                                 {p.urls.gif &&
                                                                     <div
@@ -203,7 +201,7 @@ const SubGallery = (props: ResponseData) => {
                                                 ))}
                                             </Masonry>
                                         </ResponsiveMasonry>
-                                    </FadeIn>
+                                    {/* </FadeIn> */}
                                 </div>
                             )
                                 : (
