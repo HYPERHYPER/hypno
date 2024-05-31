@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { SaveStatus } from "./Form/AutosaveStatusText";
 import Spinner from "./Spinner";
+import clsx from "clsx";
 
 interface TriggerModalProps {
     id?: string;
@@ -19,6 +20,7 @@ interface ModalProps {
         onClick?: () => void;
         hidden?: boolean;
     };
+    wide?: boolean;
 }
 
 const TriggerModal = ({ id, children }: TriggerModalProps) => {
@@ -29,12 +31,14 @@ const TriggerModal = ({ id, children }: TriggerModalProps) => {
 
 const btnClassName = "tracking-tight btn btn-primary rounded-[20px] btn-block h-[60px] text-2xl cursor-pointer";
 
-export default function Modal({ title, id, children, onDone, menu, actionBtn }: ModalProps) {
+export default function Modal({ title, id, children, onDone, menu, actionBtn, wide }: ModalProps) {
     return (
         <>
             <input type="checkbox" id={id} className="modal-toggle" />
             <label htmlFor={id} className="modal bg-[#333333]/50 backdrop-blur-[20px] cursor-pointer">
-                <label htmlFor="" className="modal-box max-w-3xl px-[40px] py-[35px] relative bg-black rounded-[60px] tracking-tight overflow-clip">
+                <label htmlFor="" className={clsx("modal-box max-w-3xl px-[40px] py-[35px] relative bg-black rounded-[60px] tracking-tight overflow-clip", 
+                    wide ? 'lg:max-w-7xl' : ''
+                )}>
                     <div className="flex justify-between">
                         <div className="space-y-4">
                             <h1 className="text-white">{title}</h1>

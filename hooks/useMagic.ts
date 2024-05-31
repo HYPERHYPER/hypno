@@ -1,5 +1,5 @@
 import { AiConfig } from "@/types/event";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import _ from 'lodash';
 import { calculateAspectRatioString } from "@/helpers/image";
 
@@ -12,13 +12,17 @@ export interface MagicImage {
 
 const sleep = (ms: number | undefined) => new Promise((r) => setTimeout(r, ms));
 
-export default function useMagic(config: AiConfig, asset: any) {
+export default function useMagic(initConfig: AiConfig, initAsset: any) {
+    const [config, setConfig] = useState<AiConfig>(initConfig);
+    const [asset, setAsset] = useState(initAsset);
+
     const [images, setImages] = useState<MagicImage[]>([]); // array of generated image urls, if still loading will be empty string
     const [textPrompt, setTextPrompt] = useState<string>(config?.text_prompt || '');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<boolean>(false);
 
     const editTextPrompt = (updatedText: string) => setTextPrompt(updatedText);
+    const resetImages = () => setImages([]);
 
     const customModels = config?.custom?.models;
     const currentCustom = config?.custom?.current;
@@ -255,7 +259,7 @@ export default function useMagic(config: AiConfig, asset: any) {
             case "midjourney": return generateMidjourneyImage();
             default: return generateStableDiffusionImage();
         }
-    }
+    };
 
     return {
         images,
@@ -265,5 +269,8 @@ export default function useMagic(config: AiConfig, asset: any) {
         editTextPrompt,
         generateMidjourneyImage,
         generateAiImage,
+        setAsset,
+        setConfig,
+        resetImages,
     }
 }
