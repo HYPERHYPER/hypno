@@ -224,7 +224,7 @@ export default function EffectsModal({
         generateAiImage();
     }
 
-    const loadingStates = ['pending', 'starting', 'processing']
+    const loadingStates = ['pending', 'starting', 'processing', 'in-progress']
     return (
         <Modal
             title='effects'
