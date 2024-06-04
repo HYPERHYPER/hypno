@@ -11,6 +11,8 @@ import axios from "axios";
 import { getS3Filename } from "@/helpers/text";
 import useUserStore from "@/store/userStore";
 import Timer from "../Timer";
+import useMagic from "@/hooks/useMagic";
+import { DotsSpinner } from "../Spinner";
 
 const AI_GENERATION_TYPES = ['custom', 'sdxl', 'midjourney']
 
@@ -190,170 +192,235 @@ export default function EffectsModal({
         }
     }, []);
 
+    // TEST PLAYGROUND
+    const testImages = ['https://images.hypno.com/8/hUk2Cjw3gkp8.jpg', 'https://images.hypno.com/8/x0qI0043gnrg.jpg', 'https://images.hypno.com/8/xmslh_Y3gkpo.jpg']
+    const [imgIdx, setImgIdx] = useState<number>(0);
+    const {
+        images,
+        isLoading,
+        error,
+        editTextPrompt,
+        generateAiImage,
+        setAsset,
+        setConfig,
+        resetImages,
+    } = useMagic({ ...ai_generation }, { urls: { url: testImages[imgIdx] } })
+
+    useEffect(() => {
+        editTextPrompt(ai_generation.text_prompt)
+    }, [ai_generation.text_prompt]);
+
+    useEffect(() => {
+        setAsset({ urls: { url: testImages[imgIdx] } })
+    }, [imgIdx]);
+
+    useEffect(() => {
+        setConfig(ai_generation)
+    }, [ai_generation]);
+
+    const handleTestImageGeneration = (e: any) => {
+        e.preventDefault();
+        resetImages();
+        generateAiImage();
+    }
+
+    const loadingStates = ['pending', 'starting', 'processing', 'in-progress']
     return (
         <Modal
             title='effects'
             id='effects-modal'
+            wide={true}
             menu={
                 <>
                     <Link href='https://discord.gg/eJc8GtsPQV' className='text-primary'><h2>need help? join our discord</h2></Link>
                     {status && AutosaveStatusText(status)}
                 </>
             }>
-            <div className='border-t-2 border-white/20'>
-                {customModelView !== 'train' &&
-                    <>
-                        <FormControl label='ai generator'>
-                            <div className='flex flex-row gap-3 text-xl sm:text-4xl'>
-                                {_.map(AI_GENERATION_TYPES, (type, i) => (
-                                    <div
-                                        key={i}
-                                        onClick={() => setValue('ai_generation.type', type, { shouldDirty: true })}
-                                        className={clsx('cursor-pointer transition', ai_generation.type == type ? 'text-primary' : 'text-primary/40')}>
-                                        {type}
-                                    </div>
-                                ))}
+            <div className='grid grid-cols-1 xl:grid-cols-2 xl:gap-5'>
+                <div className='border-y-2 pb-7 border-white/20 xl:self-start xl:top-0 xl:sticky'>
+                    <FormControl label='test?'>
+                        <button className="text-primary text-xl sm:text-4xl" onClick={handleTestImageGeneration}>start generation →</button>
+                    </FormControl>
+                    <div className="h-[420px] p-7 flex flex-row justify-center">
+
+                        <div className="relative bg-white/10 h-full aspect-[9/16]">
+                            {isLoading || (loadingStates.includes(_.first(images)?.status || '') || error) && (
+                                <div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
+                                    {error ?
+                                        <h2 className='text-white text-4xl tracking-wider'>{':('}</h2>
+                                        : <DotsSpinner />
+                                    }
+                                </div>
+                            )}
+
+                            {!_.isEmpty(_.first(images)?.src) && (
+                                <img src={_.first(images)?.src} />
+                            )}
+                        </div>
+                    </div>
+                    <div className='flex flex-row gap-3 justify-center h-[125px] w-full'>
+                        {_.map(testImages, (url, i) => (
+                            <div key={i} onClick={() => setImgIdx(i)} className={clsx("rounded-[10px] p-1 cursor-pointer border-[1px] transition", imgIdx == i ? 'border-primary' : 'border-transparent')}>
+                                <img className="h-full w-auto rounded-[6px]" src={url} />
                             </div>
-                        </FormControl>
-                        <FormControl label='apply graphics'>
-                            <input type="checkbox" className="toggle pro toggle-lg" {...register('pro_raw_upload')} />
-                        </FormControl>
-                        <FormControl label='prompt editor' altLabel="input for users to edit image generation prompt will be hidden">
-                            <input type="checkbox" className="toggle pro toggle-lg" {...register('ai_generation.disable_prompt_editor')} />
-                        </FormControl>
-                        <FormControl label='keywords' dir='col'>
-                            <h3 className="text-white/40 sm:text-xl">enter descriptive text prompts in priority order to style your content</h3>
-                            <textarea
-                                className='textarea pro left flex-1 w-full'
-                                placeholder='xxx'
-                                {...register('ai_generation.text_prompt')}
+                        ))}
+                    </div>
+                </div>
+                <div className='xl:border-t-2 xl:border-white/20 xl:-order-1'>
+                    {customModelView !== 'train' &&
+                        <>
+                            <FormControl label='ai generator'>
+                                <div className='flex flex-row gap-3 text-xl sm:text-4xl'>
+                                    {_.map(AI_GENERATION_TYPES, (type, i) => (
+                                        <div
+                                            key={i}
+                                            onClick={() => setValue('ai_generation.type', type, { shouldDirty: true })}
+                                            className={clsx('cursor-pointer transition', ai_generation.type == type ? 'text-primary' : 'text-primary/40')}>
+                                            {type}
+                                        </div>
+                                    ))}
+                                </div>
+                            </FormControl>
+                            <FormControl label='apply graphics'>
+                                <input type="checkbox" className="toggle pro toggle-lg" {...register('pro_raw_upload')} />
+                            </FormControl>
+                            <FormControl label='prompt editor' altLabel="input for users to edit image generation prompt will be hidden">
+                                <input type="checkbox" className="toggle pro toggle-lg" {...register('ai_generation.disable_prompt_editor')} />
+                            </FormControl>
+                            <FormControl label='keywords' dir='col'>
+                                <h3 className="text-white/40 sm:text-xl">enter descriptive text prompts in priority order to style your content</h3>
+                                <textarea
+                                    className='textarea pro left flex-1 w-full'
+                                    placeholder='xxx'
+                                    {...register('ai_generation.text_prompt')}
+                                />
+                            </FormControl>
+                        </>
+                    }
+                    {
+                        ai_generation.type == 'sdxl' && (
+                            <FormControl label='strength'>
+                                <div className="flex flex-row gap-4 items-center">
+                                    <h3 className="text-primary text-xl sm:text-4xl">{Number(ai_generation?.prompt_strength)}%</h3>
+                                    <input
+                                        type="range"
+                                        min={0}
+                                        max="100"
+                                        className="range range-primary range-lg"
+                                        step="5"
+                                        {...register('ai_generation.prompt_strength')}
+                                    />
+
+                                </div>
+                            </FormControl>
+                        )}
+                    {ai_generation.type == 'midjourney' && (
+                        <FormControl label='img prompt'>
+                            <FileInput
+                                inputId='ai-img'
+                                onInputChange={(value: string) => setValue('ai_generation.img_prompt', [value], { shouldDirty: true })}
+                                value={_.first(ai_generation.img_prompt)}
+                                uploadCategory="ai"
                             />
                         </FormControl>
-                    </>
-                }
-                {
-                    ai_generation.type == 'sdxl' && (
-                        <FormControl label='strength'>
-                            <div className="flex flex-row gap-4 items-center">
-                                <h3 className="text-primary text-xl sm:text-4xl">{Number(ai_generation?.prompt_strength)}%</h3>
-                                <input
-                                    type="range"
-                                    min={0}
-                                    max="100"
-                                    className="range range-primary range-lg"
-                                    step="5"
-                                    {...register('ai_generation.prompt_strength')}
-                                />
-
-                            </div>
+                    )}
+                    {ai_generation.type == 'midjourney' && (
+                        <FormControl label='parameters' dir='col'>
+                            <h3 className="text-white/40 sm:text-xl"><a href='https://docs.midjourney.com/docs/parameter-list' className="text-primary mr-2 ">help</a> customize with image generation parameters</h3>
+                            <textarea
+                                className='textarea pro left flex-1 w-full'
+                                placeholder='--param value'
+                                {...register('ai_generation.midjourney_parameters')}
+                            />
                         </FormControl>
                     )}
-                {ai_generation.type == 'midjourney' && (
-                    <FormControl label='img prompt'>
-                        <FileInput
-                            inputId='ai-img'
-                            onInputChange={(value: string) => setValue('ai_generation.img_prompt', [value], { shouldDirty: true })}
-                            value={_.first(ai_generation.img_prompt)}
-                            uploadCategory="ai"
-                        />
-                    </FormControl>
-                )}
-                {ai_generation.type == 'midjourney' && (
-                    <FormControl label='parameters' dir='col'>
-                        <h3 className="text-white/40 sm:text-xl"><a href='https://docs.midjourney.com/docs/parameter-list' className="text-primary mr-2 ">help</a> customize with image generation parameters</h3>
-                        <textarea
-                            className='textarea pro left flex-1 w-full'
-                            placeholder='--param value'
-                            {...register('ai_generation.midjourney_parameters')}
-                        />
-                    </FormControl>
-                )}
-                {ai_generation.type == 'custom' && (
-                    <div>
-                        {customModelView == 'default' && (
-                            <>
-                                <FormControl label='custom model'>
-                                    <select
-                                        value={ai_generation?.custom?.current}
-                                        onChange={(e) => setValue('ai_generation.custom.current', e.target.value, { shouldDirty: true })}
-                                        className="select pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl">
-                                        {_.isEmpty(customModels) ?
-                                            <option value={undefined}>no models trained</option>
-                                            : (
-                                                _.map(customModels, (model, i) => (
-                                                    <option value={model.id} key={i}>{model.name}</option>
-                                                ))
-                                            )
-                                        }
-                                    </select>
-                                </FormControl>
-                                <div className="list pro">
-                                    {trainingInProgress ?
-                                        <>
-                                            <FormControl label="training in progress">
-                                                <div className="text-white text-xl sm:text-4xl">{modelTraining.name} <span className="loading" /></div>
-                                            </FormControl>
-                                            {/* <FormControl>
+                    {ai_generation.type == 'custom' && (
+                        <div>
+                            {customModelView == 'default' && (
+                                <>
+                                    <FormControl label='custom model'>
+                                        <select
+                                            value={ai_generation?.custom?.current}
+                                            onChange={(e) => setValue('ai_generation.custom.current', e.target.value, { shouldDirty: true })}
+                                            className="select pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl">
+                                            {_.isEmpty(customModels) ?
+                                                <option value={undefined}>no models trained</option>
+                                                : (
+                                                    _.map(customModels, (model, i) => (
+                                                        <option value={model.id} key={i}>{model.name}</option>
+                                                    ))
+                                                )
+                                            }
+                                        </select>
+                                    </FormControl>
+                                    <div className="list pro">
+                                        {trainingInProgress ?
+                                            <>
+                                                <FormControl label="training in progress">
+                                                    <div className="text-white text-xl sm:text-4xl">{modelTraining.name} <span className="loading" /></div>
+                                                </FormControl>
+                                                {/* <FormControl>
                                                 <button className="text-red-500 text-xl sm:text-4xl">cancel training</button>
                                             </FormControl> */}
-                                        </>
-                                        :
-                                        <div className="item text-primary w-full cursor-pointer" onClick={(e) => handleNavigateCustomModelView(e, 'train')}><div />train new model →</div>
-                                    }
-                                </div>
-                            </>
-                        )}
-
-                        {customModelView == 'train' && (
-                            <>
-                                <div className="list pro" style={{ borderTop: 'none' }}>
-                                    {!trainingStatus ?
-                                        <div className="item text-primary w-full cursor-pointer" onClick={(e) => handleNavigateCustomModelView(e, 'default')}>← return</div>
-                                        :
-                                        <div className="item text-white w-full">keep open while your model is training</div>
-                                    }
-                                </div>
-                                {!trainingStatus ? (
-                                    <>
-                                        <FormControl label="model name">
-                                            <input className="input pro" value={modelName} onChange={(e) => setModelName(e.target.value)} />
-                                        </FormControl>
-                                        <FormControl label="zip file" altLabel="upload a zip file of training images to fine tune your model">
-                                            <FileInput uploadCategory="ai" inputId='trainingPhotosInput' onInputChange={(val) => setZipFile(val)} value={zipFile} />
-                                        </FormControl>
-                                        <div className="list pro">
-                                            <button className="item text-primary w-full" onClick={trainModel}><span className="text-white/40">ready?</span>start training →</button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <FormControl label="training in progress">
-                                            <div className="text-white text-xl sm:text-4xl">{modelName}</div>
-                                        </FormControl>
-                                        <FormControl label="status">
-                                            <div className="text-white text-xl sm:text-4xl flex items-center gap-2">{trainingStatus} {trainingStatus !== 'finished' && <span className="w-[50px] sm:min-w-[90px]"><Timer /></span>}</div>
-                                        </FormControl>
-                                        {trainingStatus == 'finished' &&
-                                            <div className="list pro">
-                                                <div
-                                                    className="item text-primary w-full cursor-pointer"
-                                                    onClick={(e) => {
-                                                        setValue('ai_generation.custom.current', modelId, { shouldDirty: true });
-                                                        setModelName('');
-                                                        setZipFile('');
-                                                        setTrainingStatus(undefined);
-                                                        handleNavigateCustomModelView(e, 'default');
-                                                    }}>
-                                                    <div />set as current model →
-                                                </div>
-                                            </div>
+                                            </>
+                                            :
+                                            <div className="item text-primary w-full cursor-pointer" onClick={(e) => handleNavigateCustomModelView(e, 'train')}><div />train new model →</div>
                                         }
-                                    </>
-                                )}
-                            </>
-                        )}
-                    </div>
-                )}
+                                    </div>
+                                </>
+                            )}
+
+                            {customModelView == 'train' && (
+                                <>
+                                    <div className="list pro" style={{ borderTop: 'none' }}>
+                                        {!trainingStatus ?
+                                            <div className="item text-primary w-full cursor-pointer" onClick={(e) => handleNavigateCustomModelView(e, 'default')}>← return</div>
+                                            :
+                                            <div className="item text-white w-full">keep open while your model is training</div>
+                                        }
+                                    </div>
+                                    {!trainingStatus ? (
+                                        <>
+                                            <FormControl label="model name">
+                                                <input className="input pro" value={modelName} onChange={(e) => setModelName(e.target.value)} />
+                                            </FormControl>
+                                            <FormControl label="zip file" altLabel="upload a zip file of training images to fine tune your model">
+                                                <FileInput uploadCategory="ai" inputId='trainingPhotosInput' onInputChange={(val) => setZipFile(val)} value={zipFile} />
+                                            </FormControl>
+                                            <div className="list pro">
+                                                <button className="item text-primary w-full" onClick={trainModel}><span className="text-white/40">ready?</span>start training →</button>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FormControl label="training in progress">
+                                                <div className="text-white text-xl sm:text-4xl">{modelName}</div>
+                                            </FormControl>
+                                            <FormControl label="status">
+                                                <div className="text-white text-xl sm:text-4xl flex items-center gap-2">{trainingStatus} {trainingStatus !== 'finished' && <span className="w-[50px] sm:min-w-[90px]"><Timer /></span>}</div>
+                                            </FormControl>
+                                            {trainingStatus == 'finished' &&
+                                                <div className="list pro">
+                                                    <div
+                                                        className="item text-primary w-full cursor-pointer"
+                                                        onClick={(e) => {
+                                                            setValue('ai_generation.custom.current', modelId, { shouldDirty: true });
+                                                            setModelName('');
+                                                            setZipFile('');
+                                                            setTrainingStatus(undefined);
+                                                            handleNavigateCustomModelView(e, 'default');
+                                                        }}>
+                                                        <div />set as current model →
+                                                    </div>
+                                                </div>
+                                            }
+                                        </>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    )}
+                </div>
             </div>
         </Modal >
     )
