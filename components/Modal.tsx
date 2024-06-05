@@ -1,11 +1,11 @@
 import { ReactNode } from "react";
 import { SaveStatus } from "./Form/AutosaveStatusText";
-import Spinner from "./Spinner";
 import clsx from "clsx";
 
 interface TriggerModalProps {
-    id?: string;
-    children?: ReactNode;
+  id?: string;
+  children?: ReactNode;
+  onClick?: () => void;
 }
 
 interface ModalProps {
@@ -23,13 +23,16 @@ interface ModalProps {
     wide?: boolean;
 }
 
-const TriggerModal = ({ id, children }: TriggerModalProps) => {
-    return (
-        <label htmlFor={id} className="cursor-pointer">{children}</label>
-    )
-}
+const TriggerModal = ({ id, children, onClick }: TriggerModalProps) => {
+  return (
+    <label htmlFor={id} className="cursor-pointer" onClick={onClick}>
+      {children}
+    </label>
+  );
+};
 
-const btnClassName = "tracking-tight btn btn-primary rounded-[20px] btn-block h-[60px] text-2xl cursor-pointer";
+const btnClassName =
+  "tracking-tight btn btn-primary rounded-[20px] btn-block h-[60px] text-2xl cursor-pointer";
 
 export default function Modal({ title, id, children, onDone, menu, actionBtn, wide }: ModalProps) {
     return (
@@ -71,8 +74,8 @@ export default function Modal({ title, id, children, onDone, menu, actionBtn, wi
                     )}
                 </label>
             </label>
-        </>
-    )
+    </>
+  );
 }
 
 Modal.Trigger = TriggerModal;
