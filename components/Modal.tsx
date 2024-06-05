@@ -36,23 +36,27 @@ export default function Modal({ title, id, children, onDone, menu, actionBtn, wi
         <>
             <input type="checkbox" id={id} className="modal-toggle" />
             <label htmlFor={id} className="modal bg-[#333333]/50 backdrop-blur-[20px] cursor-pointer">
-                <label htmlFor="" className={clsx("modal-box max-w-3xl px-[40px] py-[35px] relative bg-black rounded-[60px] tracking-tight overflow-clip", 
+                <label htmlFor="" className={clsx("modal-box max-w-3xl px-[40px] py-[35px] relative bg-black rounded-[40px] tracking-tight overflow-clip", 
                     wide ? 'lg:max-w-7xl' : ''
                 )}>
                     <div className="flex justify-between">
-                        <div className="space-y-4">
-                            <h1 className="text-white">{title}</h1>
+                        <div className="flex flex-row items-baseline gap-3">
+                            <h1 className="text-white sm:text-5xl">{title}</h1>
                             <div className="flex flex-row gap-4">
                                 {/* <h2 className="text-primary"><label htmlFor={id} className="cursor-pointer">cancel</label></h2> */}
                                 {menu}
                             </div>
                         </div>
-                        <label htmlFor={id} className="h-[30px] sm:h-[60px] w-[30px] sm:w-[60px] flex items-center  cursor-pointer">
+                        <label htmlFor={id} className="h-[30px] sm:h-[40px] w-[30px] sm:w-[60px] flex items-center  cursor-pointer">
                             <div className="bg-white/40 w-[30px] sm:w-[60px] h-1 rounded-sm" />
                         </label>
                     </div>
 
-                    <div className={`pr-2 mt-5 sm:mt-10 mb-9 max-h-[50vh] overflow-y-scroll ${actionBtn && actionBtn.hidden ? 'mb-0' : 'mb-9'}`}>
+                    <div className={clsx(
+                        `pr-2 mt-5 sm:mt-10 mb-9 overflow-y-scroll`, 
+                        actionBtn && actionBtn.hidden ? 'mb-0' : 'mb-9',
+                        wide ? 'max-h-[75vh]' : 'max-h-[50vh]'
+                        )}>
                         {children}
                     </div>
 

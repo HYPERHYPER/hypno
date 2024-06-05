@@ -103,6 +103,10 @@
     h2 {
         @apply text-lg sm:text-3xl;
     }
+
+    h3 {
+        @apply text-lg sm:text-2xl;
+    }
 }
 
 @layer components {

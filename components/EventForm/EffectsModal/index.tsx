@@ -131,7 +131,9 @@ export default function EffectsModal({
                     {/* <Link href='https://discord.gg/eJc8GtsPQV' className='text-primary'><h2>need help? join our discord</h2></Link> */}
                     {status && AutosaveStatusText(status)}
                 </>
-            }>
+            }
+            actionBtn={{hidden: true}}
+            >
             <div className='grid grid-cols-1 xl:grid-cols-2 xl:gap-5'>
                 <div className='pb-7 relative flex w-full items-center justify-center'>
                     <div
