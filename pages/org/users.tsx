@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Link from "next/link";
 import _ from "lodash";
 import useUserStore from "@/store/userStore";
 import withAuth from "@/components/hoc/withAuth";
@@ -12,7 +13,7 @@ import axios from "axios";
 import useSWRInfinite from "swr/infinite";
 import { axiosGetWithToken, fetchWithToken } from "@/lib/fetchWithToken";
 // import InfiniteScroll from "react-infinite-scroll-component";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   // getEventPrivileges,
   getOrganizationPrivileges,
@@ -21,7 +22,7 @@ import {
   // PrivileeContext,
   PrivilegeProvider,
 } from "@/components/PrivilegeContext/PrivilegeContext";
-import { SaveStatus } from "./Form/AutosaveStatusText";
+import { SaveStatus } from "@/components/Form/AutosaveStatusText";
 import useSWR from "swr";
 
 interface Role {
@@ -60,11 +61,6 @@ interface ResponseData {
   };
 }
 
-interface DaisyUIModalElement extends HTMLElement {
-  close: () => void;
-  showModal: () => void;
-}
-
 export default withAuth(OrganizationUsersPage, "protected");
 function OrganizationUsersPage(props: ResponseData) {
   const user = useUserStore.useUser();
@@ -93,8 +89,19 @@ function OrganizationUsersPage(props: ResponseData) {
     ([url, token]) => axiosGetWithToken(url, token),
   );
 
-  const paginatedUsers = _.map(data, (v) => v.users).flat();
-  console.log(paginatedUsers);
+  const [paginatedUsers, setPaginatedUsers] = useState<OrgUser[]>([]);
+
+  useEffect(() => {
+    if (data) {
+      setPaginatedUsers(_.map(data, (v) => v.users).flat());
+    }
+  }, [data]);
+
+  const removeUser = (email: string) => {
+    setPaginatedUsers((prevUsers) =>
+      prevUsers.filter((user) => user.email !== email),
+    );
+  };
 
   const userOrgPrivileges = orgData
     ? getOrganizationPrivileges(orgData.organization.user_privileges)
@@ -140,7 +147,13 @@ function OrganizationUsersPage(props: ResponseData) {
               // >
               <div className="list pro">
                 {_.map(paginatedUsers, (u, i) => (
-                  <Item key={i} user={u} orgId={org_id} token={token} />
+                  <Item
+                    key={i}
+                    user={u}
+                    orgId={org_id}
+                    token={token}
+                    removeUser={removeUser}
+                  />
                 ))}
               </div>
               // </InfiniteScroll>
@@ -156,10 +169,12 @@ const Item = ({
   user,
   orgId,
   token,
+  removeUser,
 }: {
   user: OrgUser;
   orgId: number;
   token: any;
+  removeUser: (email: string) => void;
 }) => {
   const nullUser = {
     id: null,
@@ -213,6 +228,7 @@ const Item = ({
       })
       .then((res) => {
         setStatus("success");
+        removeUser(selectedUserData.email as string);
         setTimeout(() => {
           handleModalClose();
           setStatus("ready");
@@ -229,6 +245,33 @@ const Item = ({
         }, 3000);
       });
   };
+
+  const userModalContent = (user: OrgUser) => (
+    <div className="user-details p-4 bg-black-800 rounded-lg text-white">
+      <p className="text-lg font-semibold">
+        Username: <span className="font-normal">{user.username}</span>
+      </p>
+      <p className="text-lg font-semibold">
+        Email: <span className="font-normal">{user.email}</span>
+      </p>
+      <br />
+      <p className="text-md">Will be removed from:</p>
+      <ul className="mt-2 space-y-2">
+        {Array.isArray(user.roles) &&
+          user.roles.map((role, i) => (
+            <Link
+              key={i}
+              href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/e/${role.event_id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary"
+            >
+              Event: {role.event_id} →
+            </Link>
+          ))}
+      </ul>
+    </div>
+  );
 
   return (
     <>
@@ -265,13 +308,14 @@ const Item = ({
       <Modal
         id="kick-user-modal"
         title="Remove User"
-        user={selectedUserData}
         actionBtn={{
           status,
           text: "Confirm",
           onClick: () => kickUser(orgId, email as string),
         }}
-      />
+      >
+        {userModalContent(selectedUserData)}
+      </Modal>
       {/* MODAL END */}
     </>
   );
