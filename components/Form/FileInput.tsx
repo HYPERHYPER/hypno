@@ -153,7 +153,7 @@ export default function FileInput(props: UploaderProps) {
   return (
     <div className='flex gap-3 items-center'>
       <div className="dropdown dropdown-top dropdown-hover">
-        <label tabIndex={0} className='text-lg sm:text-4xl text-primary truncate'>{uploadStatus == 'error' ? <span className='text-red-500'>error</span> : getFilename(props.value || '')}</label>
+        <label tabIndex={0} className='text-lg sm:text-3xl text-primary truncate'>{uploadStatus == 'error' ? <span className='text-red-500'>error</span> : getFilename(props.value || '')}</label>
         {contentType !== 'application/zip' &&
           <div tabIndex={0} className='left-1/2 mb-5 dropdown-content bg-white/10 backdrop-blur-[30px] rounded-box p-3 sm:p-4'>
             <img className='max-h-[200px] w-auto' src={props.value || ''} />
@@ -185,9 +185,9 @@ export default function FileInput(props: UploaderProps) {
           </div>
         ) : (
           props.value ?
-            <label onClick={resetInput} className="cursor-pointer h-10 w-10 rounded-full bg-white/20 text-black flex items-center justify-center"><Minus /></label>
+            <label onClick={resetInput} className="cursor-pointer h-[30px] w-[30px] rounded-full bg-white/20 text-black flex items-center justify-center"><Minus /></label>
             :
-            <label htmlFor={props.inputId} className="cursor-pointer h-10 w-10 rounded-full bg-white/20 text-black flex items-center justify-center"><Plus /></label>
+            <label htmlFor={props.inputId} className="cursor-pointer h-[30px] w-[30px] rounded-full bg-white/20 text-black flex items-center justify-center"><Plus /></label>
         )}
     </div>
   )
