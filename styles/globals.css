@@ -131,7 +131,7 @@
     }
 
     .list .item {
-        @apply flex flex-row items-center justify-between border-b-2 border-white/20 py-3 text-lg font-normal sm:h-[100px] sm:py-7 sm:text-4xl;
+        @apply flex flex-row items-center justify-between border-b-2 border-white/20 py-2 text-lg font-normal sm:h-[60px] sm:py-3 sm:text-3xl;
     }
 
     .list.list-sm .item {
@@ -181,7 +181,7 @@
 
     .input.pro,
     .textarea.pro {
-        @apply text-primary h-auto flex-1 bg-transparent text-right text-xl outline-none active:border-none disabled:border-none sm:text-4xl;
+        @apply text-primary h-auto flex-1 bg-transparent text-right text-xl outline-none active:border-none disabled:border-none sm:text-3xl pr-0;
     }
 
     .textarea.pro.left,
@@ -194,7 +194,7 @@
     }
 
     .select.pro-form {
-        @apply h-auto min-h-0 w-full bg-transparent pl-0 text-right text-xl font-normal lowercase focus:bg-transparent focus:outline-none active:bg-transparent sm:text-4xl;
+        @apply h-auto min-h-0 w-full bg-transparent pl-0 text-right text-xl font-normal lowercase focus:bg-transparent focus:outline-none active:bg-transparent sm:text-3xl;
     }
 
     .tab {
@@ -219,6 +219,14 @@
 
     .toggle.pro {
         @apply bg-black;
+    }
+
+    .tooltip {
+        @apply tracking-tight font-medium;
+    }
+
+    .tooltip::before {
+        @apply max-w-[12rem] rounded-2xl leading-none py-3;
     }
 
     .icon svg {
@@ -305,10 +313,10 @@ input[type="date"]::-webkit-input-placeholder {
 .toggle.pro {
     background-color: black;
     border-color: #333333;
-    height: 40px;
-    width: 80px;
+    height: 30px;
+    width: 60px;
     box-shadow:
-        calc(40px * -1) 0 0 2px #333333 inset,
+        calc(30px * -1) 0 0 2px #333333 inset,
         0 0 0 2px #333333 inset,
         0 0;
 }
@@ -316,7 +324,7 @@ input[type="date"]::-webkit-input-placeholder {
 .toggle.pro:checked {
     border: none;
     box-shadow:
-        calc(40px) 0 0 2px #00ff99 inset,
+        calc(30px) 0 0 2px #00ff99 inset,
         0 0 0 2px #00ff99 inset,
         0 0;
 }

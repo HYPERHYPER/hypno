@@ -252,19 +252,19 @@ const EventForm = (props: FormData) => {
 
                             <FormControl label='organization'>
                                 {event ?
-                                    <div className='lowercase text-xl sm:text-4xl'>{isLoadingOrgs ?  <span className='loading loading-spinner loading-sm sm:loading-md' /> : _.find(organizations, (o) => o.id == config.org_id)?.name}</div>
+                                    <div className='lowercase text-xl sm:text-3xl'>{isLoadingOrgs ?  <span className='loading loading-spinner loading-sm sm:loading-md' /> : _.find(organizations, (o) => o.id == config.org_id)?.name}</div>
                                     : (
                                         isLoadingOrgs ?
                                             <span className='loading loading-spinner loading-sm sm:loading-md' />
                                             :
-                                            <select onChange={(e) => setValue('org_id', e.target.value)} value={config.org_id} className='select pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl'>
+                                            <select onChange={(e) => setValue('org_id', e.target.value)} value={config.org_id} className='select pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-3xl'>
                                                 {_.map(organizations, ((o) => <option key={o.id} value={o.id}>{o.name}</option>))}
                                             </select>
                                     )}
                             </FormControl>
 
                             <FormControl label='capture'>
-                                <div className='flex flex-row gap-3 text-xl sm:text-4xl'>
+                                <div className='flex flex-row gap-3 text-xl sm:text-3xl'>
                                     <div className='text-primary'>photo</div>
                                     <div className="tooltip" data-tip="coming soon">
                                         <div className='text-primary/40'>video</div>
@@ -277,7 +277,7 @@ const EventForm = (props: FormData) => {
 
                             <FormControl label='filters'>
                                 <Modal.Trigger id='filters-modal'>
-                                    <div className='flex flex-row gap-3 text-xl sm:text-4xl'>
+                                    <div className='flex flex-row gap-3 text-xl sm:text-3xl'>
                                         {_.map(FILTERS, (f, i) => (
                                             <span key={i} className={`transition ${config.filter == f.id ? 'text-primary' : 'text-primary/40'}`}>{f.name}</span>
                                         ))}
@@ -314,9 +314,9 @@ const EventForm = (props: FormData) => {
                             <FormControl label='graphics' featureGated={featureAccess?.graphics ? undefined : 'creator'}>
                                 <Modal.Trigger id='graphics-modal'>
                                     {_.every(config.watermarks, (value) => value === "") ?
-                                        <div className='text-xl sm:text-4xl text-white/20'>none</div>
+                                        <div className='text-xl sm:text-3xl text-white/20'>none</div>
                                         : (
-                                            <div className='text-xl sm:text-4xl text-primary flex flex-row gap-2'>
+                                            <div className='text-xl sm:text-3xl text-primary flex flex-row gap-2'>
                                                 {Object.entries(config.watermarks).map(([ar, value]) => {
                                                     if (value !== "") {
                                                         return <span key={ar}>{ar}</span>;
@@ -339,7 +339,7 @@ const EventForm = (props: FormData) => {
                                 <div className='list pro'>
                                     <div key='blendmode'>
                                         <FormControl label='blend mode'>
-                                            <select onChange={(e) => setValue('blendmode', e.target.value, { shouldDirty: true })} value={config.blendmode} className='select pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl'>
+                                            <select onChange={(e) => setValue('blendmode', e.target.value, { shouldDirty: true })} value={config.blendmode} className='select pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-3xl'>
                                                 {_.map(blendModes, ((o) => <option key={o.value} value={o.value}>{o.name}</option>))}
                                             </select>
                                         </FormControl>
@@ -360,7 +360,7 @@ const EventForm = (props: FormData) => {
                             </Modal>
 
                             <FormControl label='effects' featureGated={featureAccess?.effects ? undefined : 'creator'}>
-                                {config.ai_generation.enabled && <Modal.Trigger id='effects-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
+                                {config.ai_generation.enabled && <Modal.Trigger id='effects-modal'><div className="tracking-tight text-xl sm:text-3xl text-primary mr-5">custom</div></Modal.Trigger>}
                                 <input type="checkbox" defaultChecked={config.ai_generation.enabled} className="toggle pro toggle-lg" {...register('ai_generation.enabled')} />
                             </FormControl>
 
@@ -423,7 +423,7 @@ const EventForm = (props: FormData) => {
 
                                 <FormControl label='color' nested={true} disabled={!config.custom_gallery_assigned}>
                                     <input
-                                        className='input pro disabled:text-white/20 transition-colors'
+                                        className='input pro disabled:text-white/20 transition-colors mr-3'
                                         placeholder='# hex code'
                                         disabled={!config.custom_gallery_assigned}
                                         {...register('primary_color')} />
@@ -431,7 +431,7 @@ const EventForm = (props: FormData) => {
                                         <label
                                             className='w-full'
                                             tabIndex={config.custom_gallery_assigned ? 0 : undefined}>
-                                            <span className={clsx("inline-flex h-10 w-10 rounded-full border-4 border-white/20 cursor-pointer", !config.custom_gallery_assigned && 'opacity-50 cursor-not-allowed')} style={{ backgroundColor: `${_.startsWith(config.primary_color, '#') ? "" : "#"}${config.primary_color}` }} />
+                                            <span className={clsx("inline-flex h-[30px] w-[30px] rounded-full border-4 border-white/20 cursor-pointer", !config.custom_gallery_assigned && 'opacity-50 cursor-not-allowed')} style={{ backgroundColor: `${_.startsWith(config.primary_color, '#') ? "" : "#"}${config.primary_color}` }} />
                                         </label>
                                         <div
                                             tabIndex={config.custom_gallery_assigned ? 0 : undefined}
@@ -442,7 +442,7 @@ const EventForm = (props: FormData) => {
                                 </FormControl>
 
                                 {/* <FormControl label='magic button' nested={true} disabled={!config.custom_gallery}>
-                                {config.enable_magic_button && config.custom_gallery && <Modal.Trigger id='magic-button-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
+                                {config.enable_magic_button && config.custom_gallery && <Modal.Trigger id='magic-button-modal'><div className="tracking-tight text-xl sm:text-3xl text-primary mr-5">custom</div></Modal.Trigger>}
                                 <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_gallery} {...register('enable_magic_button')} />
                             </FormControl> */}
 
@@ -451,15 +451,15 @@ const EventForm = (props: FormData) => {
                                 </FormControl>
 
                                 <FormControl label='data/legal' nested={true} disabled={!config.custom_gallery_assigned} featureGated={featureAccess?.data_capture ? undefined : 'brand'}>
-                                    {config.data_capture && config.custom_gallery_assigned && <Modal.Trigger id='data-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
+                                    {config.data_capture && config.custom_gallery_assigned && <Modal.Trigger id='data-modal'><div className="tracking-tight text-xl sm:text-3xl text-primary mr-5">custom</div></Modal.Trigger>}
                                     <input type="checkbox" defaultChecked={config.data_capture} className="toggle pro toggle-lg" disabled={!config.custom_gallery_assigned} {...register('data_capture')} />
                                 </FormControl>
 
                                 <FormControl label='domain' nested={true} disabled={!config.custom_gallery_assigned} featureGated={featureAccess?.custom_domain ? undefined : 'brand'}>
-                                    <div className='text-xl sm:text-4xl text-white/20'>coming soon</div>
+                                    <div className='text-xl sm:text-3xl text-white/20'>coming soon</div>
                                 </FormControl>
                                 {/* <FormControl label='legal' nested={true} disabled={!config.custom_frontend}>
-                                    {config.enable_legal && config.custom_frontend && <Modal.Trigger id='legal-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5" >custom</div></Modal.Trigger>}
+                                    {config.enable_legal && config.custom_frontend && <Modal.Trigger id='legal-modal'><div className="tracking-tight text-xl sm:text-3xl text-primary mr-5" >custom</div></Modal.Trigger>}
                                     <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_frontend} {...register('enable_legal')} />
                                 </FormControl> */}
 
@@ -497,84 +497,6 @@ const EventForm = (props: FormData) => {
                         </FormControl>
 
                     </DataCaptureModal>
-
-                    {/* <Modal title='legal' id='legal-modal' menu={status && AutosaveStatusText(status)}>
-                        <div className='border-t-2 border-white/20'>
-                            <FormControl dir='col' label='terms/privacy' altLabel='this appears in your web gallery during delivery; format links like <link|https://domain.com>'>
-                                <button className='ml-4 text-primary text-xl mt-3 tracking-tight' onClick={(e) => { e.preventDefault(); setValue('terms_privacy', DEFAULT_TERMS, { shouldDirty: true }) }}>reset</button>
-                                <textarea className='flex-1 textarea pro left w-full leading-[1.1rem]' rows={5} {...register('terms_privacy')} />
-                            </FormControl>
-                        </div>
-                        <div className=''>
-                            <FormControl label='explicit opt-in' altLabel='this shows a checkbox'>
-                                <input type="checkbox" className="toggle pro toggle-lg" {...register('explicit_opt_in')} />
-                            </FormControl>
-                        </div>
-                    </Modal> */}
-
-                    {/* <Modal title='magic button' id='magic-button-modal' menu={status && AutosaveStatusText(status)}>
-                        <div className='border-t-2 border-white/20'>
-                            <FormControl label='text'>
-                                <input
-                                    className='input pro flex-1'
-                                    placeholder='click me'
-                                    disabled={!config.enable_magic_button}
-                                    {...register('magic_button_text')} />
-                            </FormControl>
-                            <FormControl label='url'>
-                                <input
-                                    className='input pro flex-1'
-                                    placeholder='https://www.link.com'
-                                    disabled={!config.enable_magic_button}
-                                    {...register('magic_button_url')} />
-                            </FormControl>
-                        </div>
-                    </Modal> */}
-
-                    {/* <div className='flex-1 pb-5'>
-                        <div className='space-y-5 w-1/2 mr-[30px]'>
-                            <div className='form-control'>
-                                <label className='label'>
-                                    <span className='label-text text-white'>AI Remix Button</span>
-                                </label>
-                                <div className='flex flex-row gap-2 items-center'>
-                                    <input type="checkbox" className="toggle toggle-lg" checked={config.ai_generation?.enabled} onChange={(e) => setValue('ai_generation.enabled', e.target.checked)} />
-                                    <span className='text-sm text-white/40'>{!config.ai_generation?.enabled ? 'Disabled' : 'Enabled'}</span>
-                                </div>
-                            </div>
-                            <div className="collapse collapse-arrow w-full mt-3 bg-white/10 rounded-box">
-                                <input type="checkbox" />
-                                <div className="collapse-title text-lg font-medium">
-                                    Current Settings
-                                </div>
-                                <div className="collapse-content">
-                                    <p>Type: {config.ai_generation?.type}</p>
-                                    <p>Prompt: {config.ai_generation?.prompt}</p>
-                                    <p>Image Strength: {config.ai_generation?.image_strength}</p>
-                                </div>
-                            </div>
-                            {savedChangesStatus ? (
-                                <button className='btn btn-wide'>{savedChangesStatus == 'saving' ?
-                                    <ThreeDots
-                                        height="20"
-                                        width="50"
-                                        radius="4"
-                                        color="#FFFFFF"
-                                        ariaLabel="three-dots-loading"
-                                        visible={true}
-                                    />
-                                    :
-                                    'CHANGES SAVED!'
-                                }</button>
-                            ) :
-                                <input className='btn btn-primary btn-wide' type='submit' value='SAVE' />
-                            }
-                        </div>
-
-
-                        <div className='divider before:bg-white/[.03] after:bg-white/[.03] mr-[30px] my-[30px]' />
-                        <AiPlayground gallerySlug={event?.party_slug} onSaveCurrent={(val: any) => setValue('ai_generation', { ...val, enabled: config.ai_generation.enabled })} />
-                    </div> */}
                 </form >
             </FormProvider>
 

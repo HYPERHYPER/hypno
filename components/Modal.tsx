@@ -17,7 +17,7 @@ interface ModalProps {
     actionBtn?: {
         status?: SaveStatus;
         text?: string;
-        onClick?: () => void;
+        onClick?: (e: any) => void;
         hidden?: boolean;
     };
     wide?: boolean;
