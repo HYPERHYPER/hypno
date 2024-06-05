@@ -2,30 +2,6 @@ import { ReactNode } from "react";
 import { SaveStatus } from "./Form/AutosaveStatusText";
 import clsx from "clsx";
 
-interface OrgUser {
-  id: number | null;
-  username: string | null;
-  organization_id: number | null;
-  email: string | null;
-  first_name: string | null;
-  last_name: string | null;
-  avatar: string | null;
-  created_at: string | null;
-  roles: Role[] | string | null;
-}
-
-interface Role {
-  id: number;
-  user_id: number;
-  event_id: number;
-  organization_id: number | null;
-  created_at: string;
-  updated_at: string;
-  authorizer_id: number;
-  kind: string;
-  status: string;
-}
-
 interface TriggerModalProps {
   id?: string;
   children?: ReactNode;
@@ -33,7 +9,6 @@ interface TriggerModalProps {
 }
 
 interface ModalProps {
-  user?: OrgUser;
   id?: string;
   children?: ReactNode;
   title?: string;
@@ -67,7 +42,6 @@ export default function Modal({
   menu,
   actionBtn,
   wide,
-  user,
 }: ModalProps) {
   return (
     <>
