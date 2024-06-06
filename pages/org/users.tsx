@@ -292,14 +292,14 @@ const Item = ({
                 : null}
           </span>
           {roles !== "account_owner" && Array.isArray(roles) && (
-            <span className="bg-white/20 h-6 w-6 sm:h-10 sm:w-10 flex items-center justify-center rounded-full text-black">
-              <Modal.Trigger
-                id="kick-user-modal"
-                onClick={() => handleModalOpen(user)}
-              >
+            <Modal.Trigger
+              id="kick-user-modal"
+              onClick={() => handleModalOpen(user)}
+            >
+              <span className="bg-white/20 h-6 w-6 sm:h-10 sm:w-10 flex items-center justify-center rounded-full text-black">
                 <Minus />
-              </Modal.Trigger>
-            </span>
+              </span>
+            </Modal.Trigger>
           )}
         </div>
       </div>
