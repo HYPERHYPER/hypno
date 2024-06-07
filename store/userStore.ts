@@ -267,13 +267,14 @@ async function completeProRegistration(
     },
   });
 
+  const data = await response.json(); // user object
+
   if (response.status === 422) {
-    throw new Error(response.statusText);
+    throw new Error(data.error);
   } else if (!response.ok) {
     throw new Error("Something went wrong, please try again later");
   }
 
-  const data = await response.json(); // user object
   return data;
 }
 
