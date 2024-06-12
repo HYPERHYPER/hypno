@@ -132,8 +132,8 @@ export default function EffectsModal({
                     {status && AutosaveStatusText(status)}
                 </>
             }
-            actionBtn={{hidden: true}}
-            >
+            actionBtn={{ hidden: true }}
+        >
             <div className='grid grid-cols-1 xl:grid-cols-2 xl:gap-5'>
                 <div className='pb-7 relative flex w-full items-center justify-center'>
                     <div
@@ -214,10 +214,23 @@ export default function EffectsModal({
                     {ai_generation.type == 'midjourney' && (
                         <FormControl label='parameters' dir='col' altLabel="apply midjourney parameters across all image generations">
                             <textarea
+                                rows={1}
                                 className='textarea pro left flex-1 w-full'
                                 placeholder='--param value'
                                 {...register('ai_generation.midjourney_parameters')}
                             />
+                        </FormControl>
+                    )}
+
+                    {ai_generation.type == 'midjourney' && (
+                        <FormControl label='character' altLabel="adds midjourney character reference to prompt">
+                            <input type="checkbox" className="toggle pro toggle-lg" {...register('ai_generation.cref')} />
+                        </FormControl>
+                    )}
+
+                    {ai_generation.type == 'midjourney' && (
+                        <FormControl label='style' altLabel="adds midjourney style reference to prompt">
+                            <input type="checkbox" className="toggle pro toggle-lg" {...register('ai_generation.sref')} />
                         </FormControl>
                     )}
 
