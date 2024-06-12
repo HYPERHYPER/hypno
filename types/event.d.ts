@@ -5,6 +5,8 @@ export type AiConfig = {
     prompt_strength?: number;
     img_prompt?: string[];
     midjourney_parameters?: string;
+    cref?: boolean;
+    sref?: boolean;
     custom?: {
         current?: string;
         models?: any;
