@@ -24,7 +24,7 @@ export function TextPromptEditor({ onChange, textPrompt, generateImage, isGenera
     const adjustTextareaHeight = () => {
         if (textareaRef.current) {
             textareaRef.current.style.height = 'auto';
-            textareaRef.current.style.height = `${(textareaRef.current.scrollHeight)*1.2}px`;
+            textareaRef.current.style.height = `${(textareaRef.current.scrollHeight) * 1.2}px`;
         }
     };
 
@@ -74,8 +74,21 @@ export function TextPromptEditor({ onChange, textPrompt, generateImage, isGenera
         }
     }, [loadedGlitch, textPrompt, isGenerating]);
 
+    useEffect(() => {
+        if ("virtualKeyboard" in navigator) {
+            const virtualKeyboard = navigator.virtualKeyboard as { overlaysContent?: boolean };
+            if (virtualKeyboard.overlaysContent !== undefined) {
+                virtualKeyboard.overlaysContent = true;
+            }
+        }
+    }, []);
+
     return (
-        <dialog id="text_prompt_editor_modal" className="modal bg-[#333333]/50 backdrop-blur-[20px] cursor-pointer mt-0" >
+        <dialog
+            id="text_prompt_editor_modal"
+            className="modal bg-[#333333]/50 backdrop-blur-[20px] cursor-pointer mt-0"
+            style={{ maxHeight: 'calc(100% - env(keyboard-inset-height))' }}
+        >
             <div className="w-full p-7">
                 <textarea
                     ref={textareaRef}
