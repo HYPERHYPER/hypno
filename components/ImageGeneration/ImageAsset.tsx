@@ -9,6 +9,7 @@ import ArrowNext from '../../assets/icons/arrow-next.svg';
 import ArrowBack from '../../assets/icons/arrow-back.svg';
 import GraphicOverlay from './GraphicOverlay';
 import useElementSize from '@/hooks/useElementSize';
+import { useBackgroundMode } from '../BackgroundModeContext';
 
 type WatermarkProps = {
     url?: string;
@@ -130,6 +131,7 @@ export default function MagicImageItem({ image, watermark, updateEditorPrompt, d
     disablePromptEditor?: boolean,
 }) {
     const { src, status, textPrompt } = image;
+    const { mode : bgMode } = useBackgroundMode();
     const handleEditTextPromptClick = () => {
         updateEditorPrompt(textPrompt);
     }
@@ -147,7 +149,7 @@ export default function MagicImageItem({ image, watermark, updateEditorPrompt, d
             </div>
             {(status != 'pending' && disablePromptEditor) && (
                 <div className="text-center mt-5 px-2">
-                    <h3 className="text-white/50 mb-4">{textPrompt}</h3>
+                    <h3 className={clsx(bgMode == 'dark' ? "text-white/50" : "text-black/50", "mb-4")}>{textPrompt}</h3>
                     <EditTextPrompt onClick={handleEditTextPromptClick} />
                 </div>
             )}

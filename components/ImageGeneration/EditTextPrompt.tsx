@@ -2,9 +2,11 @@ import clsx from "clsx";
 import { useCallback, useEffect, useRef, useState } from "react";
 import Scramble from "react-scramble";
 import Close from '../../assets/icons/close.svg';
+import { useBackgroundMode } from "../BackgroundModeContext";
 
 // Each photo asset should have an edit text prompt button
 export default function EditTextPrompt({ onClick }: { onClick: any }) {
+    const { mode : bgMode } = useBackgroundMode();
     const handleOpenEditor = () => {
         // update text to edit based on prompt of image selected
         onClick && onClick();
@@ -13,7 +15,14 @@ export default function EditTextPrompt({ onClick }: { onClick: any }) {
     }
 
     return (
-        <button onClick={() => handleOpenEditor()} className="cursor-pointer py-[10px] px-[15px] rounded-[30px] leading-none bg-white/20 text-sm text-white/50">edit</button>
+        <button 
+            onClick={() => handleOpenEditor()} 
+            className={clsx(
+                "cursor-pointer py-[10px] px-[15px] rounded-[30px] leading-none text-sm",
+                bgMode == 'dark' ? 'bg-white/20 text-white/50' : 'bg-black text-white/80'
+            )}>
+                edit
+                </button>
     )
 }
 

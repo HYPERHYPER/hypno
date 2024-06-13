@@ -1,5 +1,5 @@
 import _ from "lodash";
-import {saveAs} from "file-saver";
+import { saveAs } from "file-saver";
 
 /**
  * It takes a width and height and returns a percentage value that represents the height as a
@@ -19,14 +19,14 @@ export function calculateAspectRatioString(width?: number, height?: number): str
     // Calculate the greatest common divisor (GCD) of width and height
     const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
     const divisor: number = gcd(width, height);
-  
+
     // Calculate the aspect ratio
     const aspectWidth: number = width / divisor;
     const aspectHeight: number = height / divisor;
-  
+
     // Return the aspect ratio as a string
     return `${aspectWidth}:${aspectHeight}`;
-  }
+}
 
 /**
  * It converts an array of numbers to a base64 string for image buffer converstion
@@ -84,4 +84,50 @@ export function downloadPhoto(asset: any, filetype?: string) {
     const assetUrl = filetype ? asset.urls[filetype] : asset.urls.url;
     const fileName = `hypno-${asset.event_id}-${asset.id}`;
     saveAs(assetUrl, fileName);
+}
+
+/**
+ * The function `isImageDark` asynchronously determines if an image is light or dark based on its
+ * average brightness.
+ * @param {string} imageUrl - The `imageUrl` parameter is a string that represents the URL of the image
+ * you want to analyze for darkness or lightness. This function uses the luminance formula to calculate
+ * the average brightness of the image and then determines if the image is 'dark' or 'light' based on a
+ * predefined threshold.
+ * @returns The `isImageDark` function returns a Promise that resolves with either `'light'`, `'dark'`,
+ * or `null`.
+ */
+export async function isImageDark(imageUrl?: string): Promise<'light' | 'dark' | null> {
+    if (!imageUrl) return null;
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                reject(new Error('Failed to get canvas context'));
+                return;
+            }
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+            const imageData = ctx.getImageData(0, 0, img.width, img.height);
+            let sumBrightness = 0;
+            for (let i = 0; i < imageData.data.length; i += 4) {
+                // Get brightness of each pixel using luminance formula
+                const brightness = (0.2126 * imageData.data[i] + 0.7152 * imageData.data[i + 1] + 0.0722 * imageData.data[i + 2]);
+                sumBrightness += brightness;
+            }
+            // Calculate average brightness
+            const avgBrightness = sumBrightness / (img.width * img.height);
+            // Define a threshold for light and dark images
+            const threshold = 128; // Adjust this threshold as needed
+            // Resolve with 'light' or 'dark' based on the average brightness
+            resolve(avgBrightness < threshold ? 'dark' : 'light');
+        };
+        img.onerror = (error) => {
+            reject(error);
+        };
+        img.src = imageUrl;
+    });
 }
