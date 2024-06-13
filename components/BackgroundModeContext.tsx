@@ -49,7 +49,7 @@ export const BackgroundModeProvider = ({ backgroundImage, children }: Background
             });
         }
 
-        return false;
+        return true;
     };
 
     // State to hold the mode

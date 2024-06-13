@@ -21,7 +21,7 @@ export function CustomGallery({ event, children, logoSize = 'sm', galleryBanner,
     const backgroundImage = gallery?.home_background_image || defaultBackground; // default is blurred photo from gallery
 
     return (
-        <BackgroundModeProvider backgroundImage={backgroundImage}>
+        <BackgroundModeProvider backgroundImage={gallery?.home_background_image}>
             <section className={`text-white min-h-screen relative`} style={{ minHeight: windowHeight }}>
                 <div
                     className='fixed bg-black top-0 bottom-0 left-0 w-screen h-screen'
