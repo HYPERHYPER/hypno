@@ -43,9 +43,11 @@ export default function DetailView({ asset, config, imageProps }: any) {
 
     const imagesLength = _.size(images);
     useEffect(() => {
-        setTimeout(() => {
-            scrollToBottom();
-    }, 300);
+        if (imagesLength > 0) {
+            setTimeout(() => {
+                scrollToBottom();
+            }, 300);
+        }
     }, [imagesLength])
 
     const isPortrait = asset.height > asset.width;
