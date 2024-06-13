@@ -43,7 +43,9 @@ export default function DetailView({ asset, config, imageProps }: any) {
 
     const imagesLength = _.size(images);
     useEffect(() => {
-        scrollToBottom();
+        setTimeout(() => {
+            scrollToBottom();
+    }, 300);
     }, [imagesLength])
 
     const isPortrait = asset.height > asset.width;
@@ -199,7 +201,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                 </div>
 
                 {enableAiMagic && (
-                    <div ref={containerRef} className="mt-7 w-full h-auto pb-[36px]">
+                    <div className="mt-7 w-full h-auto pb-[36px]">
                         {(!_.isEmpty(images)) && (
                             _.map(images, (img, i) => (
                                 <MagicImageItem
@@ -241,6 +243,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                     downloadButton({ mobile: true })
                 }
             </div>
+            <div ref={containerRef}></div>
         </>
     )
 }
