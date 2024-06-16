@@ -38,7 +38,7 @@ export function ImageAsset({ src, error, watermark, status }: { src?: string, er
 
     return (
         <div
-            className={clsx('relative bg-black/50 backdrop-blur-[50px] mx-auto transition-all')}
+            className={clsx('relative bg-black/50 backdrop-blur-[50px] mx-auto')}
             style={{ width: `${width}px`, height: `${height}px` }}
         >
             {(isGenerating || error) && (
