@@ -8,6 +8,7 @@ export interface MagicImage {
     status?: string;
     textPrompt?: string;
     urls?: string[];
+    progress?: number;
 }
 
 const sleep = (ms: number | undefined) => new Promise((r) => setTimeout(r, ms));
@@ -17,6 +18,9 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
     const [asset, setAsset] = useState(initAsset);
 
     const [images, setImages] = useState<MagicImage[]>([]); // array of generated image urls, if still loading will be empty string
+    const addImage = (image: MagicImage) => setImages(prev => [...prev, image]);
+    const replaceLastImage = (image: MagicImage) => setImages(prev => [...prev.slice(0, -1), image]);
+
     const [textPrompt, setTextPrompt] = useState<string>(config?.text_prompt || '');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<boolean>(false);
@@ -31,6 +35,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
     const customModel = _.find(customModels, (m: { id: string | undefined; lora_url: any; }) => m.id === currentCustom && m.lora_url) || defaultModel;
     const imageSrc = config.apply_graphics ? asset.raw : asset.urls.url;
     // const imageSrc = asset.urls.url;
+    // console.log(imageSrc)
 
     // Custom 
     async function generateCustomModelImage() {
@@ -40,7 +45,12 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
             status: 'pending',
             textPrompt
         }
-        setImages((prev) => [...prev, defaultMagicImage]) // image generating in progress
+        // check if raw was in progress
+        if (_.last(images)?.progress == -1) {
+            replaceLastImage(defaultMagicImage)
+        } else {
+            addImage(defaultMagicImage) // image generating in progress
+        }
 
         const response = await fetch("/api/predictions", {
             method: "POST",
@@ -71,7 +81,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
                     num_inference_steps: 30,
                     controlnet_1_conditioning_scale: 0.8,
                     controlnet_2_conditioning_scale: 0.8,
-                    
+
                     // https://replicate.com/batouresearch/sdxl-controlnet-lora
                     // image: `${imageSrc}?width=512`,
                     // lora_weights: customModel?.lora_url || '',
@@ -116,7 +126,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
                 textPrompt,
                 urls: output_urls,
             }
-            setImages((prev) => [...prev.slice(0, -1), magicImage]); // replace with loaded url
+            replaceLastImage(magicImage); // replace with loaded url
             setIsLoading(false);
             console.log('Completed image details', prediction);
         }
@@ -183,9 +193,15 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
         const defaultMagicImage = {
             src: '',
             status: 'pending',
+            progress: 0,
             textPrompt
         }
-        setImages((prev) => [...prev, defaultMagicImage]) // image generating in progress
+        // check if raw was in progress
+        if (_.last(images)?.progress == -1) {
+            replaceLastImage(defaultMagicImage)
+        } else {
+            addImage(defaultMagicImage) // image generating in progress
+        }
 
         const img_prompts = _.join(config?.img_prompt, " ");
         const imgAspectRatioParam = `--ar ${calculateAspectRatioString(asset?.width, asset?.height)}`
@@ -234,12 +250,19 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
                                 status: data.status,
                                 textPrompt,
                                 urls: data.upscaled_urls,
+                                progress: data.progress,
                             }
-                            setImages((prev) => [...prev.slice(0, -1), magicImage]); // replace with loaded url
+                            replaceLastImage(magicImage) // replace with loaded url
                             setIsLoading(false);
                             console.log('Completed image details', data);
                         } else {
-                            console.log("Image is not finished generation. Status: ", data.status)
+                            console.log("Image is not finished generation. Status: ", data);
+                            const magicImage = {
+                                ...defaultMagicImage,
+                                status: data.status,
+                                progress: data.progress,
+                            }
+                            replaceLastImage(magicImage);
                         }
                     } catch (error) {
                         console.error('Error getting updates', error);
@@ -265,6 +288,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
 
     return {
         images,
+        addImage,
         textPrompt,
         isLoading,
         error,

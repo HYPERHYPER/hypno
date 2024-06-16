@@ -1,7 +1,8 @@
 import { convertBlendMode } from '@/helpers/blendmode';
 import useElementSize from '@/hooks/useElementSize';
 import clsx from 'clsx';
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
+import { useImageCache } from '../ImageCacheContext';
 
 interface GraphicOverlayProps {
     imageUrl?: string;
@@ -17,6 +18,8 @@ const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps)
     const { width, height } = useElementSize('detail-view-image');
     const blendMode = convertBlendMode(watermark?.blendmode || 'source-over')
     const watermarkUrl = watermark?.url || '';
+    const { loadImageUrl } = useImageCache();
+    const [ displayImage, setDisplayImage ] = useState<boolean>(false);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -24,21 +27,13 @@ const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps)
         const context = canvas.getContext('2d');
         if (!context) return;
 
-        const loadImage = async (url: string): Promise<HTMLImageElement> => {
-            return new Promise((resolve, reject) => {
-                const image = new Image();
-                image.onload = () => resolve(image);
-                image.onerror = (error) => reject(error);
-                image.src = url;
-            });
-        };
-
         const drawImageWithWatermark = async () => {
             if (!imageUrl || !watermarkUrl) return;
+            console.log('drawImageWithWatermark')
             try {
                 const [image, watermark] = await Promise.all([
-                    loadImage(`/api/proxy-images?url=${imageUrl}`),
-                    loadImage(`/api/proxy-images?url=${watermarkUrl}`),
+                    loadImageUrl(`/api/proxy-images?url=${imageUrl}`),
+                    loadImageUrl(`/api/proxy-images?url=${watermarkUrl}`),
                 ]);
 
                 // Calculate scaling factors for the image and watermark
@@ -77,6 +72,8 @@ const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps)
 
                 // Draw the scaled watermark on top of the image
                 context.drawImage(watermark, 0, 0, scaledWatermarkWidth, scaledWatermarkHeight);
+
+                setDisplayImage(true);
             } catch (error) {
                 console.error('Error loading images:', error);
             }
@@ -117,7 +114,7 @@ const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps)
         <canvas
             id={`ai-${imageUrl}`}
             style={{ width: `${width}px`, height: `${height}px` }}
-            className={clsx('transition duration-300', loadImage ? 'opacity-100' : 'opacity-0')}
+            className={clsx('transition duration-300', displayImage ? 'opacity-100' : 'opacity-0')}
             ref={canvasRef}
         />
     );

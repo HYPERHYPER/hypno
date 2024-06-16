@@ -1,5 +1,4 @@
 import Spinner from "../Spinner";
-import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import VideoAsset from "./VideoAsset";
@@ -14,6 +13,8 @@ import MagicImageItem from "../ImageGeneration/ImageAsset";
 import { TextPromptEditor } from "../ImageGeneration/EditTextPrompt";
 import { getCookie } from "cookies-next";
 import axios from "axios";
+import useImageExistence from "@/hooks/useImageExistence";
+import { ImageCacheProvider } from "../ImageCacheContext";
 
 export default function DetailView({ asset, config, imageProps }: any) {
     // const footer = Boolean(config.aiGeneration?.enabled || asset.mp4_url);
@@ -23,23 +24,20 @@ export default function DetailView({ asset, config, imageProps }: any) {
 
     const {
         images,
+        addImage: addMagicImage,
         isLoading: isLoadingGeneration,
         textPrompt,
         editTextPrompt,
         generateAiImage
     } = useMagic({ ...config.ai_generation, apply_graphics: config.rawEnabled }, asset);
-    const containerRef = useRef<HTMLDivElement | null>(null);
 
+    const containerRef = useRef<HTMLDivElement | null>(null);
     const scrollToBottom = useCallback(() => {
         if (containerRef.current) {
             // Scroll to the element
             containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
-    }, [containerRef.current])
-
-    const handleRemix = async (e: any) => {
-        generateAiImage();
-    };
+    }, [])
 
     const imagesLength = _.size(images);
     useEffect(() => {
@@ -63,7 +61,6 @@ export default function DetailView({ asset, config, imageProps }: any) {
 
     // get watermark to be applied to image generation
     const aspectRatio = Number(getAspectRatio(asset.width, asset.height))
-
     // check if apply graphics is turned on (stored in pro_raw_upload) - since watermarks are applied to raw url
     const watermarkUrl = _.first(_.filter(config?.watermarks, (wm) => {
         const w_h = wm.name.split(":")
@@ -75,6 +72,33 @@ export default function DetailView({ asset, config, imageProps }: any) {
         url: watermarkUrl,
         blendmode: config.watermarkBlendmode
     } : undefined;
+
+    // If watermark turned on, wait until raw has uploaded before performing image generation
+    const { imageExists : rawImageExists } = useImageExistence(watermark ? asset.raw : '');
+    const [clickedMagicButton, setClickedMagicButton] = useState<boolean>(false);
+
+    const handleRemix = () => {
+        setClickedMagicButton(true);
+        // generateAiImage();
+    };
+
+    useEffect(() => {
+        // if graphics turned on (depends on watermark variable) 
+        // -> check that raw is avail before generating
+        if (clickedMagicButton) {
+            if ((watermark && rawImageExists) || !watermark) {
+                generateAiImage();
+                setClickedMagicButton(false);
+            } else if (watermark && !rawImageExists) {
+                // start fake loading magic image
+                addMagicImage({
+                    src: '',
+                    status: 'uploading raw',
+                    progress: -1
+                })
+            }
+        }
+    }, [clickedMagicButton, rawImageExists])
 
     // portrait
     // mobile
@@ -203,19 +227,21 @@ export default function DetailView({ asset, config, imageProps }: any) {
                 </div>
 
                 {enableAiMagic && (
-                    <div className="mt-7 w-full h-auto pb-[36px]">
-                        {(!_.isEmpty(images)) && (
-                            _.map(images, (img, i) => (
-                                <MagicImageItem
-                                    image={img}
-                                    watermark={watermark}
-                                    key={i}
-                                    updateEditorPrompt={editTextPrompt}
-                                    disablePromptEditor={config?.ai_generation?.disable_prompt_editor}
-                                />
-                            ))
-                        )}
-                    </div>
+                    <ImageCacheProvider>
+                        <div className="mt-7 w-full h-auto pb-[36px]">
+                            {(!_.isEmpty(images)) && (
+                                _.map(images, (img, i) => (
+                                    <MagicImageItem
+                                        image={img}
+                                        watermark={watermark}
+                                        key={i}
+                                        updateEditorPrompt={editTextPrompt}
+                                        enablePromptEditor={config?.ai_generation?.disable_prompt_editor}
+                                    />
+                                ))
+                            )}
+                        </div>
+                    </ImageCacheProvider>
                 )}
 
                 {enableAiMagic && (

@@ -1,7 +1,6 @@
-// pages/api/proxy-images.ts
-
 import { NextApiRequest, NextApiResponse } from 'next';
 import fetch from 'node-fetch';
+import sharp from 'sharp';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { url } = req.query;
@@ -14,11 +13,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Fetch images from their original sources
         const imageData = await fetchImage(String(url));
 
-        // Set appropriate response headers
-        res.setHeader('Content-Type', 'image/png');
-
-        // Forward the fetched images as the response
-        res.status(200).send(imageData);
+        // Check image size
+        if (imageData.length > 4 * 1024 * 1024) {
+            // Resize and compress the image if it exceeds 4MB
+            const resizedImageData = await resizeImage(imageData);
+            // Set appropriate response headers
+            res.setHeader('Content-Type', 'image/png');
+            // Send the resized image data as the response
+            res.status(200).send(resizedImageData);
+        } else {
+            // Set appropriate response headers
+            res.setHeader('Content-Type', 'image/png');
+            // Forward the fetched image data as the response
+            res.status(200).send(imageData);
+        }
     } catch (error) {
         console.error('Error fetching images:', error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -32,4 +40,14 @@ async function fetchImage(url: string): Promise<Buffer> {
     }
     const buffer = await response.arrayBuffer();
     return Buffer.from(buffer);
+}
+
+async function resizeImage(imageData: Buffer): Promise<Buffer> {
+    // Resize and compress the image using sharp
+    const resizedImageBuffer = await sharp(imageData)
+        .resize({ width: 1200 }) // Adjust width and height as needed
+        .jpeg({ quality: 80 }) // Set JPEG quality (0-100) as needed
+        .toBuffer();
+    
+    return resizedImageBuffer;
 }

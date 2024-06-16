@@ -38,6 +38,9 @@ type ImageData = {
     metadata: Object; // need to type?
     width: number;
     height: number;
+    has_raw_asset: boolean;
+    raw: string;
+    raw_url: string;
     urls: {
         url: string;
         jpeg_url: string;
@@ -97,9 +100,8 @@ const SubGallery = (props: ResponseData) => {
         return { id: f.name.toLowerCase().replaceAll(" ", "_"), ...f }
     });
 
-    const isProEvent = !_.isEmpty(gallery);
     const showBrowseGalleryBanner = event.is_private == 1 && event.event_type == 'hypno_pro' && (isDetailView || (!dataCapture && !gallery.email_delivery));
-
+    
     /* MINI GALLERY ?category= */
     // No photos uploaded: loading view
     // All photos uploaded + data capture required: data capture -> gallery
@@ -297,6 +299,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
     }
 
+    console.log(singleAssetData)
     return {
         props: {
             ...photosData,
