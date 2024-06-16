@@ -19,7 +19,7 @@ const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps)
     const blendMode = convertBlendMode(watermark?.blendmode || 'source-over')
     const watermarkUrl = watermark?.url || '';
     const { loadImageUrl } = useImageCache();
-    const [ displayImage, setDisplayImage ] = useState<boolean>(false);
+    const [displayImage, setDisplayImage] = useState<boolean>(false);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -29,34 +29,37 @@ const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps)
 
         const drawImageWithWatermark = async () => {
             if (!imageUrl || !watermarkUrl) return;
-            console.log('drawImageWithWatermark')
+
             try {
                 const [image, watermark] = await Promise.all([
                     loadImageUrl(`/api/proxy-images?url=${imageUrl}`),
                     loadImageUrl(`/api/proxy-images?url=${watermarkUrl}`),
                 ]);
 
-                // Calculate scaling factors for the image and watermark
-                const imageScaleFactor = Math.min(width / image.width, height / image.height);
-                const watermarkScaleFactor = Math.min(width / watermark.width, height / watermark.height);
+                // Adjust for device pixel ratio
+                const devicePixelRatio = window.devicePixelRatio || 1;
 
                 // Set canvas dimensions to match element size
                 // Increase canvas size for higher resolution
-                const canvasWidth = width * window.devicePixelRatio;
-                const canvasHeight = height * window.devicePixelRatio;
+                const canvasWidth = width * devicePixelRatio;
+                const canvasHeight = height * devicePixelRatio;
                 canvas.width = canvasWidth;
                 canvas.height = canvasHeight;
 
                 // Scale canvas context to match device pixel ratio
                 canvas.style.width = `${width}px`;
                 canvas.style.height = `${height}px`;
-                context.scale(window.devicePixelRatio, window.devicePixelRatio);
+                context.scale(devicePixelRatio, devicePixelRatio);
 
                 // Set image smoothing for better quality
                 context.imageSmoothingEnabled = true;
 
                 // Clear the canvas
                 context.clearRect(0, 0, canvasWidth, canvasHeight);
+
+                // Calculate scaling factors for the image and watermark
+                const imageScaleFactor = Math.min(width / image.width, height / image.height);
+                const watermarkScaleFactor = Math.min(width / watermark.width, height / watermark.height);
 
                 // Draw the image
                 const scaledImageWidth = image.width * imageScaleFactor;
@@ -108,7 +111,7 @@ const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps)
         return () => {
             canvas.removeEventListener('touchend', saveImageOnTouch);
         };
-    }, [imageUrl, watermarkUrl, width, height, canvasRef.current, loadImage]);
+    }, [imageUrl, watermarkUrl, width, height, canvasRef, loadImage]);
 
     return (
         <canvas
