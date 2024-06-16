@@ -93,7 +93,7 @@ export default function DetailView({ asset, config, imageProps }: any) {
                 // start fake loading magic image
                 addMagicImage({
                     src: '',
-                    status: 'uploading raw',
+                    status: 'uploading',
                     progress: -1
                 })
             }

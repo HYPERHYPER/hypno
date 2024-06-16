@@ -13,6 +13,16 @@ export interface MagicImage {
 
 const sleep = (ms: number | undefined) => new Promise((r) => setTimeout(r, ms));
 
+const getStatus = (status: string, progress?: number) => {
+    if (status == 'pending' || (status == 'in-progress' && (!progress || progress < 50))) {
+        return 'generating'
+    } else if (status == 'in-progress') {
+        return 'finishing'
+    } else {
+        return status;
+    }
+}
+
 export default function useMagic(initConfig: AiConfig, initAsset: any) {
     const [config, setConfig] = useState<AiConfig>(initConfig);
     const [asset, setAsset] = useState(initAsset);
@@ -42,7 +52,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
         setIsLoading(true);
         const defaultMagicImage = {
             src: '',
-            status: 'pending',
+            status: getStatus('pending'),
             textPrompt
         }
         // check if raw was in progress
@@ -122,7 +132,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
             const output_urls = _.filter(prediction.output, (o: string) => !o.includes('control'))
             const magicImage: MagicImage = {
                 src: _.first(output_urls),
-                status: prediction.status,
+                status: getStatus(prediction.status),
                 textPrompt,
                 urls: output_urls,
             }
@@ -137,7 +147,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
         setIsLoading(true);
         const defaultMagicImage = {
             src: '',
-            status: 'pending',
+            status: getStatus('pending'),
             textPrompt
         }
         setImages((prev) => [...prev, defaultMagicImage]) // image generating in progress
@@ -192,7 +202,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
 
         const defaultMagicImage = {
             src: '',
-            status: 'pending',
+            status: getStatus('pending'),
             progress: 0,
             textPrompt
         }
@@ -247,7 +257,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
                             const image = upscaledImage || imageGrid;
                             const magicImage = {
                                 src: image,
-                                status: data.status,
+                                status: getStatus(data.status, data.progress),
                                 textPrompt,
                                 urls: data.upscaled_urls,
                                 progress: data.progress,
@@ -259,7 +269,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
                             console.log("Image is not finished generation. Status: ", data);
                             const magicImage = {
                                 ...defaultMagicImage,
-                                status: data.status,
+                                status: getStatus(data.status, data.progress),
                                 progress: data.progress,
                             }
                             replaceLastImage(magicImage);
