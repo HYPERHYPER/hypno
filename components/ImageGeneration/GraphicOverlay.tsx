@@ -96,7 +96,7 @@ const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps)
                 const file = new File([blob], 'hypno-ai.png', { type: 'image/png' });
 
                 try {
-                    await navigator.share({ files: [file], title: window.location.href });
+                    await navigator.share({ files: [file] });
                 } catch (error) {
                     console.error('Error sharing image:', error);
                 }
