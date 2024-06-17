@@ -14,9 +14,23 @@ export function getAspectRatio(width?: number, height?: number) {
     return `${ratio}`;
 }
 
+function canRoundTo(targetValue: number, numerator: number, denominator: number) {
+    // Calculate the decimal value of the fraction
+    const decimalValue = numerator / denominator;
+
+    // Check if the decimal value is approximately equal to the targetValue
+    // We use a tolerance of 0.005 for a reasonable approximation
+    const tolerance = 0.005;
+    if (Math.abs(decimalValue - targetValue) < tolerance) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 export function calculateAspectRatioString(width?: number, height?: number): string {
     if (!width || !height) return '9:16'
-    if (width == 1344 && height == 2400) return '9:16';
+    if (canRoundTo(0.56, width, height)) return '9:16';
     
     // Calculate the greatest common divisor (GCD) of width and height
     const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
