@@ -16,6 +16,8 @@ export function getAspectRatio(width?: number, height?: number) {
 
 export function calculateAspectRatioString(width?: number, height?: number): string {
     if (!width || !height) return '9:16'
+    if (width == 1344 && height == 2400) return '9:16';
+    
     // Calculate the greatest common divisor (GCD) of width and height
     const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
     const divisor: number = gcd(width, height);
