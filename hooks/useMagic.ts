@@ -278,7 +278,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
                         console.error('Error getting updates', error);
                         throw error;
                     }
-                }, 5000 /* every 5 seconds */);
+                }, 3000 /* every 5 seconds */);
             }
         } catch (error) {
             console.error('Error generating image:', error);
