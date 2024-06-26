@@ -74,7 +74,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
                     scheduler: "K_EULER",
                     lora_scale: 0.8,
                     num_outputs: 1,
-                    controlnet_1: "depth_leres",
+                    controlnet_1: "edge_canny",
                     controlnet_2: "none",
                     // controlnet_2: "illusion",
                     controlnet_3: "none",
