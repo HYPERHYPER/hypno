@@ -30,8 +30,9 @@ function SettingsPage() {
   const logout = useUserStore.useLogout();
   const updateUser = useUserStore.useUpdateUser();
   const token = useUserStore.useToken();
+  console.log("here", user.organization_id);
 
-  const orgUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${user?.organization?.id}`;
+  const orgUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${user.organization_id}`;
   const {
     data: orgData,
     isValidating: isValidatingOrgData,
@@ -40,7 +41,8 @@ function SettingsPage() {
     axiosGetWithToken(url, token),
   );
 
-  const orgTier = orgData?.organization?.metadata?.hypno_pro?.current_tier;
+  const orgTier =
+    orgData?.organization?.metadata?.hypno_pro?.current_tier || "N/A";
 
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("ready");
   const {
@@ -128,7 +130,7 @@ function SettingsPage() {
   };
 
   const handleBillingRedirect = async () => {
-    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${user?.organization?.id}/billing_portal`;
+    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${user?.organization_id}/billing_portal`;
     await axios
       .get(url, {
         headers: {
