@@ -71,6 +71,7 @@ export default function DuplicateEventModal({
           router.push(
             `${process.env.NEXT_PUBLIC_DASHBOARD_URL}/e/${newEventId}`,
           );
+          setStatus("ready");
           return 0;
         }
         return prevCount - 1;
@@ -90,9 +91,9 @@ export default function DuplicateEventModal({
     >
       <div className="list pro">
         <div className="item">
-          <h2 className="text-white">{eventName}</h2>
+          <h2 className="text-white truncate">{eventName}</h2>
           <div className="inline-flex items-center gap-2">
-            <h2 className="text-white/50">copy screens?</h2>
+            <h2 className="text-white/50 whitespace-nowrap">copy screens?</h2>
             <input
               type="checkbox"
               className="toggle pro toggle-lg"
@@ -103,7 +104,7 @@ export default function DuplicateEventModal({
         </div>
 
         {status == "success" && (
-          <div className="item text-right">redirecting in {countdown}...</div>
+          <div className="item">redirecting in {countdown}...</div>
         )}
       </div>
     </Modal>
