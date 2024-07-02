@@ -28,6 +28,7 @@ function OrganizationSettingsPage(props: ResponseData) {
   const user = useUserStore.useUser();
   const updateUser = useUserStore.useUpdateUser();
   const token = useUserStore.useToken();
+  console.log('here', user)
 
   const orgUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${user.organization.id}`;
   const {

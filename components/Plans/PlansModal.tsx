@@ -50,7 +50,11 @@ interface PlanType {
 const PLAN_TYPES: PlanType = {
   free: {
     tagline: "shoot + share",
-    highlights: ["shoot + share in seconds", "add collaborators for free", "100 photo limit"],
+    highlights: [
+      "shoot + share in seconds",
+      "add collaborators for free",
+      "100 photo limit",
+    ],
     annualPrice: 0,
     monthlyPrice: 0,
     users: 1,
@@ -59,8 +63,12 @@ const PLAN_TYPES: PlanType = {
   },
   creator: {
     tagline: "endless creativity",
-    highlights: ["style your photos + galleries", "add collaborators from $9/mo", "unlimited photos"],
-    icon: '∞',
+    highlights: [
+      "style your photos + galleries",
+      "add collaborators from $9/mo",
+      "unlimited photos",
+    ],
+    icon: "∞",
     annualPrice: 9,
     monthlyPrice: 15,
     users: 1,
@@ -69,8 +77,12 @@ const PLAN_TYPES: PlanType = {
   },
   studio: {
     tagline: "canon capture",
-    highlights: ["connect your professional camera", "add collaborators from $99/mo", "unlimited photos"],
-    icon: '✶',
+    highlights: [
+      "connect your professional camera",
+      "add collaborators from $99/mo",
+      "unlimited photos",
+    ],
+    icon: "✶",
     annualPrice: 99,
     monthlyPrice: 125,
     users: 1,
@@ -79,8 +91,12 @@ const PLAN_TYPES: PlanType = {
   },
   brand: {
     tagline: "enterprise data/legal",
-    highlights: ["unlock data capture + custom legal", "add collaborators from $999/mo", "unlimited photos"],
-    icon: '✺',
+    highlights: [
+      "unlock data capture + custom legal",
+      "add collaborators from $999/mo",
+      "unlimited photos",
+    ],
+    icon: "✺",
     annualPrice: 999,
     monthlyPrice: 1250,
     users: 1,
@@ -131,15 +147,15 @@ const PlanCard = ({
 }: {
   type: string;
   current?: string;
-  onPlanSelect: (type: string, billingFrequency: 'annual' | 'monthly') => void;
+  onPlanSelect: (type: string, billingFrequency: "annual" | "monthly") => void;
   cancelledState: boolean;
 }) => (
   <div
-    className={clsx(
-      "h-full rounded-3xl bg-white/5 p-6 text-white transition",
-    )}
+    className={clsx("h-full rounded-3xl bg-white/5 p-6 text-white transition")}
   >
-    <h2 className="3xl:text-5xl text-3xl">{type} <span className="text-white/20">{PLAN_TYPES[type].icon}</span></h2>
+    <h2 className="3xl:text-5xl text-3xl">
+      {type} <span className="text-white/20">{PLAN_TYPES[type].icon}</span>
+    </h2>
     <div className="my-3">
       {_.map(PLAN_TYPES[type].highlights, (item, i) => (
         <h3 key={i} className="3xl:text-2xl text-lg text-primary">
@@ -159,7 +175,9 @@ const PlanCard = ({
                 const hasAccess = _.includes(FEATURE_ACCESS[f], type);
                 return (
                   <div key={i} className="item font-medium">
-                    <span className={!hasAccess ? 'text-white/40' : ''}>{f}{" "}</span>
+                    <span className={!hasAccess ? "text-white/40" : ""}>
+                      {f}{" "}
+                    </span>
                     {hasAccess ? (
                       <span className="text-primary">
                         <Checkmark />
@@ -170,21 +188,35 @@ const PlanCard = ({
                       </span>
                     )}
                   </div>
-                )
+                );
               })}
             </div>
           </div>
         );
       })}
     </div>
-    {type == current || type == 'free' ? (
-      <div className={clsx(type == current && "border-2 border-white", "bg-white/10 w-full rounded-3xl m-auto h-[110px]")}>
+    {type == current || type == "free" ? (
+      <div
+        className={clsx(
+          type == current && "border-2 border-white",
+          "bg-white/10 w-full rounded-3xl m-auto h-[110px]",
+        )}
+      >
         <div className="flex flex-col items-center justify-center h-full font-medium">
-          <h3>{type != current ? "need to switch plans?" : "this is your current plan"}</h3>
-          <h3 className='text-primary cursor-pointer' onClick={(e) => {
-            e.preventDefault();
-            onPlanSelect('free', 'monthly');
-          }}>manage subscription</h3>
+          <h3>
+            {type != current
+              ? "need to switch plans?"
+              : "this is your current plan"}
+          </h3>
+          <h3
+            className="text-primary cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              onPlanSelect("free", "monthly");
+            }}
+          >
+            manage subscription
+          </h3>
         </div>
       </div>
     ) : (
@@ -192,22 +224,24 @@ const PlanCard = ({
         <button
           onClick={(e) => {
             e.preventDefault();
-            !cancelledState && onPlanSelect(type, 'monthly');
+            !cancelledState && onPlanSelect(type, "monthly");
           }}
-          className="btn btn-primary rounded-full w-full">
+          className="btn btn-primary rounded-full w-full"
+        >
           {`$${PLAN_TYPES[type].monthlyPrice}/mo`}
         </button>
         <button
           onClick={(e) => {
             e.preventDefault();
-            !cancelledState && onPlanSelect(type, 'annual');
+            !cancelledState && onPlanSelect(type, "annual");
           }}
-          className="btn btn-primary rounded-full w-full">
+          className="btn btn-primary rounded-full w-full"
+        >
           {`$${PLAN_TYPES[type].annualPrice}/mo (paid annually)`}
         </button>
       </div>
     )}
-  </div >
+  </div>
 );
 
 export default function PaymentPlansModal() {
@@ -215,7 +249,7 @@ export default function PaymentPlansModal() {
   const orgId = user?.organization_id;
   const token = useUserStore.useToken();
 
-  const orgUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${user.organization.id}`;
+  const orgUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${user.organization_id}`;
   const {
     data: orgData,
     isValidating: isValidatingOrgData,
@@ -231,7 +265,7 @@ export default function PaymentPlansModal() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const redirectToBillingPortal = async () => {
-    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${user?.organization?.id}/billing_portal`;
+    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/organizations/${user?.organization_id}/billing_portal`;
     await axios
       .get(url, {
         headers: {
@@ -247,11 +281,11 @@ export default function PaymentPlansModal() {
       })
       .catch((e) => {
         console.log(e);
-      })
+      });
   };
 
   const handlePlanSelect = useCallback(
-    async (type: string, billingFrequency: 'annual' | 'monthly') => {
+    async (type: string, billingFrequency: "annual" | "monthly") => {
       setIsLoading(true);
       if (type == "free") {
         // Redirect to billing portal
@@ -327,7 +361,14 @@ export default function PaymentPlansModal() {
                     ? "you are currently signed up for a custom plan. please contact us to make any changes."
                     : `you're on the ${orgTier} plan`}
               </h2>
-              {(orgTier != "free" && orgTier != "custom") && <h2 className="text-primary cursor-pointer" onClick={redirectToBillingPortal}>manage billing →</h2>}
+              {orgTier != "free" && orgTier != "custom" && (
+                <h2
+                  className="text-primary cursor-pointer"
+                  onClick={redirectToBillingPortal}
+                >
+                  manage billing →
+                </h2>
+              )}
             </div>
           </div>
           <button className="flex h-[30px] w-[30px] cursor-pointer items-center sm:h-[60px] sm:w-[60px]">
@@ -345,7 +386,6 @@ export default function PaymentPlansModal() {
               </div>
             ) : (
               <div>
-
                 <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-6 xl:grid-cols-4">
                   {_.map(["free", "creator", "studio", "brand"], (type, i) => (
                     <PlanCard

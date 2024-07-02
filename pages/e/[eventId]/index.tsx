@@ -38,6 +38,7 @@ import ArchiveEventModal from "@/components/Events/ArchiveEventModal";
 import { downloadPhoto, getAspectRatio } from "@/helpers/image";
 import ContentDownloadModal from "@/components/Events/ContentDownloadModal";
 import { formatTimestamp } from "@/helpers/date";
+import DuplicateEventModal from "@/components/Events/DuplicateEventModal";
 
 type PhotosResponse = {
   photos: any;
@@ -243,7 +244,9 @@ const AdminAsset = ({
                 >
                   <Share />
                 </Link>
-                <span className="text-white lowercase px-3 py-2 font-normal text-lg">{formatTimestamp(asset.captured_at)}</span>
+                <span className="text-white lowercase px-3 py-2 font-normal text-lg">
+                  {formatTimestamp(asset.captured_at)}
+                </span>
               </div>
 
               {asset.gif && (
@@ -399,6 +402,11 @@ function EventPage(props: ResponseData) {
                 <h2 className="text-primary">data</h2>
               </Modal.Trigger>
             )}
+            {userEventPrivileges?.canDownloadData && (
+              <Modal.Trigger id="duplicate-event-modal">
+                <h2 className="text-primary">duplicate</h2>
+              </Modal.Trigger>
+            )}
             {userEventPrivileges?.canDownloadContent && (
               <Modal.Trigger id="content-download-modal">
                 <h2 className="text-primary">download</h2>
@@ -421,6 +429,13 @@ function EventPage(props: ResponseData) {
           <ScanQRModal eventId={id} eventName={name} modalId="scan-qr-modal" />
           {userEventPrivileges?.canDownloadData && (
             <DataDownloadModal modalId="data-download-modal" eventId={id} />
+          )}
+          {userEventPrivileges?.canDownloadData && (
+            <DuplicateEventModal
+              modalId="duplicate-event-modal"
+              eventId={id}
+              eventName={name}
+            />
           )}
           {userEventPrivileges?.canDownloadContent && (
             <ContentDownloadModal
