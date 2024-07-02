@@ -110,7 +110,7 @@ const AdminAsset = ({
         }}
       >
         <Link
-          href={`/i/${asset.id}`}
+          href={`/i/${asset.slug}`}
           className={clsx(
             "rounded-box absolute inset-0 transition duration-300 hover:scale-105",
             isLoaded ? "opacity-100" : "opacity-0",
