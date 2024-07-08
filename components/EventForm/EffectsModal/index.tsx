@@ -16,7 +16,7 @@ import { DotsSpinner } from "../../Spinner";
 import Star from '../../../assets/icons/star.svg';
 import NewModelModal from "./NewModelModal";
 
-const AI_GENERATION_TYPES = ['custom', 'midjourney']
+const AI_GENERATION_TYPES = ['custom', 'hugging-face', 'midjourney']
 
 const ImageAsset = ({ isLoading, error, src }: { isLoading: boolean, error: boolean, src?: string }) => {
     return (
@@ -263,6 +263,17 @@ export default function EffectsModal({
                                 <NewModelModal />
                             </div>
                         </div>
+                    )}
+
+                    {/* HUGGING FACE OPTIONS */}
+                    {ai_generation.type == 'hugging-face' && (
+                        <FormControl label='model' altLabel="use existing model by pasting hugging face model name (repo/model)">
+                            <input
+                                className='input pro w-full'
+                                placeholder='repo/model'
+                                {...register('ai_generation.huggingface_model')}
+                            />
+                        </FormControl>
                     )}
 
                     {/* ALL MODEL OPTIONS */}

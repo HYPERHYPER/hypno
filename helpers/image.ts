@@ -31,7 +31,7 @@ function canRoundTo(targetValue: number, numerator: number, denominator: number)
 export function calculateAspectRatioString(width?: number, height?: number): string {
     if (!width || !height) return '9:16'
     if (canRoundTo(0.56, width, height)) return '9:16';
-    
+
     // Calculate the greatest common divisor (GCD) of width and height
     const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
     const divisor: number = gcd(width, height);
@@ -146,4 +146,38 @@ export async function isImageDark(imageUrl?: string): Promise<'light' | 'dark' |
         };
         img.src = imageUrl;
     });
+}
+
+// /**
+//  * The function `blobToBase64` converts a Blob object to a base64 encoded string asynchronously using
+//  * FileReader in TypeScript.
+//  * @param {Blob} blob - A Blob object represents a file-like object of immutable, raw data. It can be
+//  * used to store binary data, such as images or documents.
+//  * @returns The `blobToBase64` function returns a Promise that resolves to the base64 representation of
+//  * the input Blob after it has been read and converted by a FileReader.
+//  */
+// export async function blobToBase64(blob: Blob): Promise<string> {
+//     return new Promise((resolve, reject) => {
+//         const reader = new FileReader();
+//         reader.onloadend = () => resolve(reader.result as string);
+//         reader.onerror = reject;
+//         reader.readAsDataURL(blob);
+//     });
+// }
+
+/**
+ * The function `bufferToBase64` converts a Buffer object to a base64 encoded string with a data URI
+ * prefix for PNG images.
+ * @param {Buffer} buffer - A Buffer object containing binary data, typically an image in this case.
+ * @returns The function `bufferToBase64` takes a Buffer as input and returns a string that represents
+ * the Buffer data as a base64 encoded image in the format `data:image/png;base64,`.
+ */
+export function bufferToBase64(buffer: Buffer): string {
+    return `data:image/png;base64,${buffer.toString('base64')}`;
+}
+
+export async function blobToBase64(blob: Blob): Promise<string> {
+    const arrayBuffer = await blob.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    return `data:${blob.type};base64,${buffer.toString('base64')}`;
 }

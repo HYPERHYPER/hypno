@@ -1,5 +1,5 @@
 import { AiConfig } from "@/types/event";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import _ from 'lodash';
 import { calculateAspectRatioString } from "@/helpers/image";
 
@@ -44,12 +44,10 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
 
     const customModel = _.find(customModels, (m: { id: string | undefined; lora_url: any; }) => m.id === currentCustom && m.lora_url) || defaultModel;
     const imageSrc = config.apply_graphics ? asset.raw : `${asset.urls.url}?width=512`;
-    // const imageSrc = asset.urls.url;
-    // console.log(imageSrc)
 
-    // Custom 
-    async function generateCustomModelImage() {
+    function initializeImageGeneration() {
         setIsLoading(true);
+        setError(false);
         const defaultMagicImage = {
             src: '',
             status: getStatus('pending'),
@@ -61,6 +59,13 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
         } else {
             addImage(defaultMagicImage) // image generating in progress
         }
+
+        return defaultMagicImage;
+    }
+
+    // Custom 
+    async function generateCustomModelImage() {
+        const defaultMagicImage = initializeImageGeneration();
 
         const response = await fetch("/api/predictions", {
             method: "POST",
@@ -145,13 +150,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
 
     // Stable diffusion
     async function generateStableDiffusionImage() {
-        setIsLoading(true);
-        const defaultMagicImage = {
-            src: '',
-            status: getStatus('pending'),
-            textPrompt
-        }
-        setImages((prev) => [...prev, defaultMagicImage]) // image generating in progress
+        const defaultMagicImage = initializeImageGeneration();
 
         const response = await fetch("/api/predictions", {
             method: "POST",
@@ -199,20 +198,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
 
     // Midjourney
     async function generateMidjourneyImage() {
-        setIsLoading(true);
-
-        const defaultMagicImage = {
-            src: '',
-            status: getStatus('pending'),
-            progress: 0,
-            textPrompt
-        }
-        // check if raw was in progress
-        if (_.last(images)?.progress == -1) {
-            replaceLastImage(defaultMagicImage)
-        } else {
-            addImage(defaultMagicImage) // image generating in progress
-        }
+        const defaultMagicImage = initializeImageGeneration();
 
         const img_prompts = _.join(config?.img_prompt, " ");
         const imgAspectRatioParam = `--ar ${calculateAspectRatioString(asset?.width, asset?.height)}`
@@ -289,10 +275,50 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
         }
     }
 
+
+    async function generateHuggingFaceImage() {
+        if (!config.huggingface_model) return;
+
+        const defaultMagicImage = initializeImageGeneration();
+        try {
+            const response = await fetch('/api/huggingface', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    oldImageUrl: imageSrc,
+                    prompt: textPrompt,
+                    model: config.huggingface_model,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to generate image');
+            }
+
+            const data = await response.json();
+
+            const magicImage = {
+                src: data.src,
+                status: getStatus('succeeded'),
+                textPrompt,
+            };
+            setIsLoading(false);
+            replaceLastImage(magicImage);
+        } catch (error) {
+            console.error('Error generating image:', error);
+            setError(true);
+            setIsLoading(false);
+            // Handle error (e.g., show error message to user)
+        }
+    }
+
     const generateAiImage = () => {
         switch (config.type) {
             case "custom": return generateCustomModelImage();
             case "midjourney": return generateMidjourneyImage();
+            case "hugging-face": return generateHuggingFaceImage();
             default: return generateStableDiffusionImage();
         }
     };

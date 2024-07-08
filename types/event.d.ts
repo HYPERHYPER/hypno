@@ -1,6 +1,6 @@
 export type AiConfig = {
     enabled?: boolean;
-    type?: 'midjourney' | 'stable diffusion' | 'sdxl' | 'custom';
+    type?: 'midjourney' | 'stable diffusion' | 'sdxl' | 'custom' | 'hugging-face';
     text_prompt?: string;
     prompt_strength?: number;
     img_prompt?: string[];
@@ -11,6 +11,7 @@ export type AiConfig = {
         current?: string;
         models?: any;
     }
+    huggingface_model?: string;
     disable_prompt_editor?: boolean;
     apply_graphics?: boolean;
 }
