@@ -63,9 +63,11 @@ export default function DetailView({ asset, config, imageProps }: any) {
     const aspectRatio = Number(getAspectRatio(asset.width, asset.height))
     // check if apply graphics is turned on (stored in pro_raw_upload) - since watermarks are applied to raw url
     const watermarkUrl = _.first(_.filter(config?.watermarks, (wm) => {
+        if (!wm.name) return;
+
         const w_h = wm.name.split(":")
         const ar = Number(w_h[0]) / Number(w_h[1])
-        return ar.toFixed(1) === aspectRatio.toFixed(1)
+        return ar.toFixed(1) == aspectRatio.toFixed(1)
     }))?.watermark_url;
 
     const watermark = (config.rawEnabled && watermarkUrl) ? {
