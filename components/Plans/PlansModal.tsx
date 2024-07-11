@@ -259,8 +259,15 @@ export default function PaymentPlansModal() {
     axiosGetWithToken(url, token),
   );
 
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+
   const orgTier = orgData?.organization.metadata.hypno_pro.current_tier;
   const cancelledState = !!orgData?.organization.metadata.hypno_pro.cancel_at;
+  const cancelDate = orgData?.organization.metadata.hypno_pro.cancel_at;
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -356,7 +363,7 @@ export default function PaymentPlansModal() {
             <div className="flex flex-col gap-2">
               <h2 className={cancelledState ? "text-error" : "text-white/40"}>
                 {cancelledState
-                  ? "you are not currently subscribed, please renew via the billing portal to make changes to your subscription"
+                  ? `you recently cancelled your plan! it will expire on ${new Date(cancelDate).toLocaleDateString("en-US", options)}, please renew via the billing portal to make changes to your subscription`
                   : orgTier == "custom"
                     ? "you are currently signed up for a custom plan. please contact us to make any changes."
                     : `you're on the ${orgTier} plan`}
