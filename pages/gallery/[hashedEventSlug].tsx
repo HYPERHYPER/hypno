@@ -7,8 +7,9 @@ import { fetchWithToken } from '@/lib/fetchWithToken';
 import { CustomGallery } from '@/components/Gallery/CustomGallery';
 import InfiniteMediaGrid from '@/components/Gallery/InfiniteMediaGrid';
 import { EventConfig } from '@/types/event';
-import { getPlaiceholder } from 'plaiceholder';
 import { useRouter } from 'next/router';
+import { useMemo } from 'react';
+import LoadingView from '@/components/LoadingView';
 
 
 type ImageData = {
@@ -61,14 +62,18 @@ const PublicGallery = (props: ResponseData) => {
     const { query } = useRouter();
     const eventSlug = query.hashedEventSlug;
 
+    if (!eventSlug) {
+        return <LoadingView />; // Or some loading indicator
+    }
+
     const galleryTitle = event.name;
 
-    const getKey = (pageIndex: number, previousPageData: any) => {
-        if ((_.isNil(previousPageData) && pageIndex > 0) || (previousPageData && !previousPageData?.meta?.next_page)) return null; // reached the end
+    const getKey = useMemo(() => (pageIndex: number, previousPageData: any) => {
+        if ((_.isNil(previousPageData) && pageIndex > 0) || (previousPageData && !previousPageData?.meta?.next_page)) return null;
         const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventSlug}/photos?per_page=30`;
         if (pageIndex === 0) return [url, process.env.NEXT_PUBLIC_AUTH_TOKEN];
         return [`${previousPageData?.meta?.next_page}`, process.env.NEXT_PUBLIC_AUTH_TOKEN];
-    }
+    }, [eventSlug]);
 
     const { data, size, setSize, error, isLoading } = useSWRInfinite(getKey,
         ([url, token]) => fetchWithToken(url, token), {
@@ -78,7 +83,7 @@ const PublicGallery = (props: ResponseData) => {
     const paginatedPhotos = !_.isEmpty(_.first(data).photos) ? _.map(data, (v) => v.photos).flat() : [];
     const hasMorePhotos = size != (_.first(data)?.meta?.total_pages || 0);
 
-    if (isLoading || !paginatedPhotos) return <div></div>
+    if (!paginatedPhotos) return <div></div>
     return (
         <>
             <Head>
@@ -102,10 +107,18 @@ const PublicGallery = (props: ResponseData) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    const { hashedEventSlug } = context.query;
-    const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
+    const { hashedEventSlug } = context.params || {};
+    console.log("Query:", context.query);
+    console.log("Params:", context.params);
+
+    if (!hashedEventSlug || hashedEventSlug === 'undefined') {
+        return {
+            notFound: true,
+        }
+    }
 
     // Fetch event config
+    const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
     const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(hashedEventSlug)}`;
     let eventData: any = {};
 
@@ -122,11 +135,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
     } catch (e) {
         console.log(e);
-    }
-
-    if (_.isEmpty(eventData)) {
-        return {
-            notFound: true,
+    } finally {
+        if (_.isEmpty(eventData)) {
+            return {
+                notFound: true,
+            }
         }
     }
 
