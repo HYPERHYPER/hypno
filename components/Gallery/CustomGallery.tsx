@@ -26,7 +26,9 @@ export function CustomGallery({ event, children, logoSize = 'sm', galleryBanner,
                 <div
                     className='fixed bg-black top-0 bottom-0 left-0 w-screen h-screen'
                     style={{
-                        background: `url(${backgroundImage}) no-repeat center center fixed`,
+                        backgroundImage: `url(${backgroundImage})`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'center center',
                         backgroundSize: 'cover',
                         WebkitBackgroundSize: 'cover',
                         MozBackgroundSize: 'cover',
