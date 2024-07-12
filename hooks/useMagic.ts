@@ -38,11 +38,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
     const editTextPrompt = (updatedText: string) => setTextPrompt(updatedText);
     const resetImages = () => setImages([]);
 
-    const customModels = config?.custom?.models;
-    const currentCustom = config?.custom?.current;
-    const defaultModel = Object.values(config?.custom?.models || {})[0];
-
-    const customModel = _.find(customModels, (m: { id: string | undefined; lora_url: any; }) => m.id === currentCustom && m.lora_url) || defaultModel;
+    const customModel = config?.custom?.current || null;
     const imageSrc = config.apply_graphics ? asset.raw : `${asset.urls.url}?width=512`;
 
     function initializeImageGeneration() {

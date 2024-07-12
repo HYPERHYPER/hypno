@@ -8,12 +8,19 @@ export type AiConfig = {
     cref?: boolean;
     sref?: boolean;
     custom?: {
-        current?: string;
+        current?: CustomModel;
         models?: any;
     }
     huggingface_model?: string;
     disable_prompt_editor?: boolean;
     apply_graphics?: boolean;
+}
+
+export type CustomModel = {
+    id: string;
+    lora_url?: string;
+    name: string;
+    status: string;
 }
 
 export type EventMicrosite = {
@@ -65,7 +72,7 @@ export type EventPayload = {
     };
     custom_frontend?: EventMicrosite;
     filter?: { id: number };
-    watermarks?: Array<{title: string, url: string}>
+    watermarks?: Array<{ title: string, url: string }>
     delivery?: string; // "qr_gallery" to show qr code to microsite, "qr" to disable
 }
 

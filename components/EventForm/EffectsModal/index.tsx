@@ -5,16 +5,12 @@ import _ from "lodash";
 import { useFormContext } from "react-hook-form";
 import FormControl from "../../Form/FormControl";
 import FileInput from "../../Form/FileInput";
-import Link from "next/link";
 import clsx from "clsx";
-import axios from "axios";
-import { getS3Filename } from "@/helpers/text";
-import useUserStore from "@/store/userStore";
-import Timer from "../../Timer";
 import useMagic from "@/hooks/useMagic";
 import { DotsSpinner } from "../../Spinner";
 import Star from '../../../assets/icons/star.svg';
 import NewModelModal from "./NewModelModal";
+import useCustomModels from "@/hooks/useCustomModels";
 
 const AI_GENERATION_TYPES = ['custom', 'hugging-face', 'midjourney']
 
@@ -46,47 +42,13 @@ export default function EffectsModal({
 }) {
     const { setValue, watch, register } = useFormContext();
     const ai_generation = watch().ai_generation;
+    const org_id = watch().org_id;
 
     useEffect(() => {
         if (ai_generation.enabled && _.isNil(ai_generation.type)) {
             setValue('ai_generation.type', 'midjourney', { shouldDirty: true })
         }
     }, [ai_generation.enabled]);
-
-    const modelTraining = _.first(_.filter(ai_generation?.custom?.models, (m) => m.status !== "succeeded"))
-    const trainingInProgress = !_.isEmpty(modelTraining)
-
-    const [trainingStatus, setTrainingStatus] = useState<string>();
-
-    const customModels = _.filter(ai_generation?.custom?.models, (m) => m.status === 'succeeded')
-
-    useEffect(() => {
-        const checkTrainingStatus = async () => {
-            console.log('CHECK TRAINING STATUS')
-            const response = await fetch("/api/predictions/" + modelTraining.id);
-            let prediction = await response.json();
-            if (response.status !== 200) {
-                console.log('Error checking training status', prediction.detail);
-                return;
-            }
-
-            if (prediction.status == 'failed') {
-                let updateModels = ai_generation?.custom?.models;
-                delete updateModels[modelTraining.id]
-                setValue('ai_generation.custom.models', updateModels, { shouldDirty: true })
-                return;
-            }
-
-            if (prediction.status == 'succeeded') {
-                console.log('SUCCESS IN CHECK TRAINING STATUS')
-                // saveModelUrl(modelTraining.id, prediction);
-            }
-        }
-
-        if (trainingInProgress) {
-            checkTrainingStatus()
-        }
-    }, []);
 
     // TEST PLAYGROUND
     const testImages = ['https://images.hypno.com/8/hUk2Cjw3gkp8.jpg', 'https://images.hypno.com/8/x0qI0043gnrg.jpg', 'https://images.hypno.com/8/xmslh_Y3gkpo.jpg']
@@ -120,7 +82,46 @@ export default function EffectsModal({
         generateAiImage();
     }
 
+    const { 
+        customModels: allModels,
+        successfulModels: customModels,
+        addModel,
+        deleteModel,
+ } = useCustomModels(org_id);
+    const modelTraining = _.first(_.filter(allModels, (m) => m.status !== "succeeded"))
+    const trainingInProgress = !_.isEmpty(modelTraining)
+
+    const [trainingStatus, setTrainingStatus] = useState<string>();
     const loadingStates = ['pending', 'starting', 'processing', 'in-progress']
+
+    // useEffect(() => {
+    //     const checkTrainingStatus = async () => {
+    //         console.log('CHECK TRAINING STATUS')
+    //         const response = await fetch("/api/predictions/" + modelTraining.id);
+    //         let prediction = await response.json();
+    //         if (response.status !== 200) {
+    //             console.log('Error checking training status', prediction.detail);
+    //             return;
+    //         }
+
+    //         if (prediction.status == 'failed') {
+    //             let updateModels = ai_generation?.custom?.models;
+    //             delete updateModels[modelTraining.id]
+    //             setValue('ai_generation.custom.models', updateModels, { shouldDirty: true })
+    //             return;
+    //         }
+
+    //         if (prediction.status == 'succeeded') {
+    //             console.log('SUCCESS IN CHECK TRAINING STATUS')
+    //             // saveModelUrl(modelTraining.id, prediction);
+    //         }
+    //     }
+
+    //     if (trainingInProgress) {
+    //         checkTrainingStatus()
+    //     }
+    // }, []);
+
     return (
         <Modal
             title='effects'
@@ -139,7 +140,9 @@ export default function EffectsModal({
                     <div
                         className='absolute top-0 bottom-0 left-0 w-full'
                         style={{
-                            background: `url(${testImages[imgIdx]}) no-repeat center center fixed`,
+                            backgroundImage: `url(${testImages[imgIdx]})`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundPosition: 'center center',
                             backgroundSize: 'cover',
                             WebkitBackgroundSize: 'cover',
                             MozBackgroundSize: 'cover',
@@ -147,13 +150,13 @@ export default function EffectsModal({
                             height: '100%',
                             filter: 'blur(60x)',
                             opacity: '50%',
+                            transition: 'ease'
                         }}
                     />
                     <div className='absolute top-0 bottom-0 left-0 w-full backdrop-blur-[30px]' />
 
                     <div className='relative'>
                         <div className="h-[420px] p-7 flex flex-row justify-center">
-
                             <ImageAsset key='orig-img' src={testImages[imgIdx]} isLoading={false} error={false} />
                             <div className="relative">
                                 <ImageAsset
@@ -239,8 +242,8 @@ export default function EffectsModal({
                         <div>
                             <FormControl label='model'>
                                 <select
-                                    value={ai_generation?.custom?.current}
-                                    onChange={(e) => setValue('ai_generation.custom.current', e.target.value, { shouldDirty: true })}
+                                    value={ai_generation?.custom?.current?.id || undefined}
+                                    onChange={(e) => setValue('ai_generation.custom.current', _.find(customModels, m => m.id == e.target.value), { shouldDirty: true })}
                                     className="select pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-3xl">
                                     {_.isEmpty(customModels) ?
                                         <option value={undefined}>no models trained</option>
@@ -260,7 +263,10 @@ export default function EffectsModal({
                                     :
                                     <FormControl label="new model"><span className="text-lg sm:text-3xl text-primary"><Modal.Trigger id={'new-model-modal'}>create →</Modal.Trigger></span></FormControl>
                                 }
-                                <NewModelModal />
+                                <NewModelModal 
+                                    onTrainingUpdate={addModel}
+                                    onTrainingFailed={deleteModel}
+                                />
                             </div>
                         </div>
                     )}

@@ -8,18 +8,24 @@ import { getS3Filename } from "@/helpers/text";
 import useUserStore from "@/store/userStore";
 import Timer from "../../Timer";
 import LogDisplay from "./LogDisplay";
+import { CustomModel } from "@/types/event";
 
 const sleep = (ms: number | undefined) => new Promise((r) => setTimeout(r, ms));
 
-export default function NewModelModal() {
-    const { setValue, watch } = useFormContext();
-    const ai_generation = watch().ai_generation;
+export default function NewModelModal({
+    onTrainingUpdate,
+    onTrainingFailed
+}: {
+    onTrainingUpdate: (model: CustomModel) => void;
+    onTrainingFailed: (modelId: number) => void;
+}) {
+    const { setValue } = useFormContext();
 
     const [modelName, setModelName] = useState<string>('');
     const [trainingData, setTrainingData] = useState<string>(); // zip file upload
 
     const [trainingStatus, setTrainingStatus] = useState<string>();
-    const [modelId, setModelId] = useState();
+    const [trainedModel, setTrainedModel] = useState<CustomModel>();
 
     const [currentPrediction, setCurrentPrediction] = useState<any>();
 
@@ -46,16 +52,13 @@ export default function NewModelModal() {
         console.log('pred', prediction);
         setCurrentPrediction(prediction);
         let model_id = prediction.id;
-        setModelId(model_id);
-        setValue('ai_generation.custom.models', {
-            ...ai_generation?.custom?.models,
-            [model_id]: {
-                id: model_id,
-                name: modelName,
-                status: prediction.status
-            }
-        }, { shouldDirty: true })
 
+        const initModel = {
+            id: model_id,
+            name: modelName,
+            status: prediction.status,
+        }
+        onTrainingUpdate(initModel)
 
         while (
             prediction.status !== "succeeded" &&
@@ -68,15 +71,30 @@ export default function NewModelModal() {
 
             if (response.status !== 200) {
                 console.log('Error', prediction.detail);
-                setTrainingStatus('failed')
+                setTrainingStatus('failed');
+                onTrainingFailed(model_id);
                 return;
             }
 
-            console.log({ prediction })
+            // console.log({ prediction })
             setTrainingStatus(prediction.status)
 
             if (prediction.status == 'succeeded') {
-                saveModelUrl(model_id, prediction);
+                try {
+                    const s3Url = await saveModelUrl(prediction);
+                    const updatedModel = {
+                        ...initModel,
+                        status: prediction.status,
+                        lora_url: s3Url
+                    }
+                    setTrainingStatus('finished');
+                    setTrainedModel(updatedModel);
+                    onTrainingUpdate(updatedModel);
+                } catch (e) {
+                    // Model upload failed
+                    setTrainingStatus('failed');
+                    onTrainingFailed(model_id);
+                }
             }
         }
     };
@@ -84,8 +102,7 @@ export default function NewModelModal() {
     const user = useUserStore.useUser();
 
     let modelTraining = { name: 'test' }
-
-    const saveModelUrl = async (model_id: any, prediction: any) => {
+    const saveModelUrl = async (prediction: any) => {
         // Get S3 upload url
         console.log('uploading to s3');
         setTrainingStatus('saving')
@@ -111,44 +128,36 @@ export default function NewModelModal() {
             console.error('Error fetching or creating blob:', error);
         }
 
-        // Upload file to S3 upload url
-        console.log('Uploading to: ', resp.data.uploadURL);
-        const result = await fetch(resp.data.uploadURL, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': contentType,
-            },
-            body: blob,
-        });
+        try {
+            // Upload file to S3 upload url
+            console.log('Uploading to: ', resp.data.uploadURL);
+            const result = await fetch(resp.data.uploadURL, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': contentType,
+                },
+                body: blob,
+            });
 
-        console.log('upload to s3 results', result)
+            console.log('upload to s3 results', result)
 
-        // Check if upload was successful
-        if (result.ok) {
+            // Check if upload was successful
+            if (!result.ok) {
+                throw new Error('Model S3 upload failed')
+            }
+
             const s3Url = result.url.split('?')[0];
             console.log('Upload successful', s3Url);
-            setValue('ai_generation.custom.models', {
-                ...ai_generation?.custom?.models,
-                [model_id]: {
-                    ...ai_generation?.custom?.models[model_id],
-                    status: prediction.status,
-                    lora_url: s3Url,
-                }
-            }, { shouldDirty: true })
-            setTrainingStatus('finished')
-        } else {
-            console.error('Upload failed');
-            let updateModels = ai_generation?.custom?.models;
-            delete updateModels[model_id]
-            setValue('ai_generation.custom.models', updateModels, { shouldDirty: true })
-            setTrainingStatus('failed')
+            return s3Url;
+        } catch (e) {
+            console.log(e);
         }
     }
 
     const handleFinishedTraining = (e: any) => {
         e.preventDefault();
         // Set new model to current model applied
-        setValue('ai_generation.custom.current', modelId, { shouldDirty: true });
+        setValue('ai_generation.custom.current', trainedModel, { shouldDirty: true });
 
         // Reset inputs
         setModelName('');
@@ -175,7 +184,7 @@ export default function NewModelModal() {
                 hidden: trainingStatus != 'finished'
             }}
         >
-            <div className="list pro" style={{ borderTop: 'none' }}>
+            <div className="list pro">
                 <FormControl label="model name">
                     <input className="input pro" value={modelName} onChange={(e) => setModelName(e.target.value)} />
                 </FormControl>
@@ -183,7 +192,10 @@ export default function NewModelModal() {
                     <FileInput uploadCategory="ai" inputId='trainingPhotosInput' onInputChange={(val) => setTrainingData(val)} value={trainingData} />
                 </FormControl>
                 <FormControl label='ready?'>
-                    <button className="text-xl sm:text-3xl text-primary" onClick={trainModel}>start ↓</button>
+                    {trainingStatus ?
+                        <div className="text-primary text-xl sm:text-3xl flex items-center gap-2">{trainingStatus} {trainingStatus !== 'finished' && <span className="w-[50px] sm:min-w-[90px]"><Timer /></span>}</div>
+                        : <button className="text-xl sm:text-3xl text-primary" onClick={trainModel}>start ↓</button>
+                    }
                 </FormControl>
                 {trainingStatus &&
                     <>
@@ -191,7 +203,6 @@ export default function NewModelModal() {
                             <div className="text-white/40">
                                 <span>keep window open until finished </span>
                             </div>
-                            <div className="text-primary text-xl sm:text-3xl flex items-center gap-2">{trainingStatus} {trainingStatus !== 'finished' && <span className="w-[50px] sm:min-w-[90px]"><Timer /></span>}</div>
                         </div>
                         <div className="text-white/40 text-xl sm:text-3xl">
                             <span>this might take a minute.......................</span>
