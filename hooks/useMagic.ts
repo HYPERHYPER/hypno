@@ -61,6 +61,9 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
 
     // Custom 
     async function generateCustomModelImage() {
+        const lora_url = customModel?.lora_url;
+        if (!lora_url) return;
+
         const defaultMagicImage = initializeImageGeneration();
 
         const response = await fetch("/api/predictions", {
@@ -79,7 +82,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
                     controlnet_2: "depth_leres",
                     // controlnet_2: "illusion",
                     controlnet_3: "none",
-                    lora_weights: customModel?.lora_url || '',
+                    lora_weights: lora_url,
                     guidance_scale: 7.5,
                     apply_watermark: false,
                     prompt_strength: 0.8,
