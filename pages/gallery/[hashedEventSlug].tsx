@@ -62,10 +62,6 @@ const PublicGallery = (props: ResponseData) => {
     const { query } = useRouter();
     const eventSlug = query.hashedEventSlug;
 
-    if (!eventSlug) {
-        return <LoadingView />; // Or some loading indicator
-    }
-
     const galleryTitle = event.name;
 
     const getKey = useMemo(() => (pageIndex: number, previousPageData: any) => {
@@ -83,7 +79,7 @@ const PublicGallery = (props: ResponseData) => {
     const paginatedPhotos = !_.isEmpty(_.first(data).photos) ? _.map(data, (v) => v.photos).flat() : [];
     const hasMorePhotos = size != (_.first(data)?.meta?.total_pages || 0);
 
-    if (!paginatedPhotos) return <div></div>
+    if (!paginatedPhotos || !eventSlug) return <div></div>
     return (
         <>
             <Head>
@@ -108,8 +104,6 @@ const PublicGallery = (props: ResponseData) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const { hashedEventSlug } = context.params || {};
-    console.log("Query:", context.query);
-    console.log("Params:", context.params);
 
     if (!hashedEventSlug || hashedEventSlug === 'undefined') {
         return {
@@ -123,7 +117,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     let eventData: any = {};
 
     try {
-        const eventRes = await axios.get(eventUrl, {
+        const eventRes = await fetch(eventUrl, {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: 'Bearer ' + token,
@@ -131,7 +125,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         });
 
         if (eventRes.status === 200) {
-            eventData = eventRes.data;
+            eventData = await eventRes.json();
         }
     } catch (e) {
         console.log(e);
