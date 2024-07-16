@@ -68,14 +68,15 @@ const SubGallery = (props: ResponseData) => {
     const outerHeight = useContentHeight({ footer: false });
     const contentHeight = useContentHeight({ footer: true });
     const { event, photos: initialPhotos, count, photo, placeholder } = props;
-
+    
     const gallery: EventMicrosite = event.custom_frontend;
-    const { query: { category, eventId, event: galleryViewSlug } } = useRouter()
+    const { query: { category, eventId: eventIdOrSlug, event: galleryViewSlug } } = useRouter()
+    const eventSlug = event.party_slug;
     const token = String(getCookie('hypno_microsite'));
 
     const [photoUploadPending, setPhotoUploadPending] = useState<boolean>(true); // waiting for first photo to arrive
     const [photoUploadCompleted, setPhotoUploadCompleted] = useState<boolean>(false);
-    const photoUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}/photos/index_from_category?category=${category}`;
+    const photoUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventIdOrSlug}/photos/index_from_category?category=${category}`;
     const { data, error } = useSWR(category ? [photoUrl, token] : null,
         ([url, token]) => axiosGetWithToken(url, token),
         {
@@ -175,7 +176,7 @@ const SubGallery = (props: ResponseData) => {
                                         <ResponsiveMasonry columnsCountBreakPoints={{ 750: 2, 900: 3 }} className='pb-8'>
                                             <Masonry gutter='15px'>
                                                 {photos.map((p, i) => (
-                                                    <Link key={p.id} href={`/${galleryViewSlug}/${eventId}?i=${p.slug}`}>
+                                                    <Link key={p.id} href={`/${galleryViewSlug}/${eventSlug}?i=${p.slug}`}>
                                                         <div className='w-full block relative bg-white/10 backdrop-blur-[50px] overflow-hidden'>
                                                             <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10'>
                                                                 <Spinner />
@@ -223,7 +224,7 @@ const SubGallery = (props: ResponseData) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const { req, res } = context;
-    const { event, eventId, category, i: photoSlug, slug: deliverySlug } = context.query;
+    const { event, eventId : eventIdOrSlug, category, i: photoSlug, slug: deliverySlug } = context.query;
 
     let eventData: any = {};
     let photosData: any = {};
@@ -248,8 +249,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         setCookie('hypno_microsite', token, { req, res });
 
         // Load custom frontend based on event
-        if (!_.isNil(eventId)) {
-            const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}/custom_frontend`;
+        if (!_.isNil(eventIdOrSlug)) {
+            const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventIdOrSlug}/custom_frontend`;
             let eventRes = await axios.get(eventUrl, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -261,7 +262,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
         // Fetch subset of photos to be displayed in subgallery
         if (category) {
-            const photosUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventId}/photos/index_from_category?category=${category}`;
+            const photosUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventIdOrSlug}/photos/index_from_category?category=${category}`;
             let photosRes = await axios.get(photosUrl, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -299,7 +300,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         }
     }
 
-    console.log(singleAssetData)
     return {
         props: {
             ...photosData,

@@ -39,7 +39,7 @@ export function CustomGallery({ event, children, logoSize = 'sm', galleryBanner,
                     }}
                 />
 
-                {galleryBanner && <Link href={`/pro/${event.id}/p`} className='absolute top-0 left-0 right-0 p-2 w-full bg-black/10 backdrop-blur-[30px] z-10 text-center transition hover:bg-black/[.08]'><span className='font-medium'>browse the gallery →</span></Link>}
+                {galleryBanner && <Link href={`/pro/${event.party_slug}/p`} className='absolute top-0 left-0 right-0 p-2 w-full bg-black/10 backdrop-blur-[30px] z-10 text-center transition hover:bg-black/[.08]'><span className='font-medium'>browse the gallery →</span></Link>}
 
                 <div id='custom-gallery-parent' className={clsx('absolute pb-6 sm:pb-6 top-0 bottom-0 left-0 right-0 flex flex-col overflow-x-hidden overflow-y-scroll', galleryBanner && 'pt-6')}>
                     <div className='w-full'>

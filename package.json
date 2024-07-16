@@ -40,6 +40,7 @@
     "glitch.js": "^1.0.0",
     "google-protobuf": "^3.21.2",
     "grpc": "^1.24.11",
+    "hashids": "^2.3.0",
     "html-react-parser": "^3.0.9",
     "lodash": "^4.17.21",
     "next": "13.1.2",

@@ -39,6 +39,7 @@ import { downloadPhoto, getAspectRatio } from "@/helpers/image";
 import ContentDownloadModal from "@/components/Events/ContentDownloadModal";
 import { formatTimestamp } from "@/helpers/date";
 import DuplicateEventModal from "@/components/Events/DuplicateEventModal";
+import { hashEncode } from "@/helpers/hashHelper";
 
 type PhotosResponse = {
   photos: any;
@@ -285,6 +286,7 @@ function EventPage(props: ResponseData) {
   const event = initialEvent || eventData?.event;
   const id = event?.id || "";
   const name = event?.name || "";
+  const eventSlug = event?.party_slug || "";
 
   const getKey = (pageIndex: number, previousPageData: any) => {
     if (previousPageData && !previousPageData?.meta.next_page) return null; // reached the end
@@ -353,6 +355,9 @@ function EventPage(props: ResponseData) {
     ? getEventPrivileges(event.user_privileges)
     : null;
 
+    
+  const shareableGalleryUrl = event ? `/gallery/${hashEncode(event.id)}` : ''
+
   if (!event && isValidatingEventData) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center">
@@ -392,8 +397,8 @@ function EventPage(props: ResponseData) {
             {/* <Link href={`/pro/${id}/p`}><h2 className='text-primary'>public gallery</h2></Link> */}
             {/* <Link href={`/e/${id}`}><h2 className='text-white'>all</h2></Link> */}
             {/* <Link href=''><h2 className='text-primary'>favorites</h2></Link> */}
-            {isProEvent(event.event_type) && event.is_private == 1 && (
-              <Link href={`/pro/${id}/p`}>
+            {isProEvent(event.event_type) && (
+              <Link href={shareableGalleryUrl}>
                 <h2 className="text-primary">gallery</h2>
               </Link>
             )}

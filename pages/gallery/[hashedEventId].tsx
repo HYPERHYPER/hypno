@@ -1,4 +1,3 @@
-import axios from 'axios';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import _ from 'lodash';
@@ -10,6 +9,7 @@ import { EventConfig } from '@/types/event';
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 import LoadingView from '@/components/LoadingView';
+import { hashDecode, hashEncode } from '@/helpers/hashHelper';
 
 
 type ImageData = {
@@ -56,20 +56,19 @@ interface ResponseData {
     event: EventConfig;
 }
 
-const PublicGallery = (props: ResponseData) => {
+const SecretPublicGallery = (props: ResponseData) => {
     const { event } = props;
     const { name, id } = event;
     const { query } = useRouter();
-    const eventSlug = query.hashedEventSlug;
 
     const galleryTitle = event.name;
 
-    const getKey = useMemo(() => (pageIndex: number, previousPageData: any) => {
+    const getKey = (pageIndex: number, previousPageData: any) => {
         if ((_.isNil(previousPageData) && pageIndex > 0) || (previousPageData && !previousPageData?.meta?.next_page)) return null;
-        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${eventSlug}/photos?per_page=30`;
+        const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${id}/photos?per_page=30`;
         if (pageIndex === 0) return [url, process.env.NEXT_PUBLIC_AUTH_TOKEN];
         return [`${previousPageData?.meta?.next_page}`, process.env.NEXT_PUBLIC_AUTH_TOKEN];
-    }, [eventSlug]);
+    };
 
     const { data, size, setSize, error, isLoading } = useSWRInfinite(getKey,
         ([url, token]) => fetchWithToken(url, token), {
@@ -79,7 +78,7 @@ const PublicGallery = (props: ResponseData) => {
     const paginatedPhotos = !_.isEmpty(_.first(data).photos) ? _.map(data, (v) => v.photos).flat() : [];
     const hasMorePhotos = size != (_.first(data)?.meta?.total_pages || 0);
 
-    if (!paginatedPhotos || !eventSlug) return <div></div>
+    if (!paginatedPhotos || !query.hashedEventId) return <div></div>
     return (
         <>
             <Head>
@@ -94,7 +93,7 @@ const PublicGallery = (props: ResponseData) => {
                         assets={paginatedPhotos}
                         data={data}
                         hasMore={hasMorePhotos}
-                        detailBaseUrl={`/pro/${event.id}?i=`}
+                        detailBaseUrl={`/pro/${event.party_slug}?i=`}
                     />
                 </section>
             </CustomGallery>
@@ -103,17 +102,18 @@ const PublicGallery = (props: ResponseData) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    const { hashedEventSlug } = context.params || {};
-
-    if (!hashedEventSlug || hashedEventSlug === 'undefined') {
+    const { hashedEventId } = context.params || {};
+    if (!hashedEventId || hashedEventId === 'undefined') {
         return {
             notFound: true,
         }
     }
 
+    const decodedEventId= hashDecode(String(hashedEventId));
+
     // Fetch event config
     const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
-    const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(hashedEventSlug)}`;
+    const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(decodedEventId)}`;
     let eventData: any = {};
 
     try {
@@ -144,4 +144,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
 };
 
-export default PublicGallery;
+export default SecretPublicGallery;

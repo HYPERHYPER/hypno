@@ -26,7 +26,7 @@ interface ResponseData {
 const PublicGallery = (props: ResponseData) => {
     const { query } = useRouter();
     const { event } = props;
-    const { name, id } = event;
+    const { name, party_slug } = event;
 
     const getKey = (pageIndex: number, previousPageData: any) => {
         if ((_.isNil(previousPageData) && pageIndex > 0) || (previousPageData && !previousPageData?.meta?.next_page)) return null; // reached the end
@@ -58,7 +58,7 @@ const PublicGallery = (props: ResponseData) => {
                         assets={paginatedPhotos}
                         data={data}
                         hasMore={hasMorePhotos}
-                        detailBaseUrl={`/pro/${event.id}?i=`}
+                        detailBaseUrl={`/pro/${party_slug}?i=`}
                     />
                 </section>
             </CustomGallery>
@@ -67,11 +67,11 @@ const PublicGallery = (props: ResponseData) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-    const { eventId } = context.query;
+    const { eventId: eventIdOrSlug } = context.query;
     const token = process.env.NEXT_PUBLIC_AUTH_TOKEN;
 
     // Fetch event config
-    const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventId)}`;
+    const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(eventIdOrSlug)}`;
     let eventData: any = {};
 
     try {
