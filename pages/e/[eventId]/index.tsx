@@ -122,7 +122,7 @@ const AdminAsset = ({
               className="rounded-box absolute left-0 top-0 h-full w-full object-cover transition"
               src={asset.posterframe}
               fill
-              alt={`${asset.event_id}-${asset.id}` || ""}
+              alt={`${asset.event_slug}-${asset.id}` || ""}
               placeholder={asset.blurDataURL ? "blur" : "empty"}
               blurDataURL={asset.blurDataURL || undefined}
               sizes="(min-width: 1280px) 20%, (min-width: 1024px) 25%, (min-width: 768px) 33.33%, 50vw"
@@ -240,7 +240,7 @@ const AdminAsset = ({
                   </button>
                 )}
                 <Link
-                  href={`/pro/${asset.event_id}?i=${asset.id}`}
+                  href={`/pro/${asset.event_slug}?i=${asset.id}`}
                   className="rounded-full p-2 transition hover:bg-white/10 hover:backdrop-blur-md"
                 >
                   <Share />
@@ -286,7 +286,6 @@ function EventPage(props: ResponseData) {
   const event = initialEvent || eventData?.event;
   const id = event?.id || "";
   const name = event?.name || "";
-  const eventSlug = event?.party_slug || "";
 
   const getKey = (pageIndex: number, previousPageData: any) => {
     if (previousPageData && !previousPageData?.meta.next_page) return null; // reached the end
