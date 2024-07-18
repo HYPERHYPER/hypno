@@ -6,7 +6,6 @@ import GlobalLayout from "@/components/GlobalLayout";
 import Link from "next/link";
 import axios from "axios";
 import { GetServerSideProps } from "next";
-import nookies from "nookies";
 import Image from "next/image";
 import Trash from "assets/icons/trash.svg";
 import Hide from "assets/icons/hide.svg";
@@ -15,7 +14,6 @@ import FavoriteFilled from "assets/icons/favoriteFilled.svg";
 import Share from "assets/icons/share.svg";
 import Save from "assets/icons/save.svg";
 import Play from "assets/icons/play.svg";
-import { getPlaiceholder } from "plaiceholder";
 import useSWRInfinite from "swr/infinite";
 import { axiosGetWithToken, fetchWithToken } from "@/lib/fetchWithToken";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -55,32 +53,6 @@ interface ResponseData {
   photos: PhotosResponse;
 }
 
-// function GridImage({ src, alt, priority }: { src: string, alt: string, priority?: boolean }) {
-//     const [blurDataURL, setBlurDataURL] = useState<string>('');
-
-//     useEffect(() => {
-//         const getBlurDataUrl = async () => {
-//             const res = await fetch(`/api/image?url=${src}`);
-//             const placeholderData = await res.json();
-//             setBlurDataURL(placeholderData.base64);
-//         }
-
-//         getBlurDataUrl();
-//     }, [])
-
-//     return (
-//         <Image
-//             className='absolute top-0 left-0 w-full h-full rounded-box object-cover'
-//             priority={priority}
-//             src={src}
-//             fill
-//             alt={alt}
-//             placeholder={blurDataURL ? 'blur' : 'empty'}
-//             blurDataURL={blurDataURL || undefined}
-//         />
-//     )
-// }
-
 const AdminAsset = ({
   asset,
   onSuccess,
@@ -101,6 +73,16 @@ const AdminAsset = ({
   const handlePhotoDownload = () => {
     downloadPhoto(asset);
   };
+
+  const handleArchive = async () => {
+    try {
+      await archiveAsset();
+      setArchiveModal(false);
+      onSuccess && onSuccess();
+    } catch (error) {
+      console.error('Failed to archive asset:', error);
+    }
+  }
 
   return (
     <>
@@ -160,11 +142,7 @@ const AdminAsset = ({
                 </button>
                 <button
                   className="btn btn-error btn-xs flex-1 rounded-2xl"
-                  onClick={() => {
-                    archiveAsset();
-                    setArchiveModal(false);
-                    onSuccess && onSuccess();
-                  }}
+                  onClick={handleArchive}
                 >
                   confirm
                 </button>
@@ -294,7 +272,7 @@ function EventPage(props: ResponseData) {
     return [`${previousPageData.meta.next_page}`, token.access_token];
   };
 
-  const { data, size, setSize, error, isValidating, mutate } = useSWRInfinite(
+  const { data, setSize, error, isValidating, mutate } = useSWRInfinite(
     getKey,
     ([url, token]) => fetchWithToken(url, token),
     {
@@ -313,33 +291,17 @@ function EventPage(props: ResponseData) {
 
   const onArchive = useCallback(
     (assetId: number) => {
-      if (!_.isEmpty(data)) {
-        const assetIndexToRemove = paginatedPhotos.findIndex(
-          (item) => item.id === assetId,
-        );
-        const assetPage = Math.floor(
-          assetIndexToRemove / (_.first(data)?.meta?.per_page || 10),
-        );
-        const photosToUpdate = data && data[assetPage].photos;
-        const idxInPage = assetIndexToRemove % 10;
-        const updatedPhotos = [
-          ...photosToUpdate.slice(0, idxInPage),
-          ...photosToUpdate.slice(idxInPage + 1),
-        ];
-        let updatedData = data || [];
-        updatedData[0] = {
-          ...updatedData[0],
-          meta: {
-            ...updatedData[0].meta,
-            total_count: updatedData[0].meta.total_count - 1,
-          },
-        };
-        updatedData[assetPage] = {
-          photos: updatedPhotos,
-          meta: updatedData[assetPage].meta,
-        };
-        mutate(updatedData);
-      }
+      if (_.isEmpty(data)) return;
+      const updatedData = data?.map(page => ({
+        ...page,
+        photos: page.photos.filter((photo: { id: number; }) => photo.id !== assetId),
+        meta: {
+          ...page.meta,
+          total_count: page.meta.total_count - (page.photos.some((photo: { id: number; }) => photo.id === assetId) ? 1 : 0)
+        }
+      }));
+
+      mutate(updatedData, false);
     },
     [data],
   );
