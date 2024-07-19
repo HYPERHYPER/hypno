@@ -259,8 +259,8 @@ export default function PaymentPlansModal() {
     axiosGetWithToken(url, token),
   );
 
-  const orgTier = orgData?.organization.metadata.hypno_pro.current_tier;
-  const cancelledState = !!orgData?.organization.metadata.hypno_pro.cancel_at;
+  const orgTier = orgData?.organization?.metadata.hypno_pro.current_tier;
+  const cancelledState = !!orgData?.organization?.metadata.hypno_pro.cancel_at;
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
