@@ -267,10 +267,7 @@ const EventForm = (props: FormData) => {
                                 <div className='flex flex-row gap-3 text-xl sm:text-3xl'>
                                     <div className='text-primary'>photo</div>
                                     <div className="tooltip" data-tip="coming soon">
-                                        <div className='text-primary/40'>video</div>
-                                    </div>
-                                    <div className="tooltip" data-tip="coming soon">
-                                        <div className='text-primary/40'>burst</div>
+                                        <div className='font-normal text-primary/40'>burst</div>
                                     </div>
                                 </div>
                             </FormControl>
