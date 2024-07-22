@@ -168,12 +168,12 @@ export default function FileInput(props: UploaderProps) {
         disabled={props.disabled}
       />
       {props.disabled ? (
-        <div className="cursor-not-allowed h-10 w-10 rounded-full bg-white/10 text-black flex items-center justify-center">
-          <Plus />
+        <div className="cursor-not-allowed h-[30px] w-[30px] rounded-full bg-white/10 text-black flex items-center justify-center">
+          {props.value ? <Minus /> : <Plus />}
         </div>
       ) :
         uploadStatus == 'uploading' ? (
-          <div className="cursor-pointer h-10 w-10 rounded-full bg-white/20 text-black flex items-center justify-center">
+          <div className="cursor-pointer h-[30px] w-[30px] rounded-full bg-white/20 text-black flex items-center justify-center">
             <ThreeDots
               height="20"
               width="20"
