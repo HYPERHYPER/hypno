@@ -12,7 +12,7 @@ import Star from '../../../assets/icons/star.svg';
 import NewModelModal from "./NewModelModal";
 import useCustomModels from "@/hooks/useCustomModels";
 
-const AI_GENERATION_TYPES = ['custom', 'hugging-face', 'midjourney']
+const AI_GENERATION_TYPES = ['custom', 'huggingface', 'midjourney']
 
 const ImageAsset = ({ isLoading, error, src }: { isLoading: boolean, error: boolean, src?: string }) => {
     return (
@@ -272,7 +272,7 @@ export default function EffectsModal({
                     )}
 
                     {/* HUGGING FACE OPTIONS */}
-                    {ai_generation.type == 'hugging-face' && (
+                    {ai_generation.type == 'huggingface' && (
                         <FormControl label='model' altLabel="use existing model by pasting hugging face model name (repo/model)">
                             <input
                                 className='input pro w-full'

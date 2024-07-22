@@ -317,7 +317,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
         switch (config.type) {
             case "custom": return generateCustomModelImage();
             case "midjourney": return generateMidjourneyImage();
-            case "hugging-face": return generateHuggingFaceImage();
+            case "huggingface": return generateHuggingFaceImage();
             default: return generateStableDiffusionImage();
         }
     };
