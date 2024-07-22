@@ -11,6 +11,7 @@ import { DotsSpinner } from "../../Spinner";
 import Star from '../../../assets/icons/star.svg';
 import NewModelModal from "./NewModelModal";
 import useCustomModels from "@/hooks/useCustomModels";
+import Plus from 'public/pop/plus.svg';
 
 const AI_GENERATION_TYPES = ['custom', 'huggingface', 'midjourney']
 
@@ -261,9 +262,13 @@ export default function EffectsModal({
                                         <div className="text-white text-xl sm:text-3xl">{modelTraining.name} <span className="loading" /></div>
                                     </FormControl>
                                     :
-                                    <FormControl label="new model"><span className="text-lg sm:text-3xl text-primary"><Modal.Trigger id={'new-model-modal'}>create →</Modal.Trigger></span></FormControl>
+                                    <FormControl label="new model">
+                                        <Modal.Trigger id={'new-model-modal'}>
+                                            <div className="h-[30px] w-[30px] rounded-full bg-white/20 text-black flex items-center justify-center"><Plus /></div>
+                                        </Modal.Trigger>
+                                    </FormControl>
                                 }
-                                <NewModelModal 
+                                <NewModelModal
                                     onTrainingUpdate={addModel}
                                     onTrainingFailed={deleteModel}
                                 />
