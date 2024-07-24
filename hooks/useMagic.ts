@@ -33,7 +33,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
 
     const [textPrompt, setTextPrompt] = useState<string>(config?.text_prompt || '');
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [error, setError] = useState<boolean>(false);
+    const [error, setError] = useState<boolean | string>(false);
 
     const editTextPrompt = (updatedText: string) => setTextPrompt(updatedText);
     const resetImages = () => setImages([]);
@@ -293,7 +293,8 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to generate image');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to generate image');
             }
 
             const data = await response.json();
@@ -305,11 +306,15 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
             };
             setIsLoading(false);
             replaceLastImage(magicImage);
-        } catch (error) {
-            console.error('Error generating image:', error);
-            setError(true);
-            setIsLoading(false);
+        } catch (error: any) {
             // Handle error (e.g., show error message to user)
+            console.error('Error generating HF image:', error.message);
+            if (error instanceof Error) {
+                setError(error.message);
+            } else {
+                setError('An unexpected error occurred');
+            }
+            setIsLoading(false);
         }
     }
 

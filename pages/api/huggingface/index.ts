@@ -33,13 +33,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
         }, { taskHint: 'image-to-image' });
 
-        console.log('finished', newImageResponse)
-
         const newImageBase64 = await blobToBase64(newImageResponse as Blob);
         res.status(200).json({ src: newImageBase64 });
-    } catch (error) {
-        console.error('Error generating image:', error);
-        res.status(500).json({ message: 'Error generating image' });
+    } catch (error: any) {
+        console.error('Error generating image:', error.message);
+        res.status(500).json({ message: error.message });
     }
 }
 

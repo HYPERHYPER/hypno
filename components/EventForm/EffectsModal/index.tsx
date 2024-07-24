@@ -12,16 +12,20 @@ import Star from '../../../assets/icons/star.svg';
 import NewModelModal from "./NewModelModal";
 import useCustomModels from "@/hooks/useCustomModels";
 import Plus from 'public/pop/plus.svg';
+import ExclamationFilled from 'public/pop/exclamation-filled.svg'
 
 const AI_GENERATION_TYPES = ['custom', 'huggingface', 'midjourney']
 
-const ImageAsset = ({ isLoading, error, src }: { isLoading: boolean, error: boolean, src?: string }) => {
+const ImageAsset = ({ isLoading, error, src }: { isLoading: boolean, error: boolean | string, src?: string }) => {
     return (
         <div className="relative bg-black/10 backdrop-blur-[30px] h-full aspect-[9/16]">
             {(isLoading || error) && (
                 <div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
                     {error ?
-                        <h2 className='text-white text-3xl tracking-wider'>{':('}</h2>
+                        <div className='text-white flex flex-col items-center text-center gap-3'>
+                            <h2 className="text-3xl tracking-wider">{':('}</h2>
+                            {typeof error == 'string' && <span className='text-sm text-white lowercase leading-none'>{error}</span>}
+                        </div>
                         : <DotsSpinner />
                     }
                 </div>
@@ -294,6 +298,12 @@ export default function EffectsModal({
                     <FormControl label='prompt editor' altLabel="allow users to edit text prompt and regenerate in gallery">
                         <input type="checkbox" className="toggle pro toggle-lg" {...register('ai_generation.disable_prompt_editor')} />
                     </FormControl>
+
+                    {ai_generation.type == 'huggingface' && (
+                        <div className="alert bg-white/20 text-white py-3 mt-3">
+                            <span className="text-base flex flex-row items-center gap-1"><ExclamationFilled /> this feature is experimental – use at your own risk</span>
+                        </div>
+                    )}
                 </div>
             </div>
         </Modal >
