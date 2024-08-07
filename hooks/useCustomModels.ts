@@ -17,7 +17,7 @@ export default function useCustomModels(orgId?: number) {
     );
     const organization = orgData?.organization;
     const customModels = organization?.metadata?.ai_generation?.custom_models || {}
-    const successfulModels = _.filter(customModels, (m) => m.status === 'succeeded')
+    const successfulModels = _.filter(customModels, (m) => m.status === 'succeeded').sort((a,b) => a.name.localeCompare(b.name));
 
     // Update organization endpoint
     const updateOrganizationCustomModels = async (customModels: any) => {
