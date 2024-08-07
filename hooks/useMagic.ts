@@ -137,7 +137,7 @@ export default function useMagic(initConfig: AiConfig, initAsset: any) {
             const output_urls = _.filter(prediction.output, (o: string) => !o.includes('control'))
             const magicImage: MagicImage = {
                 src: _.first(output_urls),
-                status: getStatus(prediction.status),
+                status: (_.isEmpty(output_urls) && prediction.status == "succeeded") ? 'try again' : getStatus(prediction.status),
                 textPrompt,
                 urls: output_urls,
             }
