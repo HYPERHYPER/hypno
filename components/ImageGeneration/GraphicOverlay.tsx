@@ -1,8 +1,8 @@
 import { convertBlendMode } from '@/helpers/blendmode';
 import useElementSize from '@/hooks/useElementSize';
 import clsx from 'clsx';
-import React, { useRef, useEffect, useState } from 'react';
-import { useImageCache } from '../ImageCacheContext';
+import React, { useEffect, useState } from 'react';
+import { AssetLoader } from './ImageAsset';
 
 interface GraphicOverlayProps {
     imageUrl?: string;
@@ -10,119 +10,64 @@ interface GraphicOverlayProps {
         url?: string;
         blendmode?: string;
     };
-    loadImage: boolean;
 }
 
-const GraphicOverlay = ({ imageUrl, watermark, loadImage }: GraphicOverlayProps) => {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
+const GraphicOverlay = ({ imageUrl, watermark }: GraphicOverlayProps) => {
     const { width, height } = useElementSize('detail-view-image');
-    const blendMode = convertBlendMode(watermark?.blendmode || 'source-over')
+    const blendMode = convertBlendMode(watermark?.blendmode || 'over');
     const watermarkUrl = watermark?.url || '';
-    const { loadImageUrl } = useImageCache();
-    const [displayImage, setDisplayImage] = useState<boolean>(false);
+
+    const [combinedImage, setCombinedImage] = useState<string | null>(null);
+    const [loadImage, setLoadImage] = useState<boolean>(false);
 
     useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const context = canvas.getContext('2d');
-        if (!context) return;
-
-        const drawImageWithWatermark = async () => {
+        const fetchCombinedImage = async () => {
             if (!imageUrl || !watermarkUrl) return;
 
+            const apiUrl = `/api/combine-images?imageUrl=${encodeURIComponent(String(imageUrl))}&watermarkUrl=${encodeURIComponent(watermarkUrl)}&blendMode=${blendMode}`;
             try {
-                const [image, watermark] = await Promise.all([
-                    loadImageUrl(`/api/proxy-images?url=${imageUrl}`),
-                    loadImageUrl(`/api/proxy-images?url=${watermarkUrl}`),
-                ]);
-
-                // Adjust for device pixel ratio
-                const devicePixelRatio = window.devicePixelRatio || 1;
-
-                // Set canvas dimensions to match element size
-                // Increase canvas size for higher resolution
-                const canvasWidth = width * devicePixelRatio;
-                const canvasHeight = height * devicePixelRatio;
-                canvas.width = canvasWidth;
-                canvas.height = canvasHeight;
-
-                // Scale canvas context to match device pixel ratio
-                canvas.style.width = `${width}px`;
-                canvas.style.height = `${height}px`;
-                context.scale(devicePixelRatio, devicePixelRatio);
-
-                // Set image smoothing for better quality
-                context.imageSmoothingEnabled = true;
-
-                // Clear the canvas
-                context.clearRect(0, 0, canvasWidth, canvasHeight);
-
-                // Calculate scaling factors for the image and watermark
-                const imageScaleFactor = Math.min(width / image.width, height / image.height);
-                const watermarkScaleFactor = Math.min(width / watermark.width, height / watermark.height);
-
-                // Draw the image
-                const scaledImageWidth = image.width * imageScaleFactor;
-                const scaledImageHeight = image.height * imageScaleFactor;
-                context.drawImage(image, 0, 0, scaledImageWidth, scaledImageHeight);
-
-                // Set blend mode
-                context.globalCompositeOperation = blendMode as GlobalCompositeOperation; // Change blend mode as needed
-
-                // Scale watermark to match image dimensions
-                const scaledWatermarkWidth = watermark.width * watermarkScaleFactor;
-                const scaledWatermarkHeight = watermark.height * watermarkScaleFactor;
-
-                // Draw the scaled watermark on top of the image
-                context.drawImage(watermark, 0, 0, scaledWatermarkWidth, scaledWatermarkHeight);
-
-                setDisplayImage(true);
-            } catch (error) {
-                console.error('Error loading images:', error);
-            }
-        };
-
-        drawImageWithWatermark();
-
-        // Add touch event listener for saving the image
-        const saveImageOnTouch = async (event: any) => {
-            event.stopPropagation(); // Stop the touch event from propagating
-
-            const canvas = canvasRef.current;
-            if (canvas) {
-                const dataURL = canvas.toDataURL('image/png');
-
-                // Convert data URL to Blob
-                const blob = await fetch(dataURL).then(response => response.blob());
-
-                // Convert Blob to File
-                const file = new File([blob], 'hypno-ai.png', { type: 'image/png' });
-
-                try {
-                    await navigator.share({ files: [file] });
-                } catch (error) {
-                    console.error('Error sharing image:', error);
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch combined image');
                 }
+
+                const blob = await response.blob();
+                const objectUrl = URL.createObjectURL(blob);
+                setCombinedImage(objectUrl);
+            } catch (error) {
+                console.error('Error fetching combined image:', error);
             }
         };
 
-        canvas.addEventListener('touchend', saveImageOnTouch);
+        if (!combinedImage && !loadImage) {
+            fetchCombinedImage();
+        }
 
+        // Cleanup function to revoke the object URL
         return () => {
-            canvas.removeEventListener('touchend', saveImageOnTouch);
+            if (combinedImage) {
+                URL.revokeObjectURL(combinedImage);
+            }
         };
-    }, [imageUrl, watermarkUrl, width, height, canvasRef, loadImage]);
+    }, [imageUrl]);
 
+    useEffect(() => {
+        if (combinedImage) {
+            setTimeout(() => {
+                setLoadImage(true);
+            }, 50);
+        }
+    }, [combinedImage]);
+
+    if (!combinedImage) return <AssetLoader width={width} height={height} isGenerating={true} />;
     return (
-        <canvas
+        <img
+            src={String(combinedImage)}
             id={`ai-${imageUrl}`}
             style={{ width: `${width}px`, height: `${height}px` }}
-            className={clsx('transition duration-300', displayImage ? 'opacity-100' : 'opacity-0')}
-            ref={canvasRef}
+            className={clsx('transition duration-300', loadImage ? 'opacity-100' : 'opacity-0')}
         />
     );
 };
 
 export default GraphicOverlay;
-
-

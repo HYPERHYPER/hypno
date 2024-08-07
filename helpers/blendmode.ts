@@ -11,38 +11,24 @@
  * blend mode is found in the map, it returns the original `
  */
 const blendModeMap: { [key: string]: string } = {
-    kCGBlendModeNormal: 'source-over',
-    kCGBlendModeMultiply: 'multiply',
-    kCGBlendModeScreen: 'screen',
-    kCGBlendModeOverlay: 'overlay',
-    kCGBlendModeDarken: 'darken',
-    kCGBlendModeLighten: 'lighten',
-    kCGBlendModeColorDodge: 'color-dodge',
-    kCGBlendModeColorBurn: 'color-burn',
-    kCGBlendModeSoftLight: 'soft-light',
-    kCGBlendModeHardLight: 'hard-light',
-    kCGBlendModeDifference: 'difference',
-    kCGBlendModeExclusion: 'exclusion',
-    kCGBlendModeHue: 'hue',
-    kCGBlendModeSaturation: 'saturation',
-    kCGBlendModeColor: 'color',
-    kCGBlendModeLuminosity: 'luminosity',
-    // Add more mappings as needed
-  };
+  kCGBlendModeNormal: 'over',
+  kCGBlendModeMultiply: 'multiply',
+  kCGBlendModeScreen: 'screen',
+  kCGBlendModeOverlay: 'overlay',
+  kCGBlendModeDarken: 'darken',
+  kCGBlendModeLighten: 'lighten',
+  kCGBlendModeColorDodge: 'colour-dodge',
+  kCGBlendModeColorBurn: 'colour-burn',
+  kCGBlendModeSoftLight: 'soft-light',
+  kCGBlendModeHardLight: 'hard-light',
+  kCGBlendModeDifference: 'difference',
+  kCGBlendModeExclusion: 'exclusion',
+  kCGBlendModeHue: 'hue',
+  kCGBlendModeSaturation: 'saturate',
+  kCGBlendModeColor: 'color',
+  kCGBlendModeLuminosity: 'luminosity',
+};
 
 export function convertBlendMode(blendMode: string): string {
   return blendModeMap[blendMode] || blendMode;
 }
-
-// const MyComponent: React.FC = () => {
-//   const blendMode = 'kCGBlendModeMultiply'; // Or any other blend mode
-//   const canvasBlendMode = convertBlendMode(blendMode);
-
-//   return (
-//     <div>
-//       <p>Blend Mode: {canvasBlendMode}</p>
-//     </div>
-//   );
-// };
-
-// export default MyComponent;

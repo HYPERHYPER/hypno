@@ -7,7 +7,6 @@ import { MagicImage } from '@/hooks/useMagic';
 import GraphicOverlay from './GraphicOverlay';
 import useElementSize from '@/hooks/useElementSize';
 import { useBackgroundMode } from '../BackgroundModeContext';
-import { useImageCache } from '../ImageCacheContext';
 
 type WatermarkProps = {
     url?: string;
@@ -20,6 +19,25 @@ const ProgressBar = ({ status }: { status?: string }) => {
             <DotsSpinner />
             {/* <progress className="progress w-40 sm:w-64 h-1" value={value ? `${value}` : undefined} max="100"></progress> */}
             <span className='font-medium'>{status}</span>
+        </div>
+    )
+}
+
+export function AssetLoader(props: any) {
+    return (
+        <div
+            className={clsx('relative bg-transparent mx-auto')}
+            style={{ width: `${props.width}px`, height: `${props.height}px` }}
+        >
+            {(props.isGenerating || props.error) && (
+                <div className='absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'>
+                    {props.error ?
+                        <h2 className='text-white text-4xl tracking-wider'>{':('}</h2>
+                        : <ProgressBar status={props.status} />
+                    }
+                </div>
+            )}
+            {props.children}
         </div>
     )
 }
@@ -57,7 +75,6 @@ export function ImageAsset({ src, error, watermark, status }: { src?: string, er
                             <GraphicOverlay
                                 imageUrl={src}
                                 watermark={watermark}
-                                loadImage={!isGenerating}
                             />
                         </div>
                     ) : (
@@ -75,28 +92,27 @@ export function ImageAsset({ src, error, watermark, status }: { src?: string, er
 }
 
 export const ImageCarousel = ({ urls, watermark }: { urls?: string[], watermark?: WatermarkProps }) => {
-    const { loadImageUrl, imageCache } = useImageCache();
-    const constructSrc = (url: string) => watermark?.url ? `/api/proxy-images?url=${url}` : url;
+    // const { loadImageUrl, imageCache } = useImageCache();
 
-    useEffect(() => {
-        if (urls) {
-            const loadUrls = _.isEmpty(watermark?.url) ? urls : [...urls, watermark!.url]
-            // Preload images before setting loadImage to true
-            Promise.all(loadUrls?.map(url => {
-                const urlToLoad = constructSrc(url || '') || '';
-                return (
-                    loadImageUrl(urlToLoad)
-                )
-            }))
-        }
-    }, [urls]);
+    // useEffect(() => {
+    //     if (urls) {
+    //         const loadUrls = _.isEmpty(watermark?.url) ? urls : [...urls, watermark!.url]
+    //         // Preload images before setting loadImage to true
+    //         Promise.all(loadUrls?.map(url => {
+    //             const urlToLoad = url || '';
+    //             return (
+    //                 loadImageUrl(urlToLoad)
+    //             )
+    //         }))
+    //     }
+    // }, [urls]);
 
     return (
         <div className='space-y-7'>
             {_.map(urls, (src, i) => (
                 <ImageAsset
                     key={i}
-                    src={imageCache.get(constructSrc(src)) ? src : ''}
+                    src={src || ''}
                     watermark={watermark}
                 />
             ))}
