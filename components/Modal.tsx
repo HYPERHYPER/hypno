@@ -39,7 +39,7 @@ export default function Modal({ title, id, children, onDone, menu, actionBtn, wi
         <>
             <input type="checkbox" id={id} className="modal-toggle" />
             <label htmlFor={id} className="modal bg-[#333333]/50 backdrop-blur-[20px] cursor-pointer">
-                <label htmlFor="" className={clsx("modal-box max-w-3xl px-[40px] py-[35px] relative bg-black rounded-[40px] tracking-tight overflow-clip", 
+                <label htmlFor="" className={clsx("modal-box max-w-3xl px-[20px] sm:px-[40px] sm:py-[35px] relative bg-black rounded-[40px] tracking-tight overflow-clip", 
                     wide ? 'lg:max-w-7xl' : ''
                 )}>
                     <div className="flex justify-between">

@@ -161,8 +161,10 @@ export default function EffectsModal({
                     <div className='absolute top-0 bottom-0 left-0 w-full backdrop-blur-[30px]' />
 
                     <div className='relative'>
-                        <div className="h-[420px] p-7 flex flex-row justify-center">
-                            <ImageAsset key='orig-img' src={testImages[imgIdx]} isLoading={false} error={false} />
+                        <div className="h-[350px] sm:h-[420px] p-7 flex flex-row justify-center">
+                            <div className="hidden sm:block">
+                                <ImageAsset key='orig-img' src={testImages[imgIdx]} isLoading={false} error={false} />
+                            </div>
                             <div className="relative">
                                 <ImageAsset
                                     key='gen-img'
@@ -300,8 +302,8 @@ export default function EffectsModal({
                     </FormControl>
 
                     {ai_generation.type == 'huggingface' && (
-                        <div className="alert bg-white/20 text-white py-3 mt-3">
-                            <span className="text-base flex flex-row items-center gap-1"><ExclamationFilled /> this feature is experimental – use at your own risk</span>
+                        <div className="alert bg-white/20 text-white py-3 mt-3 mb-3 sm:mb-0">
+                            <span className="text-sm sm:text-base flex flex-row items-center gap-1"><ExclamationFilled /> this feature is experimental – use at your own risk</span>
                         </div>
                     )}
                 </div>
