@@ -29,7 +29,7 @@ const EditEventPage = (props: ResponseData) => {
     const token = useUserStore.useToken();
 
     const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(query.eventId)}?include_overlays=true&include_ipad_screens=true`;
-    const { data: eventData, isValidating: isValidatingEventData, error: eventError } = useSWR([eventUrl, token.access_token],
+    const { data: eventData, isValidating: isValidatingEventData, error: eventError, mutate } = useSWR([eventUrl, token.access_token],
         ([url, token]) => axiosGetWithToken(url, token))
     
     const event = eventData?.event || initialEvent;
@@ -107,7 +107,7 @@ const EditEventPage = (props: ResponseData) => {
                     'Content-Type': 'application/json',
                     Authorization: 'Bearer ' + token.access_token,
                 },
-            });
+            }).then((res) => mutate(res.data));
         });
 
         // Use Promise.all to wait for all promises to resolve
