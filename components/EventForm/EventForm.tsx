@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
 import _, { debounce } from 'lodash';
 import { useForm, FormProvider } from 'react-hook-form';
 import AiPlayground from '@/components/AiPlayground/AiPlayground';
@@ -9,7 +9,6 @@ import Modal from '../Modal';
 import FileInput from '../Form/FileInput';
 import useUserStore from '@/store/userStore';
 import { toHexCode } from '@/helpers/color';
-import useDeepCompareEffect from "use-deep-compare-effect";
 import clsx from 'clsx';
 import { blendModes, convertFieldArrayToObject, convertFieldObjectToArray, isCustomGallery } from '@/helpers/event';
 import { ChromePicker } from 'react-color';
@@ -132,13 +131,12 @@ const EventForm = (props: FormData) => {
     const {
         register,
         handleSubmit,
-        formState: { errors, isDirty, isSubmitSuccessful, isValid, isSubmitting, dirtyFields, defaultValues },
+        formState: { errors, isDirty, defaultValues },
         watch,
         setValue,
         reset
     } = methods;
     const config = watch();
-    const watchedWatermarks = watch('watermarks');
 
     const { filters, loadMore: loadMoreFilters, meta: filterMeta } = useFilters(20);
 
@@ -169,30 +167,40 @@ const EventForm = (props: FormData) => {
 
         onSubmit && onSubmit(dirtyFields).then((res) => {
             console.log('res', res)
-            updateStatus && updateStatus('success');
-            reset({ ...data })
         }).catch((e) => {
             console.log('error', e)
-            updateStatus && updateStatus('error');
         });
     }
 
-    const debouncedSave = useCallback(
-        debounce(() => {
-            if (event && onSubmit) {
-                handleSubmit(submitForm)();
-                return;
-            }
-        }, 3000),
-        []
-    );
 
-    useDeepCompareEffect(() => {
-        if (isDirty || checkWatermarkChange(defaultValues?.watermarks, watchedWatermarks)) {
+    const debouncedSaveRef = useRef<ReturnType<typeof debounce> | null>(null);
+    // Create the debounced function once and store it in the ref
+    useEffect(() => {
+        debouncedSaveRef.current = debounce(async () => {
             updateStatus && updateStatus('saving');
-            debouncedSave();
-        }
-    }, [config, isDirty]);
+            try {
+                await handleSubmit(submitForm)();
+                updateStatus && updateStatus('success');
+            } catch (err) {
+                updateStatus && updateStatus('error');
+            } finally {
+                setTimeout(() => updateStatus && updateStatus('ready'), 1000);
+            }
+        }, 1500);
+
+        // Cleanup function to cancel the debounce on unmount
+        return () => {
+            debouncedSaveRef.current?.cancel();
+        };
+    }, []);
+
+    useEffect(() => {
+        const subscription = watch((data) => {
+            debouncedSaveRef.current?.();
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
 
     useEffect(() => {
         if (isDirty && updateData) {
@@ -201,18 +209,6 @@ const EventForm = (props: FormData) => {
             reset(config);
         }
     }, [isDirty]);
-
-    useEffect(() => {
-        if (updateStatus) {
-            if (isSubmitting) updateStatus('saving')
-            if (isSubmitSuccessful) {
-                updateStatus('success')
-                setTimeout(() => {
-                    updateStatus('ready')
-                }, 3000)
-            }
-        }
-    }, [isSubmitSuccessful, isSubmitting]);
 
     const organizations = useOrgAccessStore.useOrganizations();
     const getOrganizations = useOrgAccessStore.useGetOrganizations();
@@ -252,7 +248,7 @@ const EventForm = (props: FormData) => {
 
                             <FormControl label='organization'>
                                 {event ?
-                                    <div className='lowercase text-xl sm:text-3xl'>{isLoadingOrgs ?  <span className='loading loading-spinner loading-sm sm:loading-md' /> : _.find(organizations, (o) => o.id == config.org_id)?.name}</div>
+                                    <div className='lowercase text-xl sm:text-3xl'>{isLoadingOrgs ? <span className='loading loading-spinner loading-sm sm:loading-md' /> : _.find(organizations, (o) => o.id == config.org_id)?.name}</div>
                                     : (
                                         isLoadingOrgs ?
                                             <span className='loading loading-spinner loading-sm sm:loading-md' />
