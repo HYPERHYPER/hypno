@@ -39,6 +39,7 @@ import { formatTimestamp } from "@/helpers/date";
 import DuplicateEventModal from "@/components/Events/DuplicateEventModal";
 import { hashEncode } from "@/helpers/hashHelper";
 
+
 type PhotosResponse = {
   photos: any;
   meta: {
@@ -251,6 +252,7 @@ function EventPage(props: ResponseData) {
   const { event: initialEvent } = props;
 
   const token = useUserStore.useToken();
+  const isHypnoUser = useUserStore.useIsHypnoUser();
 
   const eventUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hypno/v1/events/${String(query.eventId)}`;
   const {
@@ -368,7 +370,7 @@ function EventPage(props: ResponseData) {
                 <h2 className="text-primary">data</h2>
               </Modal.Trigger>
             )}
-            {userEventPrivileges?.canDownloadData && (
+            {isHypnoUser() && (
               <Modal.Trigger id="duplicate-event-modal">
                 <h2 className="text-primary">duplicate</h2>
               </Modal.Trigger>
@@ -385,7 +387,7 @@ function EventPage(props: ResponseData) {
                 </Link>
               )}
             {isProEvent(event.event_type) &&
-              userEventPrivileges?.canArchiveEvent && (
+              isHypnoUser() && (
                 <Modal.Trigger id="archive-event-modal">
                   <h2 className="text-primary">archive</h2>
                 </Modal.Trigger>
