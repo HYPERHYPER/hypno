@@ -70,7 +70,7 @@ export default function DataDownloadModal({ modalId, eventId }: Props) {
     return (
         <Modal
             id={modalId}
-            title={'data download'}
+            title={'data'}
             menu={<h2 className="text-white/50">{_.isEmpty(password) ? 'download captured data from your event to a password-protected zip file' : 'check your downloads and use the password to unlock zip file'}</h2>}
             actionBtn={{
                 status,
