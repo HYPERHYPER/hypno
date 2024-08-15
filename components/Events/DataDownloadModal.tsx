@@ -1,7 +1,7 @@
 import axios from "axios";
 import Modal from "../Modal";
 import useUserStore from "@/store/userStore";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { saveAs } from 'file-saver';
 import Duplicate from 'public/pop/duplicate.svg';
 import Checkmark from 'public/pop/checkmark.svg';
