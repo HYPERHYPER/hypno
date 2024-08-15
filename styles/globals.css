@@ -135,7 +135,7 @@
     }
 
     .list .item {
-        @apply flex flex-row items-center justify-between border-b-2 border-white/20 py-2 text-lg font-normal sm:h-[60px] sm:py-3 sm:text-3xl;
+        @apply flex flex-row items-center justify-between border-b-2 border-white/20 py-2 text-lg font-normal sm:h-[60px] sm:py-3 sm:text-3xl overflow-hidden;
     }
 
     .list.list-sm .item {
