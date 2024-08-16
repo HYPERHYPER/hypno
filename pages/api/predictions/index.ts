@@ -22,20 +22,25 @@ export default async function handler(
   // See https://replicate.com/fofr/realvisxl-v3-multi-controlnet-lora
   // version: "90a4a3604cd637cb9f1a2bdae1cfa9ed869362ca028814cdce310a78e27daade"
 
-  const modelId = req.body.model == 'sdxl' ? 
+  const isSdxl = req.body.model == 'sdxl';
+  const modelId = isSdxl ? 
     "39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b"
     :
     "90a4a3604cd637cb9f1a2bdae1cfa9ed869362ca028814cdce310a78e27daade"
     // "3bb13fe1c33c35987b33792b01b71ed6529d03f165d1c2416375859f09ca9fef";
 
-  const response = await fetch("https://api.replicate.com/v1/predictions", {
+  const url = isSdxl ? 
+    "https://api.replicate.com/v1/predictions" 
+    : "https://api.replicate.com/v1/deployments/hyperhyper/custom-lora-controlnet/predictions"
+
+  const response = await fetch(url, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${process.env.REPLICATE_API_TOKEN}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      version: modelId,
+      // version: modelId,
       // This is the text prompt that will be submitted by a form on the frontend
       input: { 
         ...req.body.input,
