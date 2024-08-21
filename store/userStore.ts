@@ -58,7 +58,7 @@ const useUserStoreBase = create<UserState & UserAction>()(
 
           const checkUserProRegistration = await checkExistingUser(email);
           const isProUser = checkUserProRegistration.already_pro;
-          console.log("checkUser", checkUserProRegistration);
+          // console.log("checkUser", checkUserProRegistration);
 
           set({ ...authenticatedUser, isLoggedIn: true, isProUser, error: "" });
         } catch (error: any) {
@@ -69,6 +69,8 @@ const useUserStoreBase = create<UserState & UserAction>()(
         // clear the user state
         try {
           await logoutUser(get().token);
+          const resetOrgStore = useOrgAccessStore.getState().reset;
+          resetOrgStore();
           set({
             user: null,
             token: null,
@@ -76,8 +78,6 @@ const useUserStoreBase = create<UserState & UserAction>()(
             isProUser: false,
             error: "",
           });
-          const resetOrgStore = useOrgAccessStore.getState().reset;
-          resetOrgStore();
         } catch (error: any) {
           set({ error: error.message });
         }
@@ -86,7 +86,7 @@ const useUserStoreBase = create<UserState & UserAction>()(
         try {
           // call your registration API and set the user state
           const registeredUser = await signupUser(newUser, invite);
-          console.log("registered success");
+          // console.log("registered success");
           try {
             // login user after successful account creation
             const authenticatedUser = await authenticateUser(
@@ -136,7 +136,7 @@ const useUserStoreBase = create<UserState & UserAction>()(
     {
       name: "hypno",
       partialize: (state) => ({
-        ...state,
+        // ...state,
         token: state.token,
         user: state.user,
         isLoggedIn: state.isLoggedIn,
@@ -325,9 +325,11 @@ async function logoutUser(token: string) {
     throw new Error("Something went wrong, please try again later");
   }
 
+  // destroyCookie(null, 'hypno');
   axios
     .delete("/api/deleteCookie")
     .then((response) => {
+      // console.log('response', response);
       // Cookie has been deleted on the server
       // You can perform any necessary actions here
     })
