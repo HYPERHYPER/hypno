@@ -58,7 +58,7 @@ const useUserStoreBase = create<UserState & UserAction>()(
 
           const checkUserProRegistration = await checkExistingUser(email);
           const isProUser = checkUserProRegistration.already_pro;
-          console.log("checkUser", checkUserProRegistration);
+          // console.log("checkUser", checkUserProRegistration);
 
           set({ ...authenticatedUser, isLoggedIn: true, isProUser, error: "" });
         } catch (error: any) {
@@ -86,7 +86,7 @@ const useUserStoreBase = create<UserState & UserAction>()(
         try {
           // call your registration API and set the user state
           const registeredUser = await signupUser(newUser, invite);
-          console.log("registered success");
+          // console.log("registered success");
           try {
             // login user after successful account creation
             const authenticatedUser = await authenticateUser(
@@ -136,7 +136,7 @@ const useUserStoreBase = create<UserState & UserAction>()(
     {
       name: "hypno",
       partialize: (state) => ({
-        ...state,
+        // ...state,
         token: state.token,
         user: state.user,
         isLoggedIn: state.isLoggedIn,
@@ -329,7 +329,7 @@ async function logoutUser(token: string) {
   axios
     .delete("/api/deleteCookie")
     .then((response) => {
-      console.log('response', response);
+      // console.log('response', response);
       // Cookie has been deleted on the server
       // You can perform any necessary actions here
     })
