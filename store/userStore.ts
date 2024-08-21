@@ -69,6 +69,8 @@ const useUserStoreBase = create<UserState & UserAction>()(
         // clear the user state
         try {
           await logoutUser(get().token);
+          const resetOrgStore = useOrgAccessStore.getState().reset;
+          resetOrgStore();
           set({
             user: null,
             token: null,
@@ -76,8 +78,6 @@ const useUserStoreBase = create<UserState & UserAction>()(
             isProUser: false,
             error: "",
           });
-          const resetOrgStore = useOrgAccessStore.getState().reset;
-          resetOrgStore();
         } catch (error: any) {
           set({ error: error.message });
         }
@@ -325,9 +325,11 @@ async function logoutUser(token: string) {
     throw new Error("Something went wrong, please try again later");
   }
 
+  // destroyCookie(null, 'hypno');
   axios
     .delete("/api/deleteCookie")
     .then((response) => {
+      console.log('response', response);
       // Cookie has been deleted on the server
       // You can perform any necessary actions here
     })
