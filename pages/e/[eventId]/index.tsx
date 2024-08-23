@@ -318,7 +318,7 @@ function EventPage(props: ResponseData) {
     ? getEventPrivileges(event.user_privileges)
     : null;
 
-    
+
   const shareableGalleryUrl = event ? `/gallery/${hashEncode(event.id)}` : ''
 
   if (!event && isValidatingEventData) {
@@ -365,19 +365,15 @@ function EventPage(props: ResponseData) {
                 <h2 className="text-primary">gallery</h2>
               </Link>
             )}
+
+            {userEventPrivileges?.canDownloadContent && (
+              <Modal.Trigger id="content-download-modal">
+                <h2 className="text-primary">content</h2>
+              </Modal.Trigger>
+            )}
             {userEventPrivileges?.canDownloadData && (
               <Modal.Trigger id="data-download-modal">
                 <h2 className="text-primary">data</h2>
-              </Modal.Trigger>
-            )}
-            {isHypnoUser() && (
-              <Modal.Trigger id="duplicate-event-modal">
-                <h2 className="text-primary">duplicate</h2>
-              </Modal.Trigger>
-            )}
-            {userEventPrivileges?.canDownloadContent && (
-              <Modal.Trigger id="content-download-modal">
-                <h2 className="text-primary">download</h2>
               </Modal.Trigger>
             )}
             {isProEvent(event.event_type) &&
@@ -386,10 +382,15 @@ function EventPage(props: ResponseData) {
                   <h2 className="text-primary">edit</h2>
                 </Link>
               )}
+            {isHypnoUser() && (
+              <Modal.Trigger id="duplicate-event-modal">
+                <h2 className="text-primary text-lg sm:text-xl">duplicate</h2>
+              </Modal.Trigger>
+            )}
             {isProEvent(event.event_type) &&
               isHypnoUser() && (
                 <Modal.Trigger id="archive-event-modal">
-                  <h2 className="text-primary">archive</h2>
+                  <h2 className="text-primary text-lg sm:text-xl">archive</h2>
                 </Modal.Trigger>
               )}
           </GlobalLayout.Header>
