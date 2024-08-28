@@ -15,7 +15,7 @@ export const hashEncode = (to_encode?: string) => {
     if (!to_encode) return;
     const hashids = new Hashids(SALT, PADDING);
     const encoded = hashids.encode(to_encode);
-    console.log('encoding==>', encoded);
+    console.debug('encoding==>', encoded);
     return encoded;
 }
 
@@ -31,6 +31,6 @@ export const hashDecode = (to_decode?: string) => {
     if (!to_decode) return;
     const hashids = new Hashids(SALT, PADDING)
     const decoded = hashids.decode(to_decode)[0];
-    console.log('decoded==>', decoded);
+    console.debug('decoded==>', decoded);
     return decoded;
 }
