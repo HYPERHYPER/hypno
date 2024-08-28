@@ -152,8 +152,15 @@ export default function FileInput(props: UploaderProps) {
 
   return (
     <div className='flex gap-3 items-center'>
-      <div className="dropdown dropdown-top dropdown-hover">
-        <label tabIndex={0} className='text-lg sm:text-3xl text-primary truncate'>{uploadStatus == 'error' ? <span className='text-red-500'>error</span> : getFilename(props.value || '')}</label>
+      <div className="dropdown dropdown-top dropdown-hover flex items-center justify-end text-right">
+        <div className='flex-grow max-w-[200px] lg:max-w-[400px]'>
+          <label
+            tabIndex={0}
+            className='text-lg sm:text-3xl text-primary block truncate'
+          >
+            {uploadStatus == 'error' ? <span className='text-red-500'>error</span> : getFilename(props.value || '')}
+          </label>
+        </div>
         {contentType !== 'application/zip' &&
           <div tabIndex={0} className='left-1/2 mb-5 dropdown-content bg-white/10 backdrop-blur-[30px] rounded-box p-3 sm:p-4'>
             <img className='max-h-[200px] w-auto' src={props.value || ''} />
