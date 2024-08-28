@@ -278,9 +278,9 @@ const Item = ({
       <div className="item" key={id}>
         <div className="space-x-3 tracking-tight lowercase flex">
           {username && (
-            <span className="text-white text-xl sm:text-4xl">{username}</span>
+            <span className="text-white text-xl sm:text-3xl">{username}</span>
           )}
-          <span className="text-white/40 text-xl sm:text-4xl">{email}</span>
+          <span className="text-white/40 text-xl sm:text-3xl">{email}</span>
           {/* <span className='text-white/40 text-xl'>device</span> */}
         </div>
         <div className="flex items-center gap-3 sm:gap-5 text-primary lowercase">
