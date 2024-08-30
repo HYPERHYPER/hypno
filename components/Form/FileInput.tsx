@@ -156,7 +156,7 @@ export default function FileInput(props: UploaderProps) {
         <div className='flex-grow max-w-[200px] lg:max-w-[400px]'>
           <label
             tabIndex={0}
-            className='text-lg sm:text-3xl text-primary block truncate'
+            className='sm:text-3xl text-primary block truncate'
           >
             {uploadStatus == 'error' ? <span className='text-red-500'>error</span> : getFilename(props.value || '')}
           </label>
@@ -175,12 +175,12 @@ export default function FileInput(props: UploaderProps) {
         disabled={props.disabled}
       />
       {props.disabled ? (
-        <div className="cursor-not-allowed h-[30px] w-[30px] rounded-full bg-white/10 text-black flex items-center justify-center">
+        <div className="cursor-not-allowed h-[20px] w-[20px] sm:h-[30px] sm:w-[30px] rounded-full bg-white/10 text-black flex items-center justify-center">
           {props.value ? <Minus /> : <Plus />}
         </div>
       ) :
         uploadStatus == 'uploading' ? (
-          <div className="cursor-pointer h-[30px] w-[30px] rounded-full bg-white/20 text-black flex items-center justify-center">
+          <div className="cursor-pointer h-[20px] w-[20px] sm:h-[30px] sm:w-[30px] rounded-full bg-white/20 text-black flex items-center justify-center">
             <ThreeDots
               height="20"
               width="20"
@@ -192,9 +192,9 @@ export default function FileInput(props: UploaderProps) {
           </div>
         ) : (
           props.value ?
-            <label onClick={resetInput} className="cursor-pointer h-[30px] w-[30px] rounded-full bg-white/20 text-black flex items-center justify-center"><Minus /></label>
+            <label onClick={resetInput} className="cursor-pointer h-[20px] w-[20px] sm:h-[30px] sm:w-[30px] rounded-full bg-white/20 text-black flex items-center justify-center"><Minus /></label>
             :
-            <label htmlFor={props.inputId} className="cursor-pointer h-[30px] w-[30px] rounded-full bg-white/20 text-black flex items-center justify-center"><Plus /></label>
+            <label htmlFor={props.inputId} className="cursor-pointer h-[20px] w-[20px] sm:h-[30px] sm:w-[30px] rounded-full bg-white/20 text-black flex items-center justify-center"><Plus /></label>
         )}
     </div>
   )

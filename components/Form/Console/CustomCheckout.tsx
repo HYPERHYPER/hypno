@@ -339,7 +339,7 @@ const CustomCheckout = () => {
               setValue("price_id", priceId);
               setSelectedSubscriptionType(option);
             }}
-            className="select pro-form pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl"
+            className="select pro-form pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent sm:text-3xl"
           >
             {_.map(subscriptionTiers, (option, i) => (
               <option key={i}>{option.name}</option>
@@ -355,7 +355,7 @@ const CustomCheckout = () => {
               setSelectedCouponType(e.target.value);
             }}
             defaultValue="percentage"
-            className="select pro-form pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl"
+            className="select pro-form pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent sm:text-3xl"
           >
             {_.map(couponType, (option, i) => (
               <option key={i}>{option.name}</option>
@@ -405,7 +405,7 @@ const CustomCheckout = () => {
               setValue("duration", e.target.value);
             }}
             defaultValue="once"
-            className="select pro-form pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl"
+            className="select pro-form pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent sm:text-3xl"
           >
             {_.map(couponDuration, (option, i) => (
               <option key={i}>{option.name}</option>
@@ -436,7 +436,7 @@ const CustomCheckout = () => {
         (!!customCheckoutData.amount_off ||
           !!customCheckoutData.percent_off) && (
           <FormControl label="ready?">
-            <div className="text-xl sm:text-4xl ">
+            <div className="sm:text-3xl ">
               <button
                 type="submit"
                 className="tracking-[-0.03em] text-black bg-primary disabled:text-white/20 disabled:bg-white/10 py-1 px-3 sm:py-3 sm:px-5 rounded-[10px] sm:rounded-[15px] transition-colors"

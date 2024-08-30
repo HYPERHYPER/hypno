@@ -276,14 +276,14 @@ const Item = ({
   return (
     <>
       <div className="item" key={id}>
-        <div className="space-x-3 tracking-tight lowercase flex">
+        <div className="sm:space-x-3 tracking-tight lowercase flex flex-col sm:flex-row">
           {username && (
-            <span className="text-white text-xl sm:text-3xl">{username}</span>
+            <span className="text-white sm:text-3xl">{username}</span>
           )}
-          <span className="text-white/40 text-xl sm:text-3xl">{email}</span>
+          <span className="text-white/40 sm:text-3xl">{email}</span>
           {/* <span className='text-white/40 text-xl'>device</span> */}
         </div>
-        <div className="flex items-center gap-3 sm:gap-5 text-primary lowercase">
+        <div className="flex items-center gap-2 sm:gap-5 text-primary lowercase">
           <span>
             {roles === "account_owner"
               ? "owner"
@@ -296,7 +296,7 @@ const Item = ({
               id="kick-user-modal"
               onClick={() => handleModalOpen(user)}
             >
-              <span className="bg-white/20 h-6 w-6 sm:h-10 sm:w-10 flex items-center justify-center rounded-full text-black">
+              <span className="bg-white/20 h-5 w-5 sm:h-10 sm:w-10 flex items-center justify-center rounded-full text-black">
                 <Minus />
               </span>
             </Modal.Trigger>

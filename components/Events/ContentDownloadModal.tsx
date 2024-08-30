@@ -73,7 +73,7 @@ export default function ContentDownloadModal({ modalId, eventId }: Props) {
                         <>
                             <div className="text-white/50">content type</div>
 
-                            <div className='flex flex-row gap-3 text-xl sm:text-4xl'>
+                            <div className='flex flex-row gap-3 sm:text-3xl'>
                                 <div
                                     onClick={() => setContentType('all')}
                                     className={clsx('transition cursor-pointer', contentType == 'all' ? 'text-primary' : 'text-primary/40')}>

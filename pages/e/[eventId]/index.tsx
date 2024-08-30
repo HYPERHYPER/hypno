@@ -356,7 +356,7 @@ function EventPage(props: ResponseData) {
               </Modal.Trigger>
             }
           >
-            <h2>{totalCount} posts</h2>
+            <h2 className="whitespace-nowrap">{totalCount} posts</h2>
             {/* <Link href={`/pro/${id}/p`}><h2 className='text-primary'>public gallery</h2></Link> */}
             {/* <Link href={`/e/${id}`}><h2 className='text-white'>all</h2></Link> */}
             {/* <Link href=''><h2 className='text-primary'>favorites</h2></Link> */}

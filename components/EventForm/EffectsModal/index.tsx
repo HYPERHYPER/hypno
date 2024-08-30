@@ -172,7 +172,7 @@ export default function EffectsModal({
                                     isLoading={isLoading || loadingStates.includes(_.first(images)?.status || '')}
                                     error={error}
                                 />
-                                <div className="absolute -top-5 -right-5">
+                                <div className="absolute -top-3 -right-3 sm:-top-5 sm:-right-5">
                                     <button className="btn btn-primary btn-square rounded-full" onClick={handleTestImageGeneration}><Star /></button>
                                 </div>
                             </div>
@@ -190,7 +190,7 @@ export default function EffectsModal({
 
                     {/* ALL MODEL OPTIONS */}
                     <FormControl label='ai'>
-                        <div className='flex flex-row gap-3 text-xl sm:text-3xl'>
+                        <div className='flex flex-row gap-x-3 sm:text-3xl'>
                             {_.map(AI_GENERATION_TYPES, (type, i) => (
                                 <div
                                     key={i}
@@ -251,7 +251,7 @@ export default function EffectsModal({
                                 <select
                                     value={ai_generation?.custom?.current?.id || undefined}
                                     onChange={(e) => setValue('ai_generation.custom.current', _.find(customModels, m => m.id == e.target.value), { shouldDirty: true })}
-                                    className="select pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-3xl">
+                                    className="select pro pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent sm:text-3xl">
                                     {_.isEmpty(customModels) ?
                                         <option value={undefined}>no models trained</option>
                                         : (
@@ -265,12 +265,12 @@ export default function EffectsModal({
                             <div className="list pro">
                                 {trainingInProgress ?
                                     <FormControl label="training in progress">
-                                        <div className="text-white text-xl sm:text-3xl">{modelTraining.name} <span className="loading" /></div>
+                                        <div className="text-white sm:text-3xl">{modelTraining.name} <span className="loading" /></div>
                                     </FormControl>
                                     :
                                     <FormControl label="new model">
                                         <Modal.Trigger id={'new-model-modal'}>
-                                            <div className="h-[30px] w-[30px] rounded-full bg-white/20 text-black flex items-center justify-center"><Plus /></div>
+                                            <div className="sm:h-[30px] sm:w-[30px] rounded-full bg-white/20 text-black flex items-center justify-center"><Plus /></div>
                                         </Modal.Trigger>
                                     </FormControl>
                                 }

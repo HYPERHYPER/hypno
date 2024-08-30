@@ -91,13 +91,13 @@ export default function NewUserModal() {
             {status != 'success' ? (
                 <div className='list pro'>
                     <FormControl label='organization'>
-                        <span className='text-right lowercase text-white text-xl sm:text-4xl'>{user?.organization.name}</span>
+                        <span className='text-right lowercase text-white sm:text-3xl'>{user?.organization.name}</span>
                     </FormControl>
                     <FormControl label='email'>
                         <input className='input pro w-full pr-0' {...register('email')} />
                     </FormControl>
                     <FormControl label='role'>
-                        <div className='flex gap-3 text-xl sm:text-4xl'>
+                        <div className='flex gap-3 sm:text-3xl'>
                             {_.map(userRoles, (u, i) => {
                                 if ((!userPrivileges?.canInviteAdmin && u.id == 2) || (!userPrivileges?.canInviteMember && u.id == 3)) return null;
                                 return (

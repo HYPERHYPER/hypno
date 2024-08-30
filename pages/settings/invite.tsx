@@ -132,7 +132,7 @@ function GlobalInvitePage(props: ResponseData) {
                                     <select
                                         onChange={(e) => setValue('organization_id', Number(e.target.value))}
                                         value={inviteData.organization_id}
-                                        className='select pro-form pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl'
+                                        className='select pro-form pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent sm:text-3xl'
                                     >
                                         {_.map(organizations, ((o) => <option key={o.id} value={o.id}>{o.name}</option>))}
                                     </select>
@@ -148,7 +148,7 @@ function GlobalInvitePage(props: ResponseData) {
                         </FormControl>
 
                         <FormControl label='role'>
-                            <div className='flex gap-3 text-xl sm:text-4xl'>
+                            <div className='flex gap-3 sm:text-3xl'>
 
                                 {_.map(userRoles, (u, i) => (
                                     <span
@@ -165,7 +165,7 @@ function GlobalInvitePage(props: ResponseData) {
                         </FormControl>
 
                         <FormControl label={status === 'ready' ? 'ready?' : ''} >
-                            <div className='text-xl sm:text-4xl '>
+                            <div className='sm:text-3xl '>
                                 {status === 'ready' && (
                                     <button type='submit' className='tracking-[-0.03em] text-black bg-primary disabled:text-white/20 disabled:bg-white/10 py-1 px-3 sm:py-3 sm:px-5 rounded-[10px] sm:rounded-[15px] transition-colors' disabled={!inviteData.email}>
                                         send invite
@@ -189,8 +189,8 @@ const Item = ({ organization }: { organization: Organization }) => {
     return (
         <div className='item'>
             <div className='space-x-3 tracking-tight lowercase flex'>
-                {name && <span className='text-white text-xl sm:text-4xl'>{name}</span>}
-                {metadata?.hypno_pro && <span className='text-white/40 text-xl sm:text-4xl'>{metadata.hypno_pro.current_tier}</span>}
+                {name && <span className='text-white sm:text-3xl'>{name}</span>}
+                {metadata?.hypno_pro && <span className='text-white/40 sm:text-3xl'>{metadata.hypno_pro.current_tier}</span>}
                 {/* <span className='text-white/40 text-xl'>device</span> */}
             </div>
             <div className='flex items-center gap-3 sm:gap-5 text-primary lowercase'>

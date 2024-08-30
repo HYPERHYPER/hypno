@@ -348,7 +348,7 @@ export default function PaymentPlansModal() {
     >
       <form
         method="dialog"
-        className="modal-box relative max-w-[2000px] cursor-default space-y-8 rounded-[60px] bg-[#111]/90 px-[40px] py-[35px] tracking-tight"
+        className="modal-box relative max-w-[2000px] cursor-default space-y-8 rounded-[20px] sm:rounded-[40px] bg-[#111]/90 px-[40px] py-[35px] tracking-tight"
       >
         <div className="flex justify-between">
           <div className="space-y-4">

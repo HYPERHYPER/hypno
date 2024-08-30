@@ -101,7 +101,7 @@ const GlobalInvite = () => {
               setValue("organization_id", Number(e.target.value))
             }
             value={inviteData.organization_id}
-            className="select pro-form pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-xl sm:text-4xl"
+            className="select pro-form pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent sm:text-3xl"
           >
             {_.map(organizations, (o) => (
               <option key={o.id} value={o.id}>
@@ -121,7 +121,7 @@ const GlobalInvite = () => {
       </FormControl>
 
       <FormControl label="role">
-        <div className="flex gap-3 text-xl sm:text-4xl">
+        <div className="flex gap-3 sm:text-3xl">
           {_.map(userRoles, (u, i) => (
             <span
               key={i}
@@ -138,7 +138,7 @@ const GlobalInvite = () => {
       </FormControl>
 
       <FormControl label={status === "ready" ? "ready?" : ""}>
-        <div className="text-xl sm:text-4xl ">
+        <div className="sm:text-3xl ">
           {status === "ready" && (
             <button
               type="submit"

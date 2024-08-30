@@ -101,7 +101,7 @@
     }
 
     h2 {
-        @apply text-lg sm:text-3xl;
+        @apply text-lg sm:text-3xl leading-none;
     }
 
     h3 {
@@ -135,11 +135,11 @@
     }
 
     .list .item {
-        @apply flex flex-row items-center justify-between border-b-2 border-white/20 py-2 text-lg font-normal sm:h-[60px] sm:py-3 sm:text-3xl overflow-hidden;
+        @apply flex flex-row items-center justify-between border-b-2 border-white/20 py-2 font-normal sm:h-[60px] sm:py-3 sm:text-3xl overflow-hidden;
     }
 
     .list.list-sm .item {
-        @apply flex h-fit flex-row items-center justify-between border-b-[1px] border-white/20 py-1 text-lg font-normal sm:h-fit 2xl:py-1 2xl:text-lg;
+        @apply flex h-fit flex-row items-center justify-between border-b-[1px] border-white/20 py-1 font-normal sm:h-fit 2xl:py-1 2xl:text-lg;
     }
 
     .input,
@@ -185,7 +185,7 @@
 
     .input.pro,
     .textarea.pro {
-        @apply text-primary h-auto flex-1 bg-transparent text-right text-xl outline-none active:border-none disabled:border-none sm:text-3xl pr-0;
+        @apply text-primary h-auto flex-1 bg-transparent text-right outline-none active:border-none disabled:border-none text-base sm:text-3xl pr-0 leading-none;
     }
 
     .textarea.pro.left,
@@ -194,11 +194,11 @@
     }
 
     .select.pro {
-        @apply h-auto min-h-fit bg-transparent outline-none active:border-none;
+        @apply h-auto min-h-fit bg-transparent outline-none active:border-none leading-none text-base sm:text-3xl;
     }
 
     .select.pro-form {
-        @apply h-auto min-h-0 w-full bg-transparent pl-0 text-right text-xl font-normal lowercase focus:bg-transparent focus:outline-none active:bg-transparent sm:text-3xl;
+        @apply h-auto min-h-0 w-full bg-transparent pl-0 text-right font-normal lowercase focus:bg-transparent focus:outline-none active:bg-transparent sm:text-3xl;
     }
 
     .tab {
@@ -335,6 +335,24 @@ input[type="date"]::-webkit-input-placeholder {
 
 .toggle.pro:disabled {
     opacity: 0.5;
+}
+
+@media screen and (max-width: 640px) {
+    .toggle.pro {
+        height: 15px;
+        width: 30px;
+        box-shadow:
+            calc(15px * -1) 0 0 1px #333333 inset,
+            0 0 0 1px #333333 inset,
+            0 0;
+    }
+
+    .toggle.pro:checked {
+        box-shadow:
+            calc(15px) 0 0 1px #00ff99 inset,
+            0 0 0 1px #00ff99 inset,
+            0 0;
+    }
 }
 
 @media (prefers-color-scheme: dark) {

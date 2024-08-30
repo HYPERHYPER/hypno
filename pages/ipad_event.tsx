@@ -198,7 +198,7 @@ const EditCustomFrontendPage = (props: ResponseData) => {
                                 </FormControl>
 
                                 <FormControl label='data/legal' nested={true} disabled={!config.custom_frontend}>
-                                    {config.data_capture && config.custom_frontend && <Modal.Trigger id='data-modal'><div className="tracking-tight text-xl sm:text-4xl text-primary mr-5">custom</div></Modal.Trigger>}
+                                    {config.data_capture && config.custom_frontend && <Modal.Trigger id='data-modal'><div className="tracking-tight sm:text-3xl text-primary mr-5">custom</div></Modal.Trigger>}
                                     <input type="checkbox" className="toggle pro toggle-lg" disabled={!config.custom_frontend} {...register('data_capture')} />
                                 </FormControl>
 

@@ -193,8 +193,8 @@ export default function NewModelModal({
                 </FormControl>
                 <FormControl label='ready?'>
                     {trainingStatus ?
-                        <div className="text-primary text-xl sm:text-3xl flex items-center gap-2">{trainingStatus} {trainingStatus !== 'finished' && <span className="w-[50px] sm:min-w-[90px]"><Timer /></span>}</div>
-                        : <button className="text-xl sm:text-3xl text-primary" onClick={trainModel}>start ↓</button>
+                        <div className="text-primary sm:text-3xl flex items-center gap-2">{trainingStatus} {trainingStatus !== 'finished' && <span className="w-[50px] sm:min-w-[90px]"><Timer /></span>}</div>
+                        : <button className="sm:text-3xl text-primary" onClick={trainModel}>start ↓</button>
                     }
                 </FormControl>
                 {trainingStatus &&
@@ -204,7 +204,7 @@ export default function NewModelModal({
                                 <span>keep window open until finished </span>
                             </div>
                         </div>
-                        <div className="text-white/40 text-xl sm:text-3xl">
+                        <div className="text-white/40 sm:text-3xl">
                             <span>this might take a minute.......................</span>
                             <LogDisplay logs={logs} />
                             {trainingStatus == 'finished' && <span className="text-white">training complete</span>}
