@@ -97,11 +97,11 @@
 
 @layer base {
     h1 {
-        @apply text-3xl sm:text-6xl font-normal;
+        @apply text-2xl sm:text-6xl font-normal;
     }
 
     h2 {
-        @apply text-lg sm:text-3xl leading-none font-medium sm:font-normal;
+        @apply sm:text-3xl leading-none font-medium sm:font-normal;
     }
 
     h3 {

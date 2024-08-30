@@ -260,10 +260,10 @@ const EventForm = (props: FormData) => {
                             </FormControl>
 
                             <FormControl label='capture'>
-                                <div className='flex flex-row gap-3 sm:text-3xl'>
+                                <div className='flex flex-row gap-3 sm:text-3xl font-medium sm:font-normal'>
                                     <div className='text-primary'>photo</div>
                                     <div className="tooltip" data-tip="coming soon">
-                                        <div className='font-normal text-primary/40'>burst</div>
+                                        <div className='text-primary/40'>burst</div>
                                     </div>
                                 </div>
                             </FormControl>

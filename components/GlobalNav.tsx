@@ -106,7 +106,7 @@ function GlobalNavItem({
             onClick={close}
             href={`/${item.slug}`}
             className={clsx(
-                'block rounded-md text-lg sm:text-xl transition',
+                'block rounded-md font-medium sm:text-xl sm:font-normal transition',
                 {
                     'text-primary hover:text-white': !isActive,
                     'text-white': isActive,

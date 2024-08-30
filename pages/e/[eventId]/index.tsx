@@ -384,13 +384,13 @@ function EventPage(props: ResponseData) {
               )}
             {isHypnoUser() && (
               <Modal.Trigger id="duplicate-event-modal">
-                <h2 className="text-primary text-lg sm:text-xl">duplicate</h2>
+                <h2 className="text-primary sm:text-xl">duplicate</h2>
               </Modal.Trigger>
             )}
             {isProEvent(event.event_type) &&
               isHypnoUser() && (
                 <Modal.Trigger id="archive-event-modal">
-                  <h2 className="text-primary text-lg sm:text-xl">archive</h2>
+                  <h2 className="text-primary sm:text-xl">archive</h2>
                 </Modal.Trigger>
               )}
           </GlobalLayout.Header>
