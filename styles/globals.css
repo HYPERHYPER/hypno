@@ -97,11 +97,11 @@
 
 @layer base {
     h1 {
-        @apply text-3xl sm:text-6xl;
+        @apply text-3xl sm:text-6xl font-normal;
     }
 
     h2 {
-        @apply text-lg sm:text-3xl leading-none;
+        @apply text-lg sm:text-3xl leading-none font-medium sm:font-normal;
     }
 
     h3 {
@@ -135,17 +135,17 @@
     }
 
     .list .item {
-        @apply flex flex-row items-center justify-between border-b-2 border-white/20 py-2 font-normal sm:h-[60px] sm:py-3 sm:text-3xl overflow-hidden;
+        @apply flex flex-row items-center justify-between border-b-2 border-white/20 py-3 font-medium sm:font-normal sm:h-[60px] sm:py-3 sm:text-3xl overflow-hidden;
     }
 
     .list.list-sm .item {
-        @apply flex h-fit flex-row items-center justify-between border-b-[1px] border-white/20 py-1 font-normal sm:h-fit 2xl:py-1 2xl:text-lg;
+        @apply flex h-fit flex-row items-center justify-between border-b-[1px] border-white/20 py-1 font-medium sm:font-normal sm:h-fit 2xl:py-1 2xl:text-lg;
     }
 
     .input,
     .select,
     .textarea {
-        @apply input-ghost bg-white/[.08] text-white placeholder:text-white/20 focus:bg-white/10 focus:text-white disabled:border-white/[0.03] disabled:bg-white/[0.03] disabled:placeholder:text-white/10;
+        @apply input-ghost bg-white/[.08] text-white placeholder:text-white/20 focus:bg-white/10 focus:text-white disabled:border-white/[0.03] disabled:bg-white/[0.03] disabled:placeholder:text-white/10 font-medium sm:font-normal;
     }
 
     .form-control .label-text {
@@ -185,7 +185,7 @@
 
     .input.pro,
     .textarea.pro {
-        @apply text-primary h-auto flex-1 bg-transparent text-right outline-none active:border-none disabled:border-none text-base sm:text-3xl pr-0 leading-none;
+        @apply text-primary h-auto flex-1 bg-transparent text-right outline-none active:border-none disabled:border-none text-base sm:text-3xl pr-0 leading-none font-medium sm:font-normal;
     }
 
     .textarea.pro.left,
@@ -194,7 +194,7 @@
     }
 
     .select.pro {
-        @apply h-auto min-h-fit bg-transparent outline-none active:border-none leading-none text-base sm:text-3xl rounded-none;
+        @apply h-auto min-h-fit bg-transparent outline-none active:border-none leading-none text-base sm:text-3xl rounded-none font-medium sm:font-normal;
     }
 
     .select.pro-form {
