@@ -172,7 +172,7 @@ export default function EffectsModal({
                                     isLoading={isLoading || loadingStates.includes(_.first(images)?.status || '')}
                                     error={error}
                                 />
-                                <div className="absolute -top-3 -right-3 sm:-top-5 sm:-right-5">
+                                <div className="absolute top-0 right-0 sm:-top-5 sm:-right-5">
                                     <button className="btn btn-primary btn-square rounded-full" onClick={handleTestImageGeneration}><Star /></button>
                                 </div>
                             </div>
