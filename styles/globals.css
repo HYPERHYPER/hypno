@@ -97,7 +97,7 @@
 
 @layer base {
     h1 {
-        @apply text-2xl sm:text-6xl font-normal;
+        @apply text-2xl sm:text-6xl font-normal leading-none;
     }
 
     h2 {
