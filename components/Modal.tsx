@@ -32,7 +32,7 @@ const TriggerModal = ({ id, children, onClick }: TriggerModalProps) => {
 };
 
 const btnClassName =
-  "tracking-tight btn btn-primary rounded-[20px] btn-block h-[60px] text-2xl cursor-pointer";
+  "tracking-tight btn btn-primary rounded-[10px] sm:rounded-[20px] btn-block sm:h-[60px] sm:text-2xl cursor-pointer";
 
 export default function Modal({ title, id, children, onDone, menu, actionBtn, wide }: ModalProps) {
     return (
