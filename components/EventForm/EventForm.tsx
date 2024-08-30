@@ -424,7 +424,7 @@ const EventForm = (props: FormData) => {
                                         <label
                                             className='w-full'
                                             tabIndex={config.custom_gallery_assigned ? 0 : undefined}>
-                                            <span className={clsx("inline-flex h-[15px] w-[15px] sm:h-[30px] sm:w-[30px] rounded-full border-4 border-white/20 cursor-pointer", !config.custom_gallery_assigned && 'opacity-50 cursor-not-allowed')} style={{ backgroundColor: `${_.startsWith(config.primary_color, '#') ? "" : "#"}${config.primary_color}` }} />
+                                            <span className={clsx("inline-flex h-[20px] w-[20px] sm:h-[30px] sm:w-[30px] rounded-full border-4 border-white/20 cursor-pointer", !config.custom_gallery_assigned && 'opacity-50 cursor-not-allowed')} style={{ backgroundColor: `${_.startsWith(config.primary_color, '#') ? "" : "#"}${config.primary_color}` }} />
                                         </label>
                                         <div
                                             tabIndex={config.custom_gallery_assigned ? 0 : undefined}
