@@ -140,7 +140,7 @@ export default function EffectsModal({
             }
             actionBtn={{ hidden: true }}
         >
-            <div className='grid grid-cols-1 xl:grid-cols-2 xl:gap-5'>
+            <div className='grid grid-cols-1 xl:grid-cols-2 xl:gap-5 pb-[30px] sm:pb-0'>
                 <div className='pb-7 relative flex w-full items-center justify-center'>
                     <div
                         className='absolute top-0 bottom-0 left-0 w-full'
