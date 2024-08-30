@@ -339,17 +339,17 @@ input[type="date"]::-webkit-input-placeholder {
 
 @media screen and (max-width: 640px) {
     .toggle.pro {
-        height: 15px;
-        width: 30px;
+        height: 20px;
+        width: 40px;
         box-shadow:
-            calc(15px * -1) 0 0 1px #333333 inset,
+            calc(20px * -1) 0 0 1px #333333 inset,
             0 0 0 1px #333333 inset,
             0 0;
     }
 
     .toggle.pro:checked {
         box-shadow:
-            calc(15px) 0 0 1px #00ff99 inset,
+            calc(20px) 0 0 1px #00ff99 inset,
             0 0 0 1px #00ff99 inset,
             0 0;
     }
