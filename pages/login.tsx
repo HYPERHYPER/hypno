@@ -54,7 +54,7 @@ function LoginPage() {
                         <div className='hero-content sm:max-w-2xl w-full flex-col items-start space-y-9'>
                             <div className='space-y-3'>
                                 <h1 className='text-white'>login</h1>
-                                <div><Link href='/signup' className='text-primary hover:underline transition text-3xl'>don&apos;t have an account yet?</Link></div>
+                                <h2><Link href='/signup' className='text-primary hover:underline transition'>don&apos;t have an account yet?</Link></h2>
                             </div>
                             <form className='flex flex-col w-full border-t-2 border-white/20' onSubmit={handleSubmit(submitLogin)}>
                                 <FormControl label='email'>
@@ -79,10 +79,10 @@ function LoginPage() {
                                     />
                                 </FormControl>
 
-                                <Link href={'/password-reset'} className='text-right text-xl text-white/40 mt-4 hover:underline transition'>forgot password?</Link>
+                                <Link href={'/password-reset'} className='text-right text-white/40 mt-4 hover:underline transition'><h2>forgot password?</h2></Link>
                                 
-                                <input type='submit' value='ok' className={clsx('btn btn-primary rounded-lg mt-10 text-4xl h-[80px]', isLoggingIn && 'hidden')} />
-                                {isLoggingIn && <button disabled className='btn btn-primary rounded-lg mt-10 text-4xl h-[80px]'>
+                                <input type='submit' value='ok' className={clsx('btn btn-primary rounded-[10px] sm:rounded-lg mt-10 text-base sm:text-4xl h-[20px] sm:h-[80px]', isLoggingIn && 'hidden')} />
+                                {isLoggingIn && <button disabled className='btn btn-primary rounded-[10px] sm:rounded-lg mt-10 text-4xl h-[20px] sm:h-[80px]'>
                                     <ThreeDots
                                         height="20"
                                         width="50"

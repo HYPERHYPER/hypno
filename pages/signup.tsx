@@ -62,13 +62,13 @@ function SignupPage() {
             <GlobalLayout>
                 <main className='absolute inset-0 bg-black w-screen min-h-screen sm:mt-[150px]'>
                     <div className='hero min-h-screen sm:min-h-full'>
-                        <div className='hero-content sm:max-w-3xl w-full text-left flex-col items-start space-y-9'>
+                        <div className='hero-content sm:max-w-3xl w-full text-left flex-col items-start space-y-3 sm:space-y-9'>
                             <div className='space-y-3'>
                                 <h1 className='text-white'>sign up</h1>
                                 {!isInviteSignup ? 
-                                    <div><Link href='/login' className='text-primary hover:underline transition-colors text-3xl'>already have an account?</Link></div> 
+                                    <h2><Link href='/login' className='text-primary hover:underline transition-colors'>already have an account?</Link></h2> 
                                     :
-                                    <h2 className='text-3xl text-primary'>+ accept invite to join organization</h2>
+                                    <h2 className='text-primary'>+ accept invite to join organization</h2>
                                 }
                             </div>
                             <form className='flex flex-col w-full border-t-2 border-white/20' onSubmit={handleSubmit(submitSignup)}>
@@ -133,7 +133,7 @@ function SignupPage() {
                                         })}
                                     />
                                 </FormControl>
-                                <input type='submit' value='ok' className='btn btn-primary rounded-lg mt-10 text-4xl h-[80px]' />
+                                <input type='submit' value='ok' className='btn btn-primary rounded-[10px] sm:rounded-lg mt-10 text-base sm:text-4xl h-[20px] sm:h-[80px]' />
                             </form>
                             
                             {(error || passwordError) && (
