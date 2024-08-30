@@ -80,8 +80,7 @@ export default function DataCaptureModal({
                     <FieldSelect value={undefined} resetOnSelect={true} onSelect={handleAddField} />
                 </div>
 
-                <FormControl label='fine print' dir='col'>
-                    <h3 className="text-white/40 sm:text-xl">{'format links like <link|https://domain.com>'}</h3>
+                <FormControl label='fine print' dir='col' altLabel="format links like <link|https://domain.com>">
                     <textarea
                         className='textarea pro left flex-1 w-full'
                         placeholder='additional info'
