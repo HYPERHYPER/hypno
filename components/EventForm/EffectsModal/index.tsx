@@ -165,14 +165,16 @@ export default function EffectsModal({
                             <div className="hidden sm:block">
                                 <ImageAsset key='orig-img' src={testImages[imgIdx]} isLoading={false} error={false} />
                             </div>
-                            <div className="relative">
-                                <ImageAsset
-                                    key='gen-img'
-                                    src={_.first(images)?.src}
-                                    isLoading={isLoading || loadingStates.includes(_.first(images)?.status || '')}
-                                    error={error}
-                                />
-                                <div className="absolute -top-2 right-2 sm:-top-5 sm:-right-5">
+                            <div className="relative w-full mx-auto">
+                                <div className="ml-[15px] sm:ml-0 absolute sm:static top-0 left-0 right-0 w-full h-full">
+                                    <ImageAsset
+                                        key='gen-img'
+                                        src={_.first(images)?.src}
+                                        isLoading={isLoading || loadingStates.includes(_.first(images)?.status || '')}
+                                        error={error}
+                                    />
+                                </div>
+                                <div className="absolute -top-5 -right-5">
                                     <button className="btn btn-primary btn-square rounded-full" onClick={handleTestImageGeneration}><Star /></button>
                                 </div>
                             </div>
