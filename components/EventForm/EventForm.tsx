@@ -1,7 +1,6 @@
 import { useEffect, useCallback, useState, useRef } from 'react';
 import _, { debounce } from 'lodash';
 import { useForm, FormProvider } from 'react-hook-form';
-import AiPlayground from '@/components/AiPlayground/AiPlayground';
 import { replaceLinks } from '@/helpers/text';
 import { AxiosResponse } from 'axios';
 import FormControl from '../Form/FormControl';
@@ -19,6 +18,7 @@ import Spinner from '../Spinner';
 import DataCaptureModal from './DataCaptureModal';
 import EffectsModal from './EffectsModal';
 import useOrgAccessStore from '@/store/orgAccessStore';
+import Plus from 'public/pop/plus.svg'
 
 interface FormData {
     event?: any;
@@ -307,7 +307,7 @@ const EventForm = (props: FormData) => {
                             <FormControl label='graphics' featureGated={featureAccess?.graphics ? undefined : 'creator'}>
                                 <Modal.Trigger id='graphics-modal'>
                                     {_.every(config.watermarks, (value) => value === "") ?
-                                        <div className='sm:text-3xl text-white/20'>none</div>
+                                        <span className="cursor-pointer h-[20px] w-[20px] sm:h-[30px] sm:w-[30px] rounded-full bg-white/20 text-black flex items-center justify-center"><Plus /></span>
                                         : (
                                             <div className='sm:text-3xl text-primary flex flex-row gap-2'>
                                                 {Object.entries(config.watermarks).map(([ar, value]) => {
@@ -332,7 +332,7 @@ const EventForm = (props: FormData) => {
                                 <div className='list pro'>
                                     <div key='blendmode'>
                                         <FormControl label='blend mode'>
-                                            <select onChange={(e) => setValue('blendmode', e.target.value, { shouldDirty: true })} value={config.blendmode} className='select pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent sm:text-3xl'>
+                                            <select onChange={(e) => setValue('blendmode', e.target.value, { shouldDirty: true })} value={config.blendmode} className='select pro pl-0 w-full text-right min-h-0 h-auto font-normal lowercase bg-transparent active:bg-transparent text-base sm:text-3xl'>
                                                 {_.map(blendModes, ((o) => <option key={o.value} value={o.value}>{o.name}</option>))}
                                             </select>
                                         </FormControl>
