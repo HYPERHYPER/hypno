@@ -54,7 +54,7 @@ export default function ForgotPasswordForm() {
         <>
             <div className='space-y-3'>
                 <h1 className='text-white'>{success ? 'success!' : 'forgot password'}</h1>
-                <h1 className='text-primary text-3xl'>password reset link will be sent to your email</h1>
+                <h2 className='text-primary'>password reset link will be sent to your email</h2>
             </div>
             {!success ? (
                 <>
@@ -68,8 +68,8 @@ export default function ForgotPasswordForm() {
                                 })}
                             />
                         </FormControl>
-                        <input type='submit' value='ok' className={clsx('btn btn-primary rounded-lg mt-10 text-4xl h-[80px]', isLoading && 'hidden')} />
-                        {isLoading && <button disabled className='btn btn-primary rounded-lg mt-10 text-4xl h-[80px]'>
+                        <input type='submit' value='ok' className={clsx('btn btn-primary rounded-[10px] sm:rounded-lg mt-10 text-base sm:text-4xl h-[20px] sm:h-[80px]', isLoading && 'hidden')} />
+                        {isLoading && <button disabled className='btn btn-primary rounded-[10px] sm:rounded-lg mt-10 text-4xl h-[20px] sm:h-[80px]'>
                             <ThreeDots
                                 height="20"
                                 width="50"
