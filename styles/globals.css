@@ -194,7 +194,7 @@
     }
 
     .select.pro {
-        @apply h-auto min-h-fit bg-transparent outline-none active:border-none leading-none text-base sm:text-3xl;
+        @apply h-auto min-h-fit bg-transparent outline-none active:border-none leading-none text-base sm:text-3xl rounded-none;
     }
 
     .select.pro-form {
