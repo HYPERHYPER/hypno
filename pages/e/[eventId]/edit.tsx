@@ -44,7 +44,7 @@ const EditEventPage = (props: ResponseData) => {
     const submitForm = (changedFieldsArr: any) => {
         let payloadArr: any = [];
         let eventObj: any = {};
-        const eventKeys = ['name', 'is_private', 'blendmode', 'custom_gallery_assigned']
+        const eventKeys = ['name', 'client_id', 'is_private', 'blendmode', 'custom_gallery_assigned']
         let custom_frontend: any = {};
         const customFrontendKeys = ['logo_image', 'home_background_image', 'primary_color', 'data_capture', 'fields', 'data_capture_title', 'data_capture_subtitle', 'enable_legal', 'explicit_opt_in', 'terms_privacy', 'email_delivery'];
         let filter: any = {};
