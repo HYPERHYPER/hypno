@@ -48,11 +48,11 @@ function NewEventPage(props: ResponseData) {
     const submitForm = async () => {
         setStatus('saving')
 
-        console.log("submitForm", { eventData });
+        console.log("submitForm in new.tsx", { eventData });
         const payload: EventPayload = {
             event: {
                 name: eventData.name,
-                client_id: eventData.org_id,
+                client_id: eventData.client_id,
                 is_private: eventData.is_private,
                 blendmode: eventData.blendmode,
                 custom_gallery_assigned: eventData.custom_gallery_assigned ? '1' : '0',
