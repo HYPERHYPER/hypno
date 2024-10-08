@@ -360,11 +360,9 @@ function EventPage(props: ResponseData) {
             {/* <Link href={`/pro/${id}/p`}><h2 className='text-primary'>public gallery</h2></Link> */}
             {/* <Link href={`/e/${id}`}><h2 className='text-white'>all</h2></Link> */}
             {/* <Link href=''><h2 className='text-primary'>favorites</h2></Link> */}
-            {isProEvent(event.event_type) && (
-              <Link href={shareableGalleryUrl}>
-                <h2 className="text-primary">gallery</h2>
-              </Link>
-            )}
+            <Link href={shareableGalleryUrl}>
+              <h2 className="text-primary">gallery</h2>
+            </Link>
 
             {userEventPrivileges?.canDownloadContent && (
               <Modal.Trigger id="content-download-modal">
