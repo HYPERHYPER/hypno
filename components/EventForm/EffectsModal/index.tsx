@@ -47,8 +47,7 @@ export default function EffectsModal({
 }) {
     const { setValue, watch, register } = useFormContext();
     const ai_generation = watch().ai_generation;
-    const org_id = watch().org_id;
-
+    const org_id = watch().client_id;
     useEffect(() => {
         if (ai_generation.enabled && _.isNil(ai_generation.type)) {
             setValue('ai_generation.type', 'midjourney', { shouldDirty: true })
